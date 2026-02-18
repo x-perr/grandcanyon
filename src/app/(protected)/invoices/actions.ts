@@ -258,7 +258,8 @@ export async function getUninvoicedEntries(
 ): Promise<UninvoicedEntry[]> {
   const supabase = await createClient()
 
-  let query = supabase
+  // First, get all billable entries for this project
+  const { data, error } = await supabase
     .from('timesheet_entries')
     .select(
       `
@@ -279,17 +280,30 @@ export async function getUninvoicedEntries(
     )
     .eq('project_id', projectId)
     .eq('is_billable', true)
-    .is('invoice_line_id', null) // Not yet invoiced
-
-  const { data, error } = await query
 
   if (error) {
-    console.error('Error fetching uninvoiced entries:', error)
+    console.error('Error fetching timesheet entries:', error)
     return []
   }
 
+  if (!data || data.length === 0) {
+    return []
+  }
+
+  // Get entry IDs that already have invoice lines
+  const entryIds = data.map((e) => e.id)
+  const { data: invoicedLines } = await supabase
+    .from('invoice_lines')
+    .select('timesheet_entry_id')
+    .in('timesheet_entry_id', entryIds)
+
+  const invoicedEntryIds = new Set((invoicedLines ?? []).map((l) => l.timesheet_entry_id))
+
+  // Filter out already-invoiced entries
+  const uninvoiced = data.filter((entry) => !invoicedEntryIds.has(entry.id))
+
   // Filter to only approved timesheets and within date range
-  const filtered = (data ?? []).filter((entry) => {
+  const filtered = uninvoiced.filter((entry) => {
     const timesheet = Array.isArray(entry.timesheet) ? entry.timesheet[0] : entry.timesheet
     if (!timesheet || timesheet.status !== 'approved') return false
 
@@ -518,24 +532,8 @@ export async function createInvoice(data: CreateInvoiceData) {
     return { error: 'Failed to create invoice lines' }
   }
 
-  // Link timesheet entries to invoice lines
-  for (const line of lineItems) {
-    if (line.timesheet_entry_id) {
-      const { data: lineRecord } = await supabase
-        .from('invoice_lines')
-        .select('id')
-        .eq('invoice_id', invoice.id)
-        .eq('timesheet_entry_id', line.timesheet_entry_id)
-        .single()
-
-      if (lineRecord) {
-        await supabase
-          .from('timesheet_entries')
-          .update({ invoice_line_id: lineRecord.id })
-          .eq('id', line.timesheet_entry_id)
-      }
-    }
-  }
+  // Note: Timesheet entries are linked via invoice_lines.timesheet_entry_id
+  // No need to update timesheet_entries - the relationship is already established
 
   revalidatePath('/invoices')
   redirect(`/invoices/${invoice.id}`)
@@ -796,18 +794,18 @@ export async function cancelInvoice(invoiceId: string) {
     return { error: 'Cannot cancel paid invoices' }
   }
 
-  // Unlink timesheet entries
+  // Unlink timesheet entries by deleting invoice lines
   const entryIds = (invoice.lines ?? [])
     .filter((l) => l.timesheet_entry_id)
     .map((l) => l.timesheet_entry_id as string)
 
-  if (entryIds.length > 0) {
-    // Clear invoice_line_id from entries
-    await supabase
-      .from('timesheet_entries')
-      .update({ invoice_line_id: null })
-      .in('id', entryIds)
+  // Delete invoice lines to free up entries for re-invoicing
+  const lineIds = (invoice.lines ?? []).map((l) => l.id)
+  if (lineIds.length > 0) {
+    await supabase.from('invoice_lines').delete().in('id', lineIds)
+  }
 
+  if (entryIds.length > 0) {
     // Unlock timesheets (set back to approved)
     const { data: entries } = await supabase
       .from('timesheet_entries')
