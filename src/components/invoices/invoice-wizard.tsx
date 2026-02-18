@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { StepSelectProject } from './step-select-project'
@@ -239,6 +240,11 @@ export function InvoiceWizard({
 
       // createInvoice will redirect on success
     } catch (error) {
+      // Check if this is a redirect (Next.js throws special error for redirects)
+      if (isRedirectError(error)) {
+        // Let the redirect happen
+        throw error
+      }
       console.error('Error creating invoice:', error)
       toast.error('Failed to create invoice')
       setIsSubmitting(false)
