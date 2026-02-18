@@ -1,12 +1,21 @@
+import { Suspense } from 'react'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Clock, FileText, Receipt, FolderKanban } from 'lucide-react'
 import { getProfile } from '@/lib/auth'
-import Link from 'next/link'
+import { StatsCards } from '@/components/dashboard/stats-cards'
+import { RecentActivity } from '@/components/dashboard/recent-activity'
+import { getDashboardStats, getRecentActivity } from './actions'
 
 export default async function DashboardPage() {
-  const profile = await getProfile()
+  const [profile, stats, activities] = await Promise.all([
+    getProfile(),
+    getDashboardStats(),
+    getRecentActivity(10),
+  ])
+
   const firstName = profile?.first_name || 'User'
 
   return (
@@ -20,60 +29,10 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* Stats Cards - Placeholders */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Open Timesheets</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">
-              Awaiting submission
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Hours This Week</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">32.5</div>
-            <p className="text-xs text-muted-foreground">
-              +8.5 from yesterday
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Draft Invoices</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2</div>
-            <p className="text-xs text-muted-foreground">
-              Ready to send
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-            <FolderKanban className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">7</div>
-            <p className="text-xs text-muted-foreground">
-              Across 4 clients
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Stats Cards */}
+      <Suspense fallback={<StatsSkeleton />}>
+        <StatsCards stats={stats} />
+      </Suspense>
 
       {/* Quick Actions */}
       <Card>
@@ -100,42 +59,60 @@ export default async function DashboardPage() {
               New Expense
             </Link>
           </Button>
+          <Button variant="outline" asChild>
+            <Link href="/reports">
+              <FileText className="mr-2 h-4 w-4" />
+              Reports
+            </Link>
+          </Button>
         </CardContent>
       </Card>
 
-      {/* Recent Activity - Placeholder */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-          <CardDescription>Latest updates from your team</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-4">
+      {/* Recent Activity */}
+      <Suspense fallback={<ActivitySkeleton />}>
+        <RecentActivity activities={activities} />
+      </Suspense>
+    </div>
+  )
+}
+
+function StatsSkeleton() {
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {[1, 2, 3, 4].map((i) => (
+        <Card key={i}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-8 w-16 mb-1" />
+            <Skeleton className="h-3 w-20" />
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )
+}
+
+function ActivitySkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Recent Activity</CardTitle>
+        <CardDescription>Latest updates from your team</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="flex items-center gap-4">
             <Skeleton className="h-8 w-8 rounded-full" />
             <div className="flex-1 space-y-1">
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-3 w-1/4" />
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Skeleton className="h-8 w-8 rounded-full" />
-            <div className="flex-1 space-y-1">
-              <Skeleton className="h-4 w-2/3" />
-              <Skeleton className="h-3 w-1/3" />
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Skeleton className="h-8 w-8 rounded-full" />
-            <div className="flex-1 space-y-1">
-              <Skeleton className="h-4 w-4/5" />
-              <Skeleton className="h-3 w-1/4" />
-            </div>
-          </div>
-          <p className="text-sm text-muted-foreground text-center pt-2">
-            Activity feed coming soon
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+        ))}
+      </CardContent>
+    </Card>
   )
 }
