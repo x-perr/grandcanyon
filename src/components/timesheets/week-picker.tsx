@@ -15,9 +15,10 @@ import {
 
 interface WeekPickerProps {
   weekStart: string
+  basePath?: string // Default: '/timesheets'
 }
 
-export function WeekPicker({ weekStart }: WeekPickerProps) {
+export function WeekPicker({ weekStart, basePath = '/timesheets' }: WeekPickerProps) {
   const router = useRouter()
   const currentDate = parseDateISO(weekStart)
   const weekRange = formatWeekRange(currentDate)
@@ -25,17 +26,17 @@ export function WeekPicker({ weekStart }: WeekPickerProps) {
 
   const goToPreviousWeek = () => {
     const prevWeek = getPreviousWeekStart(currentDate)
-    router.push(`/timesheets/${formatDateISO(prevWeek)}`)
+    router.push(`${basePath}/${formatDateISO(prevWeek)}`)
   }
 
   const goToNextWeek = () => {
     const nextWeek = getNextWeekStart(currentDate)
-    router.push(`/timesheets/${formatDateISO(nextWeek)}`)
+    router.push(`${basePath}/${formatDateISO(nextWeek)}`)
   }
 
   const goToCurrentWeek = () => {
     const current = getCurrentWeekStart()
-    router.push(`/timesheets/${formatDateISO(current)}`)
+    router.push(`${basePath}/${formatDateISO(current)}`)
   }
 
   return (
