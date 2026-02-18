@@ -40,7 +40,7 @@ export async function GET(
             id,
             hours,
             timesheet:timesheets(
-              user:profiles(first_name, last_name)
+              user:profiles!timesheets_user_id_fkey(first_name, last_name)
             )
           )
         )

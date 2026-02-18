@@ -98,17 +98,24 @@ export function getDefaultInvoiceDates() {
   }
 }
 
-// Helper to get default period (last month)
+// Helper to get default period (current week, Monday to Sunday)
 export function getDefaultPeriod() {
   const today = new Date()
-  const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-  const lastOfPrevMonth = new Date(firstOfMonth)
-  lastOfPrevMonth.setDate(lastOfPrevMonth.getDate() - 1)
-  const firstOfPrevMonth = new Date(lastOfPrevMonth.getFullYear(), lastOfPrevMonth.getMonth(), 1)
+  const dayOfWeek = today.getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+
+  // Get start of current week (Monday)
+  // If today is Sunday (0), go back 6 days. Otherwise go back (dayOfWeek - 1) days
+  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+  const weekStart = new Date(today)
+  weekStart.setDate(today.getDate() - daysToMonday)
+
+  // Get end of current week (Sunday)
+  const weekEnd = new Date(weekStart)
+  weekEnd.setDate(weekStart.getDate() + 6)
 
   return {
-    period_start: firstOfPrevMonth.toISOString().split('T')[0],
-    period_end: lastOfPrevMonth.toISOString().split('T')[0],
+    period_start: weekStart.toISOString().split('T')[0],
+    period_end: weekEnd.toISOString().split('T')[0],
   }
 }
 

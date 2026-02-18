@@ -226,7 +226,7 @@ export async function getInvoice(id: string): Promise<InvoiceWithRelations | nul
           id,
           hours,
           timesheet:timesheets(
-            user:profiles(first_name, last_name)
+            user:profiles!timesheets_user_id_fkey(first_name, last_name)
           )
         )
       )

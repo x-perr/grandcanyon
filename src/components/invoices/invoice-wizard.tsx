@@ -9,7 +9,7 @@ import { StepSelectEntries } from './step-select-entries'
 import { StepReview } from './step-review'
 import { createInvoice, sendInvoice } from '@/app/(protected)/invoices/actions'
 import { calculateTaxes, calculateLineAmount } from '@/lib/tax'
-import { getDefaultInvoiceDates, type InvoiceLineFormData } from '@/lib/validations/invoice'
+import { getDefaultInvoiceDates, getDefaultPeriod, type InvoiceLineFormData } from '@/lib/validations/invoice'
 import { toast } from 'sonner'
 import { ChevronLeft, ChevronRight, Loader2, Save, Send } from 'lucide-react'
 import type { ClientForSelect, ProjectForSelect, UninvoicedEntry } from '@/app/(protected)/invoices/actions'
@@ -50,8 +50,9 @@ export function InvoiceWizard({
   // Local state for form values
   const [clientId, setClientId] = useState(initialValues.client_id ?? '')
   const [projectId, setProjectId] = useState(initialValues.project_id ?? '')
-  const [periodStart, setPeriodStart] = useState(initialValues.period_start ?? '')
-  const [periodEnd, setPeriodEnd] = useState(initialValues.period_end ?? '')
+  const defaultPeriod = getDefaultPeriod()
+  const [periodStart, setPeriodStart] = useState(initialValues.period_start || defaultPeriod.period_start)
+  const [periodEnd, setPeriodEnd] = useState(initialValues.period_end || defaultPeriod.period_end)
   const [selectedEntryIds, setSelectedEntryIds] = useState<string[]>(initialValues.selectedEntryIds)
 
   // Step 3 additional state
@@ -347,7 +348,10 @@ export function InvoiceWizard({
 
         <div className="flex gap-2">
           {step < 3 ? (
-            <Button onClick={handleNext} disabled={isPending}>
+            <Button
+              onClick={handleNext}
+              disabled={isPending || (step === 2 && selectedEntryIds.length === 0)}
+            >
               Continue
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
