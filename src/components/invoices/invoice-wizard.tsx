@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { StepSelectProject } from './step-select-project'
@@ -227,7 +226,7 @@ export function InvoiceWizard({
         })
       })
 
-      await createInvoice({
+      const result = await createInvoice({
         client_id: clientId,
         project_id: projectId,
         invoice_date: invoiceDate,
@@ -238,13 +237,17 @@ export function InvoiceWizard({
         lines: linesWithEntries,
       })
 
-      // createInvoice will redirect on success
-    } catch (error) {
-      // Check if this is a redirect (Next.js throws special error for redirects)
-      if (isRedirectError(error)) {
-        // Let the redirect happen
-        throw error
+      if (result.error) {
+        toast.error(result.error)
+        setIsSubmitting(false)
+        return
       }
+
+      // Navigate to the new invoice
+      if (result.invoiceId) {
+        router.push(`/invoices/${result.invoiceId}`)
+      }
+    } catch (error) {
       console.error('Error creating invoice:', error)
       toast.error('Failed to create invoice')
       setIsSubmitting(false)

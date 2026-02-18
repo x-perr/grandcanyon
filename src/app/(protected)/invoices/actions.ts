@@ -536,7 +536,9 @@ export async function createInvoice(data: CreateInvoiceData) {
   // No need to update timesheet_entries - the relationship is already established
 
   revalidatePath('/invoices')
-  redirect(`/invoices/${invoice.id}`)
+
+  // Return invoice ID for client-side navigation
+  return { invoiceId: invoice.id }
 }
 
 /**
