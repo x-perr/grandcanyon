@@ -42,7 +42,7 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
     getUserPermissions(),
   ])
 
-  const canCreate = hasPermission(permissions, 'invoices.edit')
+  const canCreate = hasPermission(permissions, 'invoices.create')
 
   return (
     <div className="space-y-6">

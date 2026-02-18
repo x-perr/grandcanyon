@@ -11,7 +11,7 @@ export default async function EditInvoicePage({ params }: EditInvoicePageProps) 
   const { id } = await params
   const permissions = await getUserPermissions()
 
-  if (!hasPermission(permissions, 'invoices.edit')) {
+  if (!hasPermission(permissions, 'invoices.create')) {
     redirect('/invoices')
   }
 

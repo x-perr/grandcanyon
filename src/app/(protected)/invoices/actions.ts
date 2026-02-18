@@ -17,11 +17,11 @@ export type InvoiceWithRelations = Tables<'invoices'> & {
     id: string
     code: string
     name: string
-    short_name: string
-    address: string | null
-    city: string | null
-    province: string | null
-    postal_code: string | null
+    short_name: string | null
+    billing_address_line1: string | null
+    billing_city: string | null
+    billing_province: string | null
+    billing_postal_code: string | null
     charges_gst: boolean | null
     charges_qst: boolean | null
   } | null
@@ -111,7 +111,8 @@ export async function getInvoices(options?: {
       `
       *,
       client:clients!invoices_client_id_fkey(
-        id, code, name, short_name, address, city, province, postal_code,
+        id, code, name, short_name,
+        billing_address_line1, billing_city, billing_province, billing_postal_code,
         charges_gst, charges_qst
       ),
       project:projects!invoices_project_id_fkey(id, code, name)
@@ -214,7 +215,8 @@ export async function getInvoice(id: string): Promise<InvoiceWithRelations | nul
       `
       *,
       client:clients!invoices_client_id_fkey(
-        id, code, name, short_name, address, city, province, postal_code,
+        id, code, name, short_name,
+        billing_address_line1, billing_city, billing_province, billing_postal_code,
         charges_gst, charges_qst
       ),
       project:projects!invoices_project_id_fkey(id, code, name),
@@ -423,7 +425,7 @@ export async function createInvoice(data: CreateInvoiceData) {
 
   // Verify permission
   const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'invoices.edit')) {
+  if (!hasPermission(permissions, 'invoices.create')) {
     return { error: 'You do not have permission to create invoices' }
   }
 
@@ -557,7 +559,7 @@ export async function updateInvoice(
 
   // Verify permission
   const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'invoices.edit')) {
+  if (!hasPermission(permissions, 'invoices.create')) {
     return { error: 'You do not have permission to edit invoices' }
   }
 
@@ -657,7 +659,7 @@ export async function sendInvoice(invoiceId: string) {
 
   // Verify permission
   const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'invoices.edit')) {
+  if (!hasPermission(permissions, 'invoices.create')) {
     return { error: 'You do not have permission to send invoices' }
   }
 
@@ -729,7 +731,7 @@ export async function markInvoicePaid(invoiceId: string) {
 
   // Verify permission
   const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'invoices.edit')) {
+  if (!hasPermission(permissions, 'invoices.create')) {
     return { error: 'You do not have permission to update invoices' }
   }
 
@@ -775,7 +777,7 @@ export async function cancelInvoice(invoiceId: string) {
 
   // Verify permission
   const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'invoices.edit')) {
+  if (!hasPermission(permissions, 'invoices.create')) {
     return { error: 'You do not have permission to cancel invoices' }
   }
 
@@ -851,7 +853,7 @@ export async function deleteInvoice(invoiceId: string) {
 
   // Verify permission
   const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'invoices.edit')) {
+  if (!hasPermission(permissions, 'invoices.create')) {
     return { error: 'You do not have permission to delete invoices' }
   }
 

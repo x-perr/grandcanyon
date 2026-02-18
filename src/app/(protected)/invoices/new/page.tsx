@@ -20,7 +20,7 @@ export default async function NewInvoicePage({ searchParams }: NewInvoicePagePro
 
   // Verify permission
   const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'invoices.edit')) {
+  if (!hasPermission(permissions, 'invoices.create')) {
     redirect('/invoices')
   }
 

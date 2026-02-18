@@ -44,7 +44,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
     notFound()
   }
 
-  const canEdit = hasPermission(permissions, 'invoices.edit')
+  const canEdit = hasPermission(permissions, 'invoices.create')
 
   const formatDate = (date: string | null) => {
     if (!date) return 'Not set'
@@ -254,12 +254,12 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
                     </div>
 
                     {/* Client Address */}
-                    {(invoice.client.address || invoice.client.city) && (
+                    {(invoice.client.billing_address_line1 || invoice.client.billing_city) && (
                       <div className="text-sm">
-                        {invoice.client.address && <p>{invoice.client.address}</p>}
-                        {(invoice.client.city || invoice.client.province || invoice.client.postal_code) && (
+                        {invoice.client.billing_address_line1 && <p>{invoice.client.billing_address_line1}</p>}
+                        {(invoice.client.billing_city || invoice.client.billing_province || invoice.client.billing_postal_code) && (
                           <p>
-                            {[invoice.client.city, invoice.client.province, invoice.client.postal_code]
+                            {[invoice.client.billing_city, invoice.client.billing_province, invoice.client.billing_postal_code]
                               .filter(Boolean)
                               .join(', ')}
                           </p>

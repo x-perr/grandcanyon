@@ -124,10 +124,10 @@ export async function getProject(id: string) {
         is_active,
         created_at,
         user:profiles!project_members_user_id_fkey(id, first_name, last_name, email),
-        billing_role:project_billing_roles(id, name, rate)
+        billing_role:project_billing_roles!project_members_billing_role_id_fkey(id, name, rate)
       ),
       tasks:project_tasks(id, code, name, description, sort_order, start_date, end_date),
-      billing_roles:project_billing_roles(id, name, rate, created_at)
+      billing_roles:project_billing_roles!project_billing_roles_project_id_fkey(id, name, rate, created_at)
     `
     )
     .eq('id', id)

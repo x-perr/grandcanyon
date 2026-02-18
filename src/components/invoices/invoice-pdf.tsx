@@ -302,12 +302,12 @@ export function InvoicePDF({ invoice, companyInfo = DEFAULT_COMPANY_INFO }: Invo
             {invoice.client && (
               <>
                 <Text style={styles.clientName}>{invoice.client.name}</Text>
-                {invoice.client.address && (
-                  <Text style={styles.clientDetails}>{invoice.client.address}</Text>
+                {invoice.client.billing_address_line1 && (
+                  <Text style={styles.clientDetails}>{invoice.client.billing_address_line1}</Text>
                 )}
-                {(invoice.client.city || invoice.client.province || invoice.client.postal_code) && (
+                {(invoice.client.billing_city || invoice.client.billing_province || invoice.client.billing_postal_code) && (
                   <Text style={styles.clientDetails}>
-                    {[invoice.client.city, invoice.client.province, invoice.client.postal_code]
+                    {[invoice.client.billing_city, invoice.client.billing_province, invoice.client.billing_postal_code]
                       .filter(Boolean)
                       .join(', ')}
                   </Text>

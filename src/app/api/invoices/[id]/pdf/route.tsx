@@ -58,24 +58,8 @@ export async function GET(
     const invoice: InvoiceWithRelations = {
       ...invoiceData,
       client: Array.isArray(invoiceData.client)
-        ? invoiceData.client[0]
-          ? {
-              ...invoiceData.client[0],
-              address: invoiceData.client[0].billing_address_line1,
-              city: invoiceData.client[0].billing_city,
-              province: invoiceData.client[0].billing_province,
-              postal_code: invoiceData.client[0].billing_postal_code,
-            }
-          : null
-        : invoiceData.client
-          ? {
-              ...invoiceData.client,
-              address: invoiceData.client.billing_address_line1,
-              city: invoiceData.client.billing_city,
-              province: invoiceData.client.billing_province,
-              postal_code: invoiceData.client.billing_postal_code,
-            }
-          : null,
+        ? invoiceData.client[0] ?? null
+        : invoiceData.client,
       project: Array.isArray(invoiceData.project)
         ? invoiceData.project[0] ?? null
         : invoiceData.project,

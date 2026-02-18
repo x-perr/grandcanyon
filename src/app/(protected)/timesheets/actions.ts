@@ -310,7 +310,7 @@ export async function getUserProjects(userId?: string): Promise<ProjectForTimesh
       code,
       name,
       tasks:project_tasks(id, code, name),
-      billing_roles:project_billing_roles(id, name, rate)
+      billing_roles:project_billing_roles!project_billing_roles_project_id_fkey(id, name, rate)
     `
     )
     .or(`is_global.eq.true,project_manager_id.eq.${targetUserId}`)
@@ -335,7 +335,7 @@ export async function getUserProjects(userId?: string): Promise<ProjectForTimesh
         status,
         deleted_at,
         tasks:project_tasks(id, code, name),
-        billing_roles:project_billing_roles(id, name, rate)
+        billing_roles:project_billing_roles!project_billing_roles_project_id_fkey(id, name, rate)
       )
     `
     )
