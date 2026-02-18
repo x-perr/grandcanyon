@@ -1,0 +1,771 @@
+'use server'
+
+import { createClient } from '@/lib/supabase/server'
+import { revalidatePath } from 'next/cache'
+import { getUserPermissions, hasPermission, getProfile } from '@/lib/auth'
+import { formatDateISO, getMonday, getSunday, getPreviousWeekStart } from '@/lib/date'
+import { timesheetEntrySchema } from '@/lib/validations/timesheet'
+import type { Enums, Tables } from '@/types/database'
+
+type TimesheetStatus = Enums<'timesheet_status'>
+
+// === TYPE DEFINITIONS ===
+
+export type TimesheetWithUser = Tables<'timesheets'> & {
+  user: {
+    id: string
+    first_name: string
+    last_name: string
+    email: string
+  } | null
+  total_hours?: number
+}
+
+export type TimesheetEntryWithRelations = Tables<'timesheet_entries'> & {
+  project: {
+    id: string
+    code: string
+    name: string
+  } | null
+  task: {
+    id: string
+    code: string
+    name: string
+  } | null
+  billing_role: {
+    id: string
+    name: string
+    rate: number
+  } | null
+}
+
+export type ProjectForTimesheet = {
+  id: string
+  code: string
+  name: string
+  tasks: { id: string; code: string; name: string }[]
+  billing_roles: { id: string; name: string; rate: number }[]
+}
+
+// === QUERY FUNCTIONS ===
+
+/**
+ * Get list of timesheets for a user (paginated)
+ */
+export async function getTimesheets(options?: {
+  userId?: string
+  status?: TimesheetStatus
+  limit?: number
+  offset?: number
+}): Promise<{ timesheets: TimesheetWithUser[]; count: number }> {
+  const supabase = await createClient()
+  const { userId, status, limit = 25, offset = 0 } = options ?? {}
+
+  // Get current user if no userId specified
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const targetUserId = userId ?? user?.id
+
+  if (!targetUserId) {
+    return { timesheets: [], count: 0 }
+  }
+
+  let query = supabase
+    .from('timesheets')
+    .select(
+      `
+      *,
+      user:profiles!timesheets_user_id_fkey(id, first_name, last_name, email)
+    `,
+      { count: 'exact' }
+    )
+    .eq('user_id', targetUserId)
+
+  if (status) {
+    query = query.eq('status', status)
+  }
+
+  query = query.order('week_start', { ascending: false }).range(offset, offset + limit - 1)
+
+  const { data, count, error } = await query
+
+  if (error) {
+    console.error('Error fetching timesheets:', error)
+    return { timesheets: [], count: 0 }
+  }
+
+  // Calculate total hours for each timesheet
+  const timesheetIds = (data ?? []).map((ts) => ts.id)
+
+  if (timesheetIds.length > 0) {
+    const { data: entries } = await supabase
+      .from('timesheet_entries')
+      .select('timesheet_id, hours')
+      .in('timesheet_id', timesheetIds)
+
+    const hoursByTimesheet = new Map<string, number>()
+    entries?.forEach((entry) => {
+      const total = entry.hours?.reduce((sum: number, h: number | null) => sum + (h ?? 0), 0) ?? 0
+      hoursByTimesheet.set(entry.timesheet_id, (hoursByTimesheet.get(entry.timesheet_id) ?? 0) + total)
+    })
+
+    const timesheets = (data ?? []).map((ts) => ({
+      ...ts,
+      user: Array.isArray(ts.user) ? ts.user[0] ?? null : ts.user,
+      total_hours: hoursByTimesheet.get(ts.id) ?? 0,
+    })) as TimesheetWithUser[]
+
+    return { timesheets, count: count ?? 0 }
+  }
+
+  const timesheets = (data ?? []).map((ts) => ({
+    ...ts,
+    user: Array.isArray(ts.user) ? ts.user[0] ?? null : ts.user,
+    total_hours: 0,
+  })) as TimesheetWithUser[]
+
+  return { timesheets, count: count ?? 0 }
+}
+
+/**
+ * Get or create a timesheet for a specific week
+ */
+export async function getOrCreateTimesheet(weekStart: string, userId?: string) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const targetUserId = userId ?? user?.id
+
+  if (!targetUserId) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Check impersonation permission if entering for others
+  if (userId && userId !== user?.id) {
+    const permissions = await getUserPermissions()
+    if (!hasPermission(permissions, 'timesheets.impersonate')) {
+      return { error: 'Not authorized to enter time for others' }
+    }
+  }
+
+  // Ensure weekStart is a Monday
+  const monday = getMonday(new Date(weekStart))
+  const weekStartISO = formatDateISO(monday)
+  const weekEndISO = formatDateISO(getSunday(monday))
+
+  // Try to get existing timesheet
+  const { data: existing } = await supabase
+    .from('timesheets')
+    .select('*')
+    .eq('user_id', targetUserId)
+    .eq('week_start', weekStartISO)
+    .single()
+
+  if (existing) {
+    return { timesheet: existing }
+  }
+
+  // Create new timesheet
+  const { data: timesheet, error } = await supabase
+    .from('timesheets')
+    .insert({
+      user_id: targetUserId,
+      week_start: weekStartISO,
+      week_end: weekEndISO,
+      status: 'draft',
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating timesheet:', error)
+    return { error: 'Failed to create timesheet' }
+  }
+
+  return { timesheet }
+}
+
+/**
+ * Get a timesheet by ID with all entries
+ */
+export async function getTimesheetById(timesheetId: string) {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('timesheets')
+    .select(
+      `
+      *,
+      user:profiles!timesheets_user_id_fkey(id, first_name, last_name, email, manager_id),
+      entries:timesheet_entries(
+        *,
+        project:projects!timesheet_entries_project_id_fkey(id, code, name),
+        task:project_tasks!timesheet_entries_task_id_fkey(id, code, name),
+        billing_role:project_billing_roles!timesheet_entries_billing_role_id_fkey(id, name, rate)
+      )
+    `
+    )
+    .eq('id', timesheetId)
+    .single()
+
+  if (error) {
+    console.error('Error fetching timesheet:', error)
+    return null
+  }
+
+  return data
+}
+
+/**
+ * Get pending approvals for a manager
+ */
+export async function getPendingApprovals(): Promise<{ timesheets: TimesheetWithUser[]; count: number }> {
+  const supabase = await createClient()
+  const profile = await getProfile()
+
+  if (!profile) {
+    return { timesheets: [], count: 0 }
+  }
+
+  // Get timesheets submitted by direct reports
+  const { data, count: _count, error } = await supabase
+    .from('timesheets')
+    .select(
+      `
+      *,
+      user:profiles!timesheets_user_id_fkey(id, first_name, last_name, email, manager_id)
+    `,
+      { count: 'exact' }
+    )
+    .eq('status', 'submitted')
+
+  if (error) {
+    console.error('Error fetching pending approvals:', error)
+    return { timesheets: [], count: 0 }
+  }
+
+  // Filter to only direct reports (where manager_id matches current user)
+  const directReportTimesheets = (data ?? []).filter((ts) => {
+    const user = Array.isArray(ts.user) ? ts.user[0] : ts.user
+    return user?.manager_id === profile.id
+  })
+
+  // Calculate total hours
+  const timesheetIds = directReportTimesheets.map((ts) => ts.id)
+
+  if (timesheetIds.length > 0) {
+    const { data: entries } = await supabase
+      .from('timesheet_entries')
+      .select('timesheet_id, hours')
+      .in('timesheet_id', timesheetIds)
+
+    const hoursByTimesheet = new Map<string, number>()
+    entries?.forEach((entry) => {
+      const total = entry.hours?.reduce((sum: number, h: number | null) => sum + (h ?? 0), 0) ?? 0
+      hoursByTimesheet.set(entry.timesheet_id, (hoursByTimesheet.get(entry.timesheet_id) ?? 0) + total)
+    })
+
+    const timesheets = directReportTimesheets.map((ts) => ({
+      ...ts,
+      user: Array.isArray(ts.user) ? ts.user[0] ?? null : ts.user,
+      total_hours: hoursByTimesheet.get(ts.id) ?? 0,
+    })) as TimesheetWithUser[]
+
+    return { timesheets, count: timesheets.length }
+  }
+
+  const timesheets = directReportTimesheets.map((ts) => ({
+    ...ts,
+    user: Array.isArray(ts.user) ? ts.user[0] ?? null : ts.user,
+    total_hours: 0,
+  })) as TimesheetWithUser[]
+
+  return { timesheets, count: timesheets.length }
+}
+
+/**
+ * Get projects the user can log time to
+ */
+export async function getUserProjects(userId?: string): Promise<ProjectForTimesheet[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const targetUserId = userId ?? user?.id
+
+  if (!targetUserId) {
+    return []
+  }
+
+  // Get projects where user is a team member or project is global
+  const { data: projects, error } = await supabase
+    .from('projects')
+    .select(
+      `
+      id,
+      code,
+      name,
+      tasks:project_tasks(id, code, name),
+      billing_roles:project_billing_roles(id, name, rate)
+    `
+    )
+    .or(`is_global.eq.true,project_manager_id.eq.${targetUserId}`)
+    .eq('status', 'active')
+    .is('deleted_at', null)
+    .order('code')
+
+  if (error) {
+    console.error('Error fetching user projects:', error)
+    return []
+  }
+
+  // Also get projects where user is a member
+  const { data: memberProjects } = await supabase
+    .from('project_members')
+    .select(
+      `
+      project:projects!project_members_project_id_fkey(
+        id,
+        code,
+        name,
+        status,
+        deleted_at,
+        tasks:project_tasks(id, code, name),
+        billing_roles:project_billing_roles(id, name, rate)
+      )
+    `
+    )
+    .eq('user_id', targetUserId)
+    .eq('is_active', true)
+
+  // Combine and deduplicate
+  const projectMap = new Map<string, ProjectForTimesheet>()
+
+  projects?.forEach((p) => {
+    projectMap.set(p.id, {
+      id: p.id,
+      code: p.code,
+      name: p.name,
+      tasks: p.tasks ?? [],
+      billing_roles: p.billing_roles ?? [],
+    })
+  })
+
+  memberProjects?.forEach((mp) => {
+    const project = Array.isArray(mp.project) ? mp.project[0] : mp.project
+    if (project && project.status === 'active' && !project.deleted_at) {
+      projectMap.set(project.id, {
+        id: project.id,
+        code: project.code,
+        name: project.name,
+        tasks: project.tasks ?? [],
+        billing_roles: project.billing_roles ?? [],
+      })
+    }
+  })
+
+  return Array.from(projectMap.values()).sort((a, b) => a.code.localeCompare(b.code))
+}
+
+// === MUTATION FUNCTIONS ===
+
+/**
+ * Save a timesheet entry (create or update)
+ */
+export async function saveTimesheetEntry(
+  timesheetId: string,
+  entry: {
+    id?: string
+    project_id: string
+    task_id?: string | null
+    billing_role_id?: string | null
+    description?: string | null
+    hours: number[]
+    is_billable?: boolean
+  }
+) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // Verify timesheet exists and is editable
+  const { data: timesheet, error: tsError } = await supabase
+    .from('timesheets')
+    .select('id, status, user_id')
+    .eq('id', timesheetId)
+    .single()
+
+  if (tsError || !timesheet) {
+    return { error: 'Timesheet not found' }
+  }
+
+  if (timesheet.status !== 'draft') {
+    return { error: 'Timesheet is not editable' }
+  }
+
+  // Verify ownership or impersonation permission
+  if (timesheet.user_id !== user?.id) {
+    const permissions = await getUserPermissions()
+    if (!hasPermission(permissions, 'timesheets.impersonate')) {
+      return { error: 'Not authorized' }
+    }
+  }
+
+  // Validate entry
+  const validation = timesheetEntrySchema.safeParse(entry)
+  if (!validation.success) {
+    return { error: validation.error.issues[0]?.message ?? 'Validation failed' }
+  }
+
+  const entryData = {
+    timesheet_id: timesheetId,
+    project_id: entry.project_id,
+    task_id: entry.task_id || null,
+    billing_role_id: entry.billing_role_id || null,
+    description: entry.description || null,
+    hours: entry.hours,
+    is_billable: entry.is_billable ?? true,
+  }
+
+  if (entry.id) {
+    // Update existing
+    const { data, error } = await supabase
+      .from('timesheet_entries')
+      .update(entryData)
+      .eq('id', entry.id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating entry:', error)
+      return { error: 'Failed to update entry' }
+    }
+
+    revalidatePath('/timesheets')
+    return { entry: data }
+  } else {
+    // Create new
+    const { data, error } = await supabase.from('timesheet_entries').insert(entryData).select().single()
+
+    if (error) {
+      console.error('Error creating entry:', error)
+      return { error: 'Failed to create entry' }
+    }
+
+    revalidatePath('/timesheets')
+    return { entry: data }
+  }
+}
+
+/**
+ * Delete a timesheet entry
+ */
+export async function deleteTimesheetEntry(entryId: string) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // Get entry with timesheet info
+  const { data: entry, error: entryError } = await supabase
+    .from('timesheet_entries')
+    .select('id, timesheet:timesheets!timesheet_entries_timesheet_id_fkey(id, status, user_id)')
+    .eq('id', entryId)
+    .single()
+
+  if (entryError || !entry) {
+    return { error: 'Entry not found' }
+  }
+
+  const timesheet = Array.isArray(entry.timesheet) ? entry.timesheet[0] : entry.timesheet
+
+  if (!timesheet || timesheet.status !== 'draft') {
+    return { error: 'Cannot delete from non-draft timesheet' }
+  }
+
+  // Verify ownership or impersonation permission
+  if (timesheet.user_id !== user?.id) {
+    const permissions = await getUserPermissions()
+    if (!hasPermission(permissions, 'timesheets.impersonate')) {
+      return { error: 'Not authorized' }
+    }
+  }
+
+  const { error } = await supabase.from('timesheet_entries').delete().eq('id', entryId)
+
+  if (error) {
+    console.error('Error deleting entry:', error)
+    return { error: 'Failed to delete entry' }
+  }
+
+  revalidatePath('/timesheets')
+  return { success: true }
+}
+
+/**
+ * Submit a timesheet for approval
+ */
+export async function submitTimesheet(timesheetId: string) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // Get timesheet
+  const { data: timesheet, error: tsError } = await supabase
+    .from('timesheets')
+    .select('id, status, user_id')
+    .eq('id', timesheetId)
+    .single()
+
+  if (tsError || !timesheet) {
+    return { error: 'Timesheet not found' }
+  }
+
+  // Verify ownership
+  if (timesheet.user_id !== user?.id) {
+    return { error: 'Can only submit your own timesheet' }
+  }
+
+  // Verify status
+  if (timesheet.status !== 'draft') {
+    return { error: 'Timesheet already submitted' }
+  }
+
+  // Verify has entries
+  const { count } = await supabase
+    .from('timesheet_entries')
+    .select('*', { count: 'exact', head: true })
+    .eq('timesheet_id', timesheetId)
+
+  if (!count || count === 0) {
+    return { error: 'Cannot submit empty timesheet' }
+  }
+
+  // Update status
+  const { error } = await supabase
+    .from('timesheets')
+    .update({
+      status: 'submitted',
+      submitted_at: new Date().toISOString(),
+    })
+    .eq('id', timesheetId)
+
+  if (error) {
+    console.error('Error submitting timesheet:', error)
+    return { error: 'Failed to submit timesheet' }
+  }
+
+  revalidatePath('/timesheets')
+  return { success: true }
+}
+
+/**
+ * Approve a timesheet (manager only)
+ */
+export async function approveTimesheet(timesheetId: string) {
+  const supabase = await createClient()
+  const profile = await getProfile()
+
+  if (!profile) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Get timesheet with owner's manager
+  const { data: timesheet, error: tsError } = await supabase
+    .from('timesheets')
+    .select(
+      `
+      id,
+      status,
+      user_id,
+      owner:profiles!timesheets_user_id_fkey(manager_id)
+    `
+    )
+    .eq('id', timesheetId)
+    .single()
+
+  if (tsError || !timesheet) {
+    return { error: 'Timesheet not found' }
+  }
+
+  const owner = Array.isArray(timesheet.owner) ? timesheet.owner[0] : timesheet.owner
+
+  // Verify user is owner's manager
+  if (owner?.manager_id !== profile.id) {
+    return { error: 'Only direct manager can approve' }
+  }
+
+  // Verify status
+  if (timesheet.status !== 'submitted') {
+    return { error: 'Timesheet not pending approval' }
+  }
+
+  // Approve
+  const { error } = await supabase
+    .from('timesheets')
+    .update({
+      status: 'approved',
+      approved_at: new Date().toISOString(),
+      approved_by: profile.id,
+    })
+    .eq('id', timesheetId)
+
+  if (error) {
+    console.error('Error approving timesheet:', error)
+    return { error: 'Failed to approve timesheet' }
+  }
+
+  revalidatePath('/timesheets')
+  return { success: true }
+}
+
+/**
+ * Reject a timesheet (manager only)
+ */
+export async function rejectTimesheet(timesheetId: string, reason?: string) {
+  const supabase = await createClient()
+  const profile = await getProfile()
+
+  if (!profile) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Get timesheet with owner's manager
+  const { data: timesheet, error: tsError } = await supabase
+    .from('timesheets')
+    .select(
+      `
+      id,
+      status,
+      user_id,
+      owner:profiles!timesheets_user_id_fkey(manager_id)
+    `
+    )
+    .eq('id', timesheetId)
+    .single()
+
+  if (tsError || !timesheet) {
+    return { error: 'Timesheet not found' }
+  }
+
+  const owner = Array.isArray(timesheet.owner) ? timesheet.owner[0] : timesheet.owner
+
+  // Verify user is owner's manager
+  if (owner?.manager_id !== profile.id) {
+    return { error: 'Only direct manager can reject' }
+  }
+
+  // Verify status (can reject submitted or approved)
+  if (!['submitted', 'approved'].includes(timesheet.status ?? '')) {
+    return { error: 'Cannot reject this timesheet' }
+  }
+
+  // Reset to draft
+  const { error } = await supabase
+    .from('timesheets')
+    .update({
+      status: 'draft',
+      submitted_at: null,
+      approved_at: null,
+      approved_by: null,
+      rejection_reason: reason || null,
+    })
+    .eq('id', timesheetId)
+
+  if (error) {
+    console.error('Error rejecting timesheet:', error)
+    return { error: 'Failed to reject timesheet' }
+  }
+
+  revalidatePath('/timesheets')
+  return { success: true }
+}
+
+/**
+ * Copy entries from previous week
+ */
+export async function copyPreviousWeek(timesheetId: string) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // Get current timesheet
+  const { data: current, error: tsError } = await supabase
+    .from('timesheets')
+    .select('id, user_id, week_start, status')
+    .eq('id', timesheetId)
+    .single()
+
+  if (tsError || !current) {
+    return { error: 'Timesheet not found' }
+  }
+
+  if (current.status !== 'draft') {
+    return { error: 'Can only copy to draft timesheets' }
+  }
+
+  // Verify ownership or impersonation
+  if (current.user_id !== user?.id) {
+    const permissions = await getUserPermissions()
+    if (!hasPermission(permissions, 'timesheets.impersonate')) {
+      return { error: 'Not authorized' }
+    }
+  }
+
+  // Get previous week's timesheet
+  const prevWeekStart = getPreviousWeekStart(new Date(current.week_start))
+  const prevWeekISO = formatDateISO(prevWeekStart)
+
+  const { data: previous } = await supabase
+    .from('timesheets')
+    .select(
+      `
+      id,
+      entries:timesheet_entries(
+        project_id,
+        task_id,
+        billing_role_id,
+        description,
+        is_billable
+      )
+    `
+    )
+    .eq('user_id', current.user_id)
+    .eq('week_start', prevWeekISO)
+    .single()
+
+  if (!previous || !previous.entries || previous.entries.length === 0) {
+    return { error: 'No entries to copy from previous week' }
+  }
+
+  // Delete existing entries in current timesheet
+  await supabase.from('timesheet_entries').delete().eq('timesheet_id', timesheetId)
+
+  // Copy entries (without hours - user fills those in)
+  const newEntries = previous.entries.map((entry) => ({
+    timesheet_id: timesheetId,
+    project_id: entry.project_id,
+    task_id: entry.task_id,
+    billing_role_id: entry.billing_role_id,
+    description: entry.description,
+    is_billable: entry.is_billable,
+    hours: [0, 0, 0, 0, 0, 0, 0], // Empty hours
+  }))
+
+  const { error } = await supabase.from('timesheet_entries').insert(newEntries)
+
+  if (error) {
+    console.error('Error copying entries:', error)
+    return { error: 'Failed to copy entries' }
+  }
+
+  revalidatePath('/timesheets')
+  return { success: true, entriesCopied: newEntries.length }
+}
