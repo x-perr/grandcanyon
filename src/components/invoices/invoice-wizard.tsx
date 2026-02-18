@@ -237,15 +237,22 @@ export function InvoiceWizard({
         lines: linesWithEntries,
       })
 
-      if (result.error) {
+      console.log('createInvoice result:', result)
+
+      if ('error' in result && result.error) {
         toast.error(result.error)
         setIsSubmitting(false)
         return
       }
 
       // Navigate to the new invoice
-      if (result.invoiceId) {
+      if ('invoiceId' in result && result.invoiceId) {
+        toast.success('Invoice created!')
         router.push(`/invoices/${result.invoiceId}`)
+      } else {
+        console.error('No invoiceId in result:', result)
+        toast.error('Invoice created but navigation failed')
+        setIsSubmitting(false)
       }
     } catch (error) {
       console.error('Error creating invoice:', error)
@@ -346,7 +353,11 @@ export function InvoiceWizard({
             </Button>
           ) : (
             <>
-              <Button variant="outline" onClick={handleSaveDraft} disabled={isSubmitting}>
+              <Button
+                variant="outline"
+                onClick={handleSaveDraft}
+                disabled={isSubmitting || selectedEntryIds.length === 0}
+              >
                 {isSubmitting ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
@@ -354,7 +365,10 @@ export function InvoiceWizard({
                 )}
                 Save as Draft
               </Button>
-              <Button onClick={handleCreateAndSend} disabled={isSubmitting}>
+              <Button
+                onClick={handleCreateAndSend}
+                disabled={isSubmitting || selectedEntryIds.length === 0}
+              >
                 {isSubmitting ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
