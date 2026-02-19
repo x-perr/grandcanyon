@@ -1,0 +1,9 @@
+# Migration data files (contains sensitive legacy data)
+data/
+
+# Environment variables
+.env
+.env.local
+
+# Node modules
+node_modules/

@@ -1,0 +1,20 @@
+{
+  "name": "grandcanyon-migration",
+  "version": "1.0.0",
+  "description": "MySQL to Supabase migration scripts for Grand Canyon",
+  "type": "module",
+  "scripts": {
+    "parse": "node 1-parse-dump.js",
+    "transform": "node 2-transform-data.js",
+    "import": "node 3-import-supabase.js",
+    "verify": "node 4-verify-counts.js",
+    "password-resets": "node 5-send-password-resets.js",
+    "full-migration": "npm run parse && npm run transform && npm run import && npm run verify"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.96.0",
+    "dotenv": "^16.4.0",
+    "iconv-lite": "^0.6.3",
+    "uuid": "^9.0.0"
+  }
+}
