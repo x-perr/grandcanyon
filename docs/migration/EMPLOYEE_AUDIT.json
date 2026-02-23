@@ -1,0 +1,2030 @@
+{
+  "employees": [
+    {
+      "legacy_user_id": 2,
+      "name": "Daniel Perrault",
+      "legacy_hours": 0,
+      "db_hours": 0,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 186,
+      "name": "Gérard  Boulet",
+      "legacy_hours": 22,
+      "db_hours": 22,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 185,
+      "name": "Martin  Beaulac",
+      "legacy_hours": 85.5,
+      "db_hours": 85.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 184,
+      "name": "Robert  Gariepy",
+      "legacy_hours": 1387.5,
+      "db_hours": 1387.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 183,
+      "name": "Yannick  Nadon",
+      "legacy_hours": 0,
+      "db_hours": 0,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 177,
+      "name": "Richard  Roy",
+      "legacy_hours": 1347,
+      "db_hours": 1347,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 170,
+      "name": "Stéphane  Salerno",
+      "legacy_hours": 16383,
+      "db_hours": 16383,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 160,
+      "name": "Alain  Sweeney",
+      "legacy_hours": 23901.5,
+      "db_hours": 23901.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 271,
+      "name": "Gilles Poirier",
+      "legacy_hours": 168,
+      "db_hours": 168,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 272,
+      "name": "Jean-Pierre Rioux",
+      "legacy_hours": 184,
+      "db_hours": 184,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 156,
+      "name": "Loca  Ehab Adel Elias",
+      "legacy_hours": 19425.5,
+      "db_hours": 19425.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 154,
+      "name": "Daniel  Martin",
+      "legacy_hours": 4176,
+      "db_hours": 4176,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 273,
+      "name": "Corey Morrissette",
+      "legacy_hours": 115,
+      "db_hours": 115,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 149,
+      "name": "Pascal  Fortin",
+      "legacy_hours": 6042,
+      "db_hours": 6042,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 147,
+      "name": "Simon  Chabot",
+      "legacy_hours": 14824.5,
+      "db_hours": 14824.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 139,
+      "name": "Xavier  Perrault",
+      "legacy_hours": 5772.75,
+      "db_hours": 5772.75,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 264,
+      "name": "Christian Chabot",
+      "legacy_hours": 114,
+      "db_hours": 114,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 265,
+      "name": "Marc Lambert",
+      "legacy_hours": 2749,
+      "db_hours": 2749,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 266,
+      "name": "Vincent Grenier",
+      "legacy_hours": 6288,
+      "db_hours": 6288,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 187,
+      "name": "Christian  Houyon",
+      "legacy_hours": 14469,
+      "db_hours": 14469,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 190,
+      "name": "François  Héroux",
+      "legacy_hours": 23677.5,
+      "db_hours": 23677.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 191,
+      "name": "Pierre  Morin",
+      "legacy_hours": 0,
+      "db_hours": 0,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 193,
+      "name": "Paul  Houyon",
+      "legacy_hours": 14128.8,
+      "db_hours": 14128.8,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 194,
+      "name": "Sébastien  Riopel",
+      "legacy_hours": 71.5,
+      "db_hours": 71.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 195,
+      "name": "Serge  Rioux",
+      "legacy_hours": 0,
+      "db_hours": 0,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 196,
+      "name": "Marc  Chagnon",
+      "legacy_hours": 13797.5,
+      "db_hours": 13797.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 199,
+      "name": "Reale  Vincenzo",
+      "legacy_hours": 10908.5,
+      "db_hours": 10908.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 200,
+      "name": "Alain  Ross",
+      "legacy_hours": 0,
+      "db_hours": 0,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 204,
+      "name": "Sylvain  Bernier",
+      "legacy_hours": 1185.5,
+      "db_hours": 1185.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 207,
+      "name": "Daniel  Bégin",
+      "legacy_hours": 19809.5,
+      "db_hours": 19809.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 208,
+      "name": "Noah  Patrice Campbell",
+      "legacy_hours": 17256.5,
+      "db_hours": 17256.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 210,
+      "name": "Sylvain  Gagnon",
+      "legacy_hours": 70.5,
+      "db_hours": 70.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 211,
+      "name": "Yves  Descoteaux",
+      "legacy_hours": 24.5,
+      "db_hours": 24.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 212,
+      "name": "Yves  Gagnon",
+      "legacy_hours": 150,
+      "db_hours": 150,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 214,
+      "name": "Michel  Pellerin",
+      "legacy_hours": 4672.5,
+      "db_hours": 4672.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 215,
+      "name": "Robert  Emond",
+      "legacy_hours": 2020.5,
+      "db_hours": 2020.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 223,
+      "name": "Richard  Caouette",
+      "legacy_hours": 98,
+      "db_hours": 98,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 225,
+      "name": "Paul  Bleau",
+      "legacy_hours": 29.5,
+      "db_hours": 29.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 228,
+      "name": "Claude  Perrault",
+      "legacy_hours": 796,
+      "db_hours": 796,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 239,
+      "name": "Guy  Lavallée",
+      "legacy_hours": 0,
+      "db_hours": 0,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 263,
+      "name": "Patrice Beaudoin",
+      "legacy_hours": 3011,
+      "db_hours": 3011,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 267,
+      "name": "Mike Volpicella",
+      "legacy_hours": 733,
+      "db_hours": 733,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 268,
+      "name": "Dominic Berardino",
+      "legacy_hours": 3499,
+      "db_hours": 3499,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 269,
+      "name": "Pierrick Lamarre",
+      "legacy_hours": 689,
+      "db_hours": 689,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 270,
+      "name": "Alain Grandbois",
+      "legacy_hours": 1368.5,
+      "db_hours": 1368.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 274,
+      "name": "Patrick Dubé",
+      "legacy_hours": 214,
+      "db_hours": 214,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 275,
+      "name": "Stéphane Grenier",
+      "legacy_hours": 2141,
+      "db_hours": 2141,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 276,
+      "name": "Marc-André Grenier",
+      "legacy_hours": 2131,
+      "db_hours": 2131,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 303,
+      "name": "Sam Latif",
+      "legacy_hours": 55,
+      "db_hours": 55,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 262,
+      "name": "Richère Foisy",
+      "legacy_hours": 0,
+      "db_hours": 0,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 287,
+      "name": "Pierre Lessard",
+      "legacy_hours": 204,
+      "db_hours": 204,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 290,
+      "name": "Yannick Roy",
+      "legacy_hours": 21111.5,
+      "db_hours": 21111.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 280,
+      "name": "Benoit Rail",
+      "legacy_hours": 192.5,
+      "db_hours": 192.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 302,
+      "name": "Mark MacDonald",
+      "legacy_hours": 60,
+      "db_hours": 60,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 278,
+      "name": "Jean-Philippe Lortie",
+      "legacy_hours": 478.5,
+      "db_hours": 478.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 281,
+      "name": "Mathieu Carrière",
+      "legacy_hours": 1282.5,
+      "db_hours": 1282.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 282,
+      "name": "Eric Tremblay",
+      "legacy_hours": 671.5,
+      "db_hours": 671.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 283,
+      "name": "Bernard Carrière",
+      "legacy_hours": 195.5,
+      "db_hours": 195.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 284,
+      "name": "Robert D'Amour",
+      "legacy_hours": 26.5,
+      "db_hours": 26.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 285,
+      "name": "Martin Lapointe",
+      "legacy_hours": 1789,
+      "db_hours": 1789,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 289,
+      "name": "Sébastien Lambert",
+      "legacy_hours": 568,
+      "db_hours": 568,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 286,
+      "name": "Eric Desjardins",
+      "legacy_hours": 516.5,
+      "db_hours": 516.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 288,
+      "name": "Bruno DiGirolamo",
+      "legacy_hours": 3012.5,
+      "db_hours": 3012.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 291,
+      "name": "Jean-François Marcotte",
+      "legacy_hours": 51,
+      "db_hours": 51,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 292,
+      "name": "Pierre Richer",
+      "legacy_hours": 1060.5,
+      "db_hours": 1060.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 293,
+      "name": "Pierre Brodeur",
+      "legacy_hours": 835.5,
+      "db_hours": 835.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 294,
+      "name": "Richard Brodeur",
+      "legacy_hours": 4383,
+      "db_hours": 4383,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 295,
+      "name": "Alex Voyer",
+      "legacy_hours": 128,
+      "db_hours": 128,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 296,
+      "name": "Guy Brassard",
+      "legacy_hours": 600.5,
+      "db_hours": 600.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 297,
+      "name": "Olivier Charlier",
+      "legacy_hours": 5856.5,
+      "db_hours": 5856.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 298,
+      "name": "Yvan Charbonneau",
+      "legacy_hours": 4863.5,
+      "db_hours": 4863.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 299,
+      "name": "Marquis Roy",
+      "legacy_hours": 358,
+      "db_hours": 358,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 300,
+      "name": "Sébastien Dion",
+      "legacy_hours": 11806,
+      "db_hours": 11806,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 301,
+      "name": "Sébastien Vaillancourt",
+      "legacy_hours": 111,
+      "db_hours": 111,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 304,
+      "name": "Richard Lacroix",
+      "legacy_hours": 16541.5,
+      "db_hours": 16541.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 305,
+      "name": "Pierre Beaudoin",
+      "legacy_hours": 1700,
+      "db_hours": 1700,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 306,
+      "name": "Mikael Rancourt",
+      "legacy_hours": 19,
+      "db_hours": 19,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 307,
+      "name": "Mario Lomaglio",
+      "legacy_hours": 5645,
+      "db_hours": 5645,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 308,
+      "name": "Julie Fournier",
+      "legacy_hours": 367.5,
+      "db_hours": 367.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 309,
+      "name": "Stéphane Brunette",
+      "legacy_hours": 436.5,
+      "db_hours": 436.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 310,
+      "name": "Robert Gibson",
+      "legacy_hours": 5103,
+      "db_hours": 5103,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 311,
+      "name": "Daniel Test Perrault",
+      "legacy_hours": 0,
+      "db_hours": 0,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 312,
+      "name": "Normand Paul",
+      "legacy_hours": 474.5,
+      "db_hours": 474.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 313,
+      "name": "Jessica Bruneau",
+      "legacy_hours": 44.5,
+      "db_hours": 44.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 314,
+      "name": "Stéphane Lamarche",
+      "legacy_hours": 141.5,
+      "db_hours": 141.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 315,
+      "name": "Alexandre  séguin",
+      "legacy_hours": 181,
+      "db_hours": 181,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 316,
+      "name": "Amélia De Bellefeuille",
+      "legacy_hours": 16.5,
+      "db_hours": 16.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 317,
+      "name": "Benoit Vachon",
+      "legacy_hours": 116.5,
+      "db_hours": 116.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 318,
+      "name": "Normand Ouellet",
+      "legacy_hours": 70.5,
+      "db_hours": 70.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 319,
+      "name": "Claude Roy",
+      "legacy_hours": 52,
+      "db_hours": 52,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 320,
+      "name": "Rémy Champagne",
+      "legacy_hours": 168,
+      "db_hours": 168,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 321,
+      "name": "Louis Charbonneau",
+      "legacy_hours": 3712.5,
+      "db_hours": 3712.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 322,
+      "name": "Sacha Boileau",
+      "legacy_hours": 32.5,
+      "db_hours": 32.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 323,
+      "name": "Michael Bolduc",
+      "legacy_hours": 38,
+      "db_hours": 38,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 324,
+      "name": "Mathieu Fournier",
+      "legacy_hours": 38.5,
+      "db_hours": 38.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 325,
+      "name": "Vincent Lamarre",
+      "legacy_hours": 177.5,
+      "db_hours": 177.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 326,
+      "name": "Fadia Saoul",
+      "legacy_hours": 64,
+      "db_hours": 64,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 327,
+      "name": "Yender Rodriguez",
+      "legacy_hours": 74,
+      "db_hours": 74,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 328,
+      "name": "françois  dubois",
+      "legacy_hours": 50,
+      "db_hours": 50,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 329,
+      "name": "Félix Mercure",
+      "legacy_hours": 15,
+      "db_hours": 15,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 330,
+      "name": "Eric Lussier",
+      "legacy_hours": 7587.5,
+      "db_hours": 7587.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 331,
+      "name": "Cristel Whitaker",
+      "legacy_hours": 967,
+      "db_hours": 967,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 332,
+      "name": "Frédérick Dupras",
+      "legacy_hours": 794.5,
+      "db_hours": 794.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 333,
+      "name": "Louis Volper",
+      "legacy_hours": 72,
+      "db_hours": 72,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 334,
+      "name": "Martin Lalonde",
+      "legacy_hours": 618.5,
+      "db_hours": 618.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 335,
+      "name": "Pierre  Allegrezza",
+      "legacy_hours": 11117.5,
+      "db_hours": 11117.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 336,
+      "name": "Doris Fontaine",
+      "legacy_hours": 2043.5,
+      "db_hours": 2043.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 337,
+      "name": "Mario Fortin",
+      "legacy_hours": 184,
+      "db_hours": 184,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 338,
+      "name": "Guillaume Bouchard",
+      "legacy_hours": 1112,
+      "db_hours": 1112,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 339,
+      "name": "Jesse Fontaine",
+      "legacy_hours": 1350.5,
+      "db_hours": 1350.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 340,
+      "name": "Marc-Antoine Cléroux",
+      "legacy_hours": 66,
+      "db_hours": 66,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 341,
+      "name": "David Siphengphet",
+      "legacy_hours": 223,
+      "db_hours": 223,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 342,
+      "name": "Sylvain Mathieu",
+      "legacy_hours": 4941.5,
+      "db_hours": 4941.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 343,
+      "name": "Patrice White",
+      "legacy_hours": 55,
+      "db_hours": 55,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 344,
+      "name": "Jean-Michel Benzahra",
+      "legacy_hours": 204.5,
+      "db_hours": 204.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 345,
+      "name": "Yvon Rioux",
+      "legacy_hours": 7411.5,
+      "db_hours": 7411.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 346,
+      "name": "Sébastien Mainville",
+      "legacy_hours": 5041,
+      "db_hours": 5041,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 347,
+      "name": "Michel Morand",
+      "legacy_hours": 6585.5,
+      "db_hours": 6585.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 348,
+      "name": "Francois Lapointe",
+      "legacy_hours": 318.5,
+      "db_hours": 318.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 349,
+      "name": "Alain Robitaille",
+      "legacy_hours": 67.5,
+      "db_hours": 67.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 350,
+      "name": "Louis Mercure",
+      "legacy_hours": 0,
+      "db_hours": 0,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 351,
+      "name": "Sébastien  Arnaud",
+      "legacy_hours": 9792.65,
+      "db_hours": 9792.65,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 352,
+      "name": "Marc-André Tavano",
+      "legacy_hours": 771,
+      "db_hours": 771,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 353,
+      "name": "Marco Tavano",
+      "legacy_hours": 761.5,
+      "db_hours": 761.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 354,
+      "name": "Michel Garneau",
+      "legacy_hours": 16,
+      "db_hours": 16,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 355,
+      "name": "Daniel Dor",
+      "legacy_hours": 40,
+      "db_hours": 40,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 356,
+      "name": "Mikael Blais",
+      "legacy_hours": 17,
+      "db_hours": 17,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 357,
+      "name": "Michèle Blackburn",
+      "legacy_hours": 8297,
+      "db_hours": 8297,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 358,
+      "name": "Sylvain Poirier",
+      "legacy_hours": 911.5,
+      "db_hours": 911.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 359,
+      "name": "Joanie Grenon",
+      "legacy_hours": 8,
+      "db_hours": 8,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 360,
+      "name": "Jean-Marc  Lemousy",
+      "legacy_hours": 344,
+      "db_hours": 344,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 361,
+      "name": "Laflèche Foisy",
+      "legacy_hours": 19.5,
+      "db_hours": 19.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 362,
+      "name": "Patrick Dallaire",
+      "legacy_hours": 9459.25,
+      "db_hours": 9459.25,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 363,
+      "name": "Michel Rochon",
+      "legacy_hours": 576.5,
+      "db_hours": 576.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 364,
+      "name": "Nathalie Piché",
+      "legacy_hours": 204.5,
+      "db_hours": 204.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 365,
+      "name": "Jason Roy",
+      "legacy_hours": 415.5,
+      "db_hours": 415.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 366,
+      "name": "Éric Despres",
+      "legacy_hours": 569,
+      "db_hours": 569,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 367,
+      "name": "Carlos Betancourt",
+      "legacy_hours": 258.5,
+      "db_hours": 258.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 368,
+      "name": "Guillaume Bélanger",
+      "legacy_hours": 40,
+      "db_hours": 40,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 369,
+      "name": "Patrick Venditti",
+      "legacy_hours": 3506.5,
+      "db_hours": 3506.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 370,
+      "name": "Umberto Aguire",
+      "legacy_hours": 1687,
+      "db_hours": 1687,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 371,
+      "name": "Benoit Grignon",
+      "legacy_hours": 165,
+      "db_hours": 165,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 372,
+      "name": "Martin Grignon",
+      "legacy_hours": 150,
+      "db_hours": 150,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 373,
+      "name": "Alexandre Roireau",
+      "legacy_hours": 4239.5,
+      "db_hours": 4239.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 374,
+      "name": "Sergio Lago",
+      "legacy_hours": 32.5,
+      "db_hours": 32.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 375,
+      "name": "Daniel Grenon",
+      "legacy_hours": 126,
+      "db_hours": 126,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 376,
+      "name": "Incatif Inactif",
+      "legacy_hours": 24,
+      "db_hours": 24,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 377,
+      "name": "André Jean",
+      "legacy_hours": 1423,
+      "db_hours": 1423,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 378,
+      "name": "Guillaume Berardino",
+      "legacy_hours": 1615.25,
+      "db_hours": 1615.25,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 380,
+      "name": "Frédéric Ducharme",
+      "legacy_hours": 11117.5,
+      "db_hours": 11117.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 379,
+      "name": "Sylvie Dufour",
+      "legacy_hours": 2292,
+      "db_hours": 2292,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 381,
+      "name": "Samir Boualem",
+      "legacy_hours": 3442.5,
+      "db_hours": 3442.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 382,
+      "name": "François Paradis",
+      "legacy_hours": 40,
+      "db_hours": 40,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 383,
+      "name": "Philippe Turcot",
+      "legacy_hours": 555.5,
+      "db_hours": 555.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 384,
+      "name": "Mikael Foisy",
+      "legacy_hours": 12546,
+      "db_hours": 12546,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 393,
+      "name": "Andres Farias-Vargas",
+      "legacy_hours": 640.5,
+      "db_hours": 640.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 385,
+      "name": "Nathalie Paul",
+      "legacy_hours": 1598.5,
+      "db_hours": 1598.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 386,
+      "name": "Rocco Gallotta",
+      "legacy_hours": 307,
+      "db_hours": 307,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 387,
+      "name": "Mark St-Jacques ",
+      "legacy_hours": 191.5,
+      "db_hours": 191.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 388,
+      "name": "Anthony St-Jacques",
+      "legacy_hours": 1204.5,
+      "db_hours": 1204.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 389,
+      "name": "Gabriel Aguirre-Villablanca",
+      "legacy_hours": 1269.5,
+      "db_hours": 1269.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 390,
+      "name": "Patrick Leboeuf",
+      "legacy_hours": 0,
+      "db_hours": 0,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 391,
+      "name": "Virginie Castonguay",
+      "legacy_hours": 66.5,
+      "db_hours": 66.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 392,
+      "name": "Robert Goral",
+      "legacy_hours": 9603,
+      "db_hours": 9603,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 394,
+      "name": "Jean-François Tremblay",
+      "legacy_hours": 194,
+      "db_hours": 194,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 395,
+      "name": "Yannick Gauthier",
+      "legacy_hours": 1162.9,
+      "db_hours": 1162.9,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 396,
+      "name": "David Bourret",
+      "legacy_hours": 6002,
+      "db_hours": 6002,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 397,
+      "name": "Sébastien Tardif",
+      "legacy_hours": 8350,
+      "db_hours": 8350,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 398,
+      "name": "Yves cloutier",
+      "legacy_hours": 5393,
+      "db_hours": 5393,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 399,
+      "name": "Christian Salerno",
+      "legacy_hours": 96,
+      "db_hours": 96,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 400,
+      "name": "Marc Tremblay",
+      "legacy_hours": 856.5,
+      "db_hours": 856.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 401,
+      "name": "Wisly Michel",
+      "legacy_hours": 9199,
+      "db_hours": 9199,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 402,
+      "name": "Eric Landry",
+      "legacy_hours": 1153.5,
+      "db_hours": 1153.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 403,
+      "name": "Gilles Bisson",
+      "legacy_hours": 799.5,
+      "db_hours": 799.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 404,
+      "name": "Cladio Filippone",
+      "legacy_hours": 197,
+      "db_hours": 197,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 405,
+      "name": "Olivier Fiset",
+      "legacy_hours": 1175.5,
+      "db_hours": 1175.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 406,
+      "name": "Nicholas Naccarata",
+      "legacy_hours": 681.5,
+      "db_hours": 681.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 407,
+      "name": "Sylvain Beaudet",
+      "legacy_hours": 7040.5,
+      "db_hours": 7040.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 408,
+      "name": "Anne-Sophie Mathon",
+      "legacy_hours": 1010,
+      "db_hours": 1010,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 409,
+      "name": "Patrick Rouillard",
+      "legacy_hours": 891,
+      "db_hours": 891,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 410,
+      "name": "Dany Fiscaletti",
+      "legacy_hours": 59,
+      "db_hours": 59,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 411,
+      "name": "Hamza Shhadat",
+      "legacy_hours": 24,
+      "db_hours": 24,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 412,
+      "name": "David Piquette",
+      "legacy_hours": 3301,
+      "db_hours": 3301,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 413,
+      "name": "Mathéus Krazy",
+      "legacy_hours": 415.5,
+      "db_hours": 415.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 414,
+      "name": "Nabil Felkai",
+      "legacy_hours": 24,
+      "db_hours": 24,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 415,
+      "name": "Normand David",
+      "legacy_hours": 57,
+      "db_hours": 57,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 416,
+      "name": "Alexandre Roquebrune",
+      "legacy_hours": 35,
+      "db_hours": 35,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 417,
+      "name": "Mathieu Lemaire",
+      "legacy_hours": 7562,
+      "db_hours": 7562,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 418,
+      "name": "Louis Dalbec",
+      "legacy_hours": 6,
+      "db_hours": 6,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 419,
+      "name": "Charles-Edouard Boyle",
+      "legacy_hours": 452.5,
+      "db_hours": 452.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 420,
+      "name": "Ludovic Campeau",
+      "legacy_hours": 1420,
+      "db_hours": 1420,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 421,
+      "name": "Jonathan Sweeney",
+      "legacy_hours": 6010,
+      "db_hours": 6010,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 422,
+      "name": "Juan Manuel Arrieta Orozco",
+      "legacy_hours": 396.5,
+      "db_hours": 396.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 423,
+      "name": "Jean-Paul Saavedra",
+      "legacy_hours": 5289,
+      "db_hours": 5289,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 424,
+      "name": "Marc-Olivier Dini",
+      "legacy_hours": 887,
+      "db_hours": 887,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 425,
+      "name": "Raphael Girard",
+      "legacy_hours": 324,
+      "db_hours": 324,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 426,
+      "name": "Gabriel White",
+      "legacy_hours": 331,
+      "db_hours": 331,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 427,
+      "name": "Marylou Desjardins",
+      "legacy_hours": 1391.5,
+      "db_hours": 1391.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 428,
+      "name": "Martin Binette",
+      "legacy_hours": 852.5,
+      "db_hours": 852.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 429,
+      "name": "Michel Clusiau",
+      "legacy_hours": 328.5,
+      "db_hours": 328.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 430,
+      "name": "Danny Poissant",
+      "legacy_hours": 780.5,
+      "db_hours": 780.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 431,
+      "name": "René Poissant",
+      "legacy_hours": 604,
+      "db_hours": 604,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 432,
+      "name": "Ewa Zoltko",
+      "legacy_hours": 222,
+      "db_hours": 222,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 433,
+      "name": "Remi Guillome",
+      "legacy_hours": 2175.5,
+      "db_hours": 2175.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 434,
+      "name": "Rémi Fréchette",
+      "legacy_hours": 278.5,
+      "db_hours": 278.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 435,
+      "name": "Marc-André Ruel",
+      "legacy_hours": 1650.5,
+      "db_hours": 1650.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 436,
+      "name": "Patrick Saint-Laurent",
+      "legacy_hours": 175,
+      "db_hours": 175,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 437,
+      "name": "Robert Champagne",
+      "legacy_hours": 39,
+      "db_hours": 39,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 438,
+      "name": "Mario Pelletier",
+      "legacy_hours": 527.5,
+      "db_hours": 527.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 439,
+      "name": "Jimmy Daskalakis",
+      "legacy_hours": 536,
+      "db_hours": 536,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 441,
+      "name": "Caroline Pitre-Labreche",
+      "legacy_hours": 660,
+      "db_hours": 660,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 440,
+      "name": "Martino Mancini",
+      "legacy_hours": 1893,
+      "db_hours": 1893,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 442,
+      "name": "André Richard",
+      "legacy_hours": 133,
+      "db_hours": 133,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 443,
+      "name": "Richard Czerwonka",
+      "legacy_hours": 30.5,
+      "db_hours": 30.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 444,
+      "name": "Jennifer Grenier",
+      "legacy_hours": 83.5,
+      "db_hours": 83.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 445,
+      "name": "Nicodemo De Minico",
+      "legacy_hours": 984.5,
+      "db_hours": 984.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 446,
+      "name": "Antonio Motillo",
+      "legacy_hours": 760.5,
+      "db_hours": 760.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 447,
+      "name": "Dominic Cicciola Perron",
+      "legacy_hours": 699,
+      "db_hours": 699,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 448,
+      "name": "Émilie Cote Pelletier",
+      "legacy_hours": 749.5,
+      "db_hours": 749.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 449,
+      "name": "Faycal Bensekhar",
+      "legacy_hours": 584.5,
+      "db_hours": 584.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 450,
+      "name": "Jean-Marc Champagne",
+      "legacy_hours": 42,
+      "db_hours": 42,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 451,
+      "name": "Gaetan Gregoire",
+      "legacy_hours": 14.5,
+      "db_hours": 14.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 452,
+      "name": "Martial Gagné",
+      "legacy_hours": 62.5,
+      "db_hours": 62.5,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 453,
+      "name": "Pascal Giroux",
+      "legacy_hours": 261,
+      "db_hours": 261,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    },
+    {
+      "legacy_user_id": 454,
+      "name": "Mathieu Brien",
+      "legacy_hours": 48,
+      "db_hours": 48,
+      "diff": 0,
+      "percent_diff": 0,
+      "status": "PASS"
+    }
+  ],
+  "issues": []
+}

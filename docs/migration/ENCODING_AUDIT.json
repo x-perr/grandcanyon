@@ -1,0 +1,21 @@
+{
+  "tables": [
+    {
+      "table": "clients",
+      "issues": 0
+    },
+    {
+      "table": "projects",
+      "issues": 0
+    },
+    {
+      "table": "people",
+      "issues": 0
+    },
+    {
+      "table": "project_tasks",
+      "issues": 0
+    }
+  ],
+  "issues": []
+}

@@ -1,0 +1,30 @@
+{
+  "checks": [
+    {
+      "check": "Orphan timesheet entries",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "check": "Orphan expense entries",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "check": "Timesheet entries with invalid project",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "check": "Timesheets with non-Monday week_start",
+      "count": 21724,
+      "status": "WARN"
+    },
+    {
+      "check": "Duplicate invoice numbers",
+      "count": 0,
+      "status": "PASS"
+    }
+  ],
+  "issues": []
+}
