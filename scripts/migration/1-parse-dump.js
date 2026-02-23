@@ -258,11 +258,10 @@ async function main() {
     process.exit(1)
   }
 
-  // Read file as binary buffer, decode as latin1
+  // Read file as UTF-8 (dump header specifies SET NAMES utf8)
   console.log('\nReading SQL dump file...')
-  const buffer = fs.readFileSync(SQL_DUMP_PATH)
-  const content = iconv.decode(buffer, 'latin1')
-  console.log(`File size: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`)
+  const content = fs.readFileSync(SQL_DUMP_PATH, 'utf8')
+  console.log(`File size: ${(content.length / 1024 / 1024).toFixed(2)} MB`)
 
   // Create output directories
   const rawDir = path.join(__dirname, 'data', 'raw')

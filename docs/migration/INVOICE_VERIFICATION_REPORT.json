@@ -1,0 +1,28 @@
+[
+  {
+    "user_id": "268",
+    "user_email": "berardinodominique@gmail.com",
+    "user_name": "Dominic Berardino",
+    "week_start": "2012-09-03",
+    "week_end": "2012-09-09",
+    "timesheets": [
+      {
+        "ts_id": 20,
+        "status": "approved",
+        "submitted": "2012-09-16 11:23:37",
+        "hoursByProject": {},
+        "totalHours": 8
+      },
+      {
+        "ts_id": 21,
+        "status": "draft",
+        "submitted": null,
+        "hoursByProject": {},
+        "totalHours": 0
+      }
+    ],
+    "relevant_invoices": 0,
+    "invoice_matches": [],
+    "result": "NO_INVOICE"
+  }
+]

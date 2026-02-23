@@ -126,21 +126,31 @@ async function verifyTotalHours() {
     }
   }
 
-  // Calculate new total hours
-  const { data: entries, error } = await supabase
-    .from('timesheet_entries')
-    .select('hours')
-
-  if (error) {
-    console.log('Error fetching entries:', error.message)
-    return { legacy: legacyTotalHours, new: 0, match: false }
-  }
-
+  // Calculate new total hours (with pagination)
   let newTotalHours = 0
-  for (const entry of entries) {
-    if (entry.hours && Array.isArray(entry.hours)) {
-      newTotalHours += entry.hours.reduce((sum, h) => sum + (h || 0), 0)
+  let page = 0
+  const pageSize = 1000
+
+  while (true) {
+    const { data: entries, error } = await supabase
+      .from('timesheet_entries')
+      .select('hours')
+      .range(page * pageSize, (page + 1) * pageSize - 1)
+
+    if (error) {
+      console.log('Error fetching entries:', error.message)
+      break
     }
+
+    if (!entries || entries.length === 0) break
+
+    for (const entry of entries) {
+      if (entry.hours && Array.isArray(entry.hours)) {
+        newTotalHours += entry.hours.reduce((sum, h) => sum + (h || 0), 0)
+      }
+    }
+
+    page++
   }
 
   const match = Math.abs(legacyTotalHours - newTotalHours) < 0.01
@@ -172,26 +182,35 @@ async function verifyInvoiceTotals() {
     legacyQst += parseFloat(inv.inv_tvp) || 0
   }
 
-  // Calculate new totals
-  const { data: invoices, error } = await supabase
-    .from('invoices')
-    .select('total, subtotal, gst_amount, qst_amount')
-
-  if (error) {
-    console.log('Error fetching invoices:', error.message)
-    return { match: false }
-  }
-
+  // Calculate new totals (with pagination)
   let newTotal = 0
   let newSubtotal = 0
   let newGst = 0
   let newQst = 0
+  let invPage = 0
+  const invPageSize = 1000
 
-  for (const inv of invoices) {
-    newTotal += inv.total || 0
-    newSubtotal += inv.subtotal || 0
-    newGst += inv.gst_amount || 0
-    newQst += inv.qst_amount || 0
+  while (true) {
+    const { data: invoices, error } = await supabase
+      .from('invoices')
+      .select('total, subtotal, gst_amount, qst_amount')
+      .range(invPage * invPageSize, (invPage + 1) * invPageSize - 1)
+
+    if (error) {
+      console.log('Error fetching invoices:', error.message)
+      break
+    }
+
+    if (!invoices || invoices.length === 0) break
+
+    for (const inv of invoices) {
+      newTotal += inv.total || 0
+      newSubtotal += inv.subtotal || 0
+      newGst += inv.gst_amount || 0
+      newQst += inv.qst_amount || 0
+    }
+
+    invPage++
   }
 
   const totalMatch = Math.abs(legacyTotal - newTotal) < 0.01

@@ -1,0 +1,491 @@
+{
+  "timestamp": "2026-02-23T21:32:56.578Z",
+  "sections": [
+    {
+      "name": "Record Counts",
+      "checks": [
+        {
+          "name": "Users/People",
+          "legacy": 225,
+          "db": 225,
+          "diff": 0,
+          "status": "PASS",
+          "note": "All users should map to people"
+        },
+        {
+          "name": "Clients",
+          "legacy": 360,
+          "db": 360,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Projects",
+          "legacy": 5404,
+          "db": 5404,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Tasks",
+          "legacy": 4666,
+          "db": 4664,
+          "diff": 2,
+          "status": "WARN"
+        },
+        {
+          "name": "Timesheets",
+          "legacy": 21726,
+          "db": 21725,
+          "diff": 1,
+          "status": "WARN",
+          "note": "1 duplicate + 1 missing user"
+        },
+        {
+          "name": "Timesheet Entries",
+          "legacy": 22681,
+          "db": 22676,
+          "diff": 5,
+          "status": "WARN",
+          "note": "5 orphaned entries"
+        },
+        {
+          "name": "Expenses",
+          "legacy": 4593,
+          "db": 4593,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Expense Entries",
+          "legacy": 3153,
+          "db": 3153,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Invoices",
+          "legacy": 15021,
+          "db": 15021,
+          "diff": 0,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "name": "Timesheet Hours",
+      "checks": [
+        {
+          "name": "Total Hours",
+          "legacy": 564059.1000000001,
+          "db": 563910.1,
+          "diff": 149.00000000011642,
+          "percentDiff": "0.026",
+          "status": "PASS"
+        },
+        {
+          "name": "Billable Hours",
+          "legacy": 563713.1000000001,
+          "db": 563564.1,
+          "diff": 149.00000000011642,
+          "percentDiff": "0.026",
+          "status": "PASS"
+        },
+        {
+          "name": "Non-Billable Hours",
+          "legacy": 346,
+          "db": 346,
+          "diff": 0,
+          "percentDiff": "0.000",
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2012",
+          "legacy": 15260,
+          "db": 15268,
+          "diff": -8,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2013",
+          "legacy": 31369.3,
+          "db": 31369.3,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2014",
+          "legacy": 31840.5,
+          "db": 31840.5,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2015",
+          "legacy": 31826,
+          "db": 31826,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2016",
+          "legacy": 38553.75,
+          "db": 38553.75,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2017",
+          "legacy": 48805,
+          "db": 48805,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2018",
+          "legacy": 60451.25,
+          "db": 60451.25,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2019",
+          "legacy": 55295.15,
+          "db": 55295.15,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2020",
+          "legacy": 46631.65,
+          "db": 46631.65,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2021",
+          "legacy": 46621.5,
+          "db": 46621.5,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2022",
+          "legacy": 43160.5,
+          "db": 43160.5,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2023",
+          "legacy": 40728,
+          "db": 40728,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2024",
+          "legacy": 32374,
+          "db": 32374,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2025",
+          "legacy": 36849,
+          "db": 36849,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2026",
+          "legacy": 4136.5,
+          "db": 4136.5,
+          "diff": 0,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "name": "Invoice Totals",
+      "checks": [
+        {
+          "name": "Subtotal",
+          "legacy": 37823028.03000004,
+          "db": 37823028.03000004,
+          "diff": 0,
+          "percentDiff": "0.000",
+          "status": "PASS"
+        },
+        {
+          "name": "GST (5%)",
+          "legacy": 1889829.8599999838,
+          "db": 1889829.8599999838,
+          "diff": 0,
+          "percentDiff": "0.000",
+          "status": "PASS"
+        },
+        {
+          "name": "QST (9.975%)",
+          "legacy": 3770201.5499999854,
+          "db": 3770201.5499999854,
+          "diff": 0,
+          "percentDiff": "0.000",
+          "status": "PASS"
+        },
+        {
+          "name": "Total",
+          "legacy": 43482788.91999917,
+          "db": 43482788.91999917,
+          "diff": 0,
+          "percentDiff": "0.000",
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2012",
+          "legacy": 1055234.9400000004,
+          "db": 1055234.9400000004,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2013",
+          "legacy": 2329686.7099999976,
+          "db": 2329686.7099999976,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2014",
+          "legacy": 2120968.7300000037,
+          "db": 2120968.7300000037,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2015",
+          "legacy": 2318928.650000001,
+          "db": 2318928.650000001,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2016",
+          "legacy": 2640195.1800000034,
+          "db": 2640195.1800000034,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2017",
+          "legacy": 3566540.139999996,
+          "db": 3566540.139999996,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2018",
+          "legacy": 4540741.549999998,
+          "db": 4540741.549999998,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2019",
+          "legacy": 4199137.539999996,
+          "db": 4199137.539999996,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2020",
+          "legacy": 3561758.4899999974,
+          "db": 3561758.4899999974,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2021",
+          "legacy": 3599346.3899999936,
+          "db": 3599346.3899999936,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2022",
+          "legacy": 3357885.989999999,
+          "db": 3357885.989999999,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2023",
+          "legacy": 3283150.230000001,
+          "db": 3283150.230000001,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2024",
+          "legacy": 2880546.7999999984,
+          "db": 2880546.7999999984,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2025",
+          "legacy": 3540009.490000002,
+          "db": 3540009.490000002,
+          "diff": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "Year 2026",
+          "legacy": 488658.0900000001,
+          "db": 488658.0900000001,
+          "diff": 0,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "name": "Expense Totals",
+      "checks": [
+        {
+          "name": "Subtotal",
+          "legacy": 166218.89000000115,
+          "db": 166218.89000000074,
+          "diff": 4.0745362639427185e-10,
+          "percentDiff": "0.000",
+          "status": "PASS"
+        },
+        {
+          "name": "GST",
+          "legacy": 8284.209999999983,
+          "db": 8284.209999999983,
+          "diff": 0,
+          "percentDiff": "0.000",
+          "status": "PASS"
+        },
+        {
+          "name": "QST",
+          "legacy": 16529.089999999913,
+          "db": 16529.089999999953,
+          "diff": -4.001776687800884e-11,
+          "percentDiff": "0.000",
+          "status": "PASS"
+        },
+        {
+          "name": "Total",
+          "legacy": 192649.6500000001,
+          "db": 192649.65000000002,
+          "diff": 8.731149137020111e-11,
+          "percentDiff": "0.000",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "name": "Hours by Client",
+      "checks": [
+        {
+          "name": "TA",
+          "legacy": 99561.5,
+          "db": 99561.5,
+          "diff": 0,
+          "percentDiff": "0.0",
+          "status": "PASS"
+        },
+        {
+          "name": "LEMAY",
+          "legacy": 39567,
+          "db": 39567,
+          "diff": 0,
+          "percentDiff": "0.0",
+          "status": "PASS"
+        },
+        {
+          "name": "Selection 2000",
+          "legacy": 34715.5,
+          "db": 34715.5,
+          "diff": 0,
+          "percentDiff": "0.0",
+          "status": "PASS"
+        },
+        {
+          "name": "CGA",
+          "legacy": 26921.5,
+          "db": 26921.5,
+          "diff": 0,
+          "percentDiff": "0.0",
+          "status": "PASS"
+        },
+        {
+          "name": "O.R.",
+          "legacy": 24547,
+          "db": 24547,
+          "diff": 0,
+          "percentDiff": "0.0",
+          "status": "PASS"
+        },
+        {
+          "name": "GAGNON",
+          "legacy": 23868.5,
+          "db": 23868.5,
+          "diff": 0,
+          "percentDiff": "0.0",
+          "status": "PASS"
+        },
+        {
+          "name": "SGC",
+          "legacy": 21496.8,
+          "db": 21464.8,
+          "diff": 32,
+          "percentDiff": "0.1",
+          "status": "PASS"
+        },
+        {
+          "name": "PDM",
+          "legacy": 16777.5,
+          "db": 16745.5,
+          "diff": 32,
+          "percentDiff": "0.2",
+          "status": "PASS"
+        },
+        {
+          "name": "LORAC",
+          "legacy": 15972.5,
+          "db": 15972.5,
+          "diff": 0,
+          "percentDiff": "0.0",
+          "status": "PASS"
+        },
+        {
+          "name": "JTDN",
+          "legacy": 14342,
+          "db": 14324,
+          "diff": 18,
+          "percentDiff": "0.1",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "name": "Sample Verification",
+      "checks": [
+        {
+          "name": "Sample tsd_id 22614",
+          "legacy": 15.5,
+          "db": 15.5,
+          "status": "PASS"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "warnings": 3
+  },
+  "result": "VERIFIED"
+}

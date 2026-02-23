@@ -1,0 +1,1577 @@
+[
+  {
+    "legacy_user_id": 2,
+    "person_id": "25ed67c1-4d2e-4e81-b425-00d7862c1efb",
+    "first_name": "Daniel",
+    "last_name": "Perrault",
+    "legacy_email": "dperrault@ssti.ca"
+  },
+  {
+    "legacy_user_id": 186,
+    "person_id": "25cf6d8f-61e2-4ee9-a459-5266d5a1bdb8",
+    "first_name": "Gérard ",
+    "last_name": "Boulet",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 185,
+    "person_id": "694e2f25-f124-458c-9a16-135220777bd5",
+    "first_name": "Martin ",
+    "last_name": "Beaulac",
+    "legacy_email": "jackie55j@gmail.com"
+  },
+  {
+    "legacy_user_id": 184,
+    "person_id": "48e1476e-82b3-489d-b28d-a7dd19fc912a",
+    "first_name": "Robert ",
+    "last_name": "Gariepy",
+    "legacy_email": "bobquartet@hotmail.com"
+  },
+  {
+    "legacy_user_id": 183,
+    "person_id": "78f4ea0e-aebf-4df5-91ba-f023268eb85e",
+    "first_name": "Yannick ",
+    "last_name": "Nadon",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 177,
+    "person_id": "dd7574c9-52a1-4879-8eee-fcbaa166a3e9",
+    "first_name": "Richard ",
+    "last_name": "Roy",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 170,
+    "person_id": "c88b4a76-7463-482f-879f-1a5f21c3ee75",
+    "first_name": "Stéphane ",
+    "last_name": "Salerno",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 160,
+    "person_id": "cb083670-73d6-40ba-8185-8306d409b448",
+    "first_name": "Alain ",
+    "last_name": "Sweeney",
+    "legacy_email": "sweeney.a@videotron.ca"
+  },
+  {
+    "legacy_user_id": 271,
+    "person_id": "76322ad4-3843-4e22-8107-8146c9ab7c95",
+    "first_name": "Gilles",
+    "last_name": "Poirier",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 272,
+    "person_id": "5d23ce87-e1bb-444d-aa3a-8ff14f1fb489",
+    "first_name": "Jean-Pierre",
+    "last_name": "Rioux",
+    "legacy_email": "Jp@si-gc.com"
+  },
+  {
+    "legacy_user_id": 156,
+    "person_id": "5015306d-a76d-4015-9a62-c033daa0ffe9",
+    "first_name": "Loca ",
+    "last_name": "Ehab Adel Elias",
+    "legacy_email": "ehabloca@yahoo.ca"
+  },
+  {
+    "legacy_user_id": 154,
+    "person_id": "273b2384-2ea3-4200-b1e1-d2d9253e0696",
+    "first_name": "Daniel ",
+    "last_name": "Martin",
+    "legacy_email": "danielmartinvarennes@gmail.com"
+  },
+  {
+    "legacy_user_id": 273,
+    "person_id": "1f51bddf-3a85-4e69-81ee-b92b2d0bdaec",
+    "first_name": "Corey",
+    "last_name": "Morrissette",
+    "legacy_email": "grandcanyon@hotmail.ca"
+  },
+  {
+    "legacy_user_id": 149,
+    "person_id": "28836ed3-77a1-4ef8-b2fc-afeab8f93f74",
+    "first_name": "Pascal ",
+    "last_name": "Fortin",
+    "legacy_email": "pascalfortin296@gmail.com"
+  },
+  {
+    "legacy_user_id": 147,
+    "person_id": "aaa1f26b-7224-4495-a7c5-e44406518ddf",
+    "first_name": "Simon ",
+    "last_name": "Chabot",
+    "legacy_email": "simonchabot1@hotmail.com"
+  },
+  {
+    "legacy_user_id": 139,
+    "person_id": "90e491d8-d7e4-48be-8118-6f1add0390e0",
+    "first_name": "Xavier ",
+    "last_name": "Perrault",
+    "legacy_email": "xav_perrault@hotmail.com"
+  },
+  {
+    "legacy_user_id": 264,
+    "person_id": "0bef59e7-4b97-45d4-bfd8-90e173f338da",
+    "first_name": "Christian",
+    "last_name": "Chabot",
+    "legacy_email": "cchabot@si-gc.com"
+  },
+  {
+    "legacy_user_id": 265,
+    "person_id": "5c6dad85-899f-439f-a71e-e0b12f1c0e67",
+    "first_name": "Marc",
+    "last_name": "Lambert",
+    "legacy_email": "ginetteL49@hotmail.com"
+  },
+  {
+    "legacy_user_id": 266,
+    "person_id": "9cde820c-1119-4f21-8573-a6abd82365e6",
+    "first_name": "Vincent",
+    "last_name": "Grenier",
+    "legacy_email": "vincentgrenier26@gmail.com"
+  },
+  {
+    "legacy_user_id": 187,
+    "person_id": "8fcfdd6d-ed18-4001-8b6f-ba2f0ef9e523",
+    "first_name": "Christian ",
+    "last_name": "Houyon",
+    "legacy_email": "christian.houc@gmail.com"
+  },
+  {
+    "legacy_user_id": 190,
+    "person_id": "52293805-d18f-497d-9b83-fcd07807b9ec",
+    "first_name": "François ",
+    "last_name": "Héroux",
+    "legacy_email": "herouxfrancois@videotron.ca"
+  },
+  {
+    "legacy_user_id": 191,
+    "person_id": "86ee37d5-cb1b-4bab-9640-a6c401a5d1f4",
+    "first_name": "Pierre ",
+    "last_name": "Morin",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 193,
+    "person_id": "acfea8e3-02a4-49b3-a863-01bc5e6f463b",
+    "first_name": "Paul ",
+    "last_name": "Houyon",
+    "legacy_email": "lolux64@icloud.com"
+  },
+  {
+    "legacy_user_id": 194,
+    "person_id": "8776eea9-78ac-4372-9d4f-47b4d5fa1ab5",
+    "first_name": "Sébastien ",
+    "last_name": "Riopel",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 195,
+    "person_id": "52cf2aed-2a21-416d-8861-a9423e0b150a",
+    "first_name": "Serge ",
+    "last_name": "Rioux",
+    "legacy_email": "belle-vivie@live.fr"
+  },
+  {
+    "legacy_user_id": 196,
+    "person_id": "ba933b2a-b352-41a8-bba2-c78cddfeb1fc",
+    "first_name": "Marc ",
+    "last_name": "Chagnon",
+    "legacy_email": "placeholder@mail.ca"
+  },
+  {
+    "legacy_user_id": 199,
+    "person_id": "e0867cc9-4680-4e57-abc4-0f2e01cb3021",
+    "first_name": "Reale ",
+    "last_name": "Vincenzo",
+    "legacy_email": "annapelle61@gmail.com"
+  },
+  {
+    "legacy_user_id": 200,
+    "person_id": "bb2003e8-3cef-4600-87b5-99d5941de684",
+    "first_name": "Alain ",
+    "last_name": "Ross",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 204,
+    "person_id": "69905762-3be4-4fbf-84d8-9b09e1f76d84",
+    "first_name": "Sylvain ",
+    "last_name": "Bernier",
+    "legacy_email": "sylvain455@hotmail.com"
+  },
+  {
+    "legacy_user_id": 207,
+    "person_id": "0559a5d9-d384-4918-9e5d-0b3a1a9b8ea4",
+    "first_name": "Daniel ",
+    "last_name": "Bégin",
+    "legacy_email": "ysa-bill@hotmail.com"
+  },
+  {
+    "legacy_user_id": 208,
+    "person_id": "a1b359bd-41b4-4f1d-bcab-3972f28f80c9",
+    "first_name": "Noah ",
+    "last_name": "Patrice Campbell",
+    "legacy_email": "notaurus@hotmail.com"
+  },
+  {
+    "legacy_user_id": 210,
+    "person_id": "c7b69c82-4fb6-4bf3-b04c-a23eb1a019fe",
+    "first_name": "Sylvain ",
+    "last_name": "Gagnon",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 211,
+    "person_id": "ff5a4ba3-b3f1-4f30-a8f0-46fffeb14c22",
+    "first_name": "Yves ",
+    "last_name": "Descoteaux",
+    "legacy_email": "ydg@hotmail.com"
+  },
+  {
+    "legacy_user_id": 212,
+    "person_id": "0c4915e5-4228-4c0c-8f5a-e1d2d4d8d312",
+    "first_name": "Yves ",
+    "last_name": "Gagnon",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 214,
+    "person_id": "558eae46-f23f-4d26-a071-66fd01407e2b",
+    "first_name": "Michel ",
+    "last_name": "Pellerin",
+    "legacy_email": "michel.pellerin101@videotron.ca"
+  },
+  {
+    "legacy_user_id": 215,
+    "person_id": "369305c6-fffa-49b4-b7b7-c94b36f01fd5",
+    "first_name": "Robert ",
+    "last_name": "Emond",
+    "legacy_email": "robert6346@hotmail.com"
+  },
+  {
+    "legacy_user_id": 223,
+    "person_id": "5219868b-b1f0-4ed6-86a2-ff30ce5b4dbd",
+    "first_name": "Richard ",
+    "last_name": "Caouette",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 225,
+    "person_id": "bba6ef8b-2fcc-467c-a198-6abbd5468bd6",
+    "first_name": "Paul ",
+    "last_name": "Bleau",
+    "legacy_email": "pableau12@hotmail.com"
+  },
+  {
+    "legacy_user_id": 228,
+    "person_id": "be319afd-e0fe-4440-8470-1e5182200dff",
+    "first_name": "Claude ",
+    "last_name": "Perrault",
+    "legacy_email": "cperrault@si-gc.com"
+  },
+  {
+    "legacy_user_id": 239,
+    "person_id": "d4fc520f-4d8d-4d34-9d5f-026917a2c833",
+    "first_name": "Guy ",
+    "last_name": "Lavallée",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 263,
+    "person_id": "d43b8d3f-3bc2-4365-9885-e6fa41e0c2d2",
+    "first_name": "Patrice",
+    "last_name": "Beaudoin",
+    "legacy_email": "pbeaudoin@hotmail.com"
+  },
+  {
+    "legacy_user_id": 267,
+    "person_id": "676775c1-a73d-48c2-8da5-efc6902f0fe5",
+    "first_name": "Mike",
+    "last_name": "Volpicella",
+    "legacy_email": "moparmike360@hotmail.com"
+  },
+  {
+    "legacy_user_id": 268,
+    "person_id": "4440409d-3a87-4f71-a02b-36831163f10e",
+    "first_name": "Dominic",
+    "last_name": "Berardino",
+    "legacy_email": "berardinodominique@gmail.com"
+  },
+  {
+    "legacy_user_id": 269,
+    "person_id": "c27d5044-1729-4bd8-bf2b-5d79e896ace3",
+    "first_name": "Pierrick",
+    "last_name": "Lamarre",
+    "legacy_email": "pierricklamarre350@hotmail.com"
+  },
+  {
+    "legacy_user_id": 270,
+    "person_id": "8802b300-42f6-408d-8602-fe1b1fcb0112",
+    "first_name": "Alain",
+    "last_name": "Grandbois",
+    "legacy_email": "straitwall@hotmail.ca"
+  },
+  {
+    "legacy_user_id": 274,
+    "person_id": "663084e5-a2a6-45d8-9c04-15646b75810f",
+    "first_name": "Patrick",
+    "last_name": "Dubé",
+    "legacy_email": "blazer481@hotmail.com"
+  },
+  {
+    "legacy_user_id": 275,
+    "person_id": "e6e64756-7001-43ba-af98-c66ef1217eb6",
+    "first_name": "Stéphane",
+    "last_name": "Grenier",
+    "legacy_email": "grandcanyon@hotmail.ca"
+  },
+  {
+    "legacy_user_id": 276,
+    "person_id": "4d77fd7a-0994-4519-a351-dd2c6d2fbcb7",
+    "first_name": "Marc-André",
+    "last_name": "Grenier",
+    "legacy_email": "grandcanyon@hotmail.ca"
+  },
+  {
+    "legacy_user_id": 303,
+    "person_id": "33b5ae8a-7cf8-467e-983b-83cc7d7f96d4",
+    "first_name": "Sam",
+    "last_name": "Latif",
+    "legacy_email": "latif_samy_2009@hotmail.com"
+  },
+  {
+    "legacy_user_id": 262,
+    "person_id": "937a4c5e-3205-4fb7-9d5e-307f8c4753f2",
+    "first_name": "Richère",
+    "last_name": "Foisy",
+    "legacy_email": "richere@si-gc.com"
+  },
+  {
+    "legacy_user_id": 287,
+    "person_id": "90b47145-1775-4f1e-9d0f-d40b47652cbe",
+    "first_name": "Pierre",
+    "last_name": "Lessard",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 290,
+    "person_id": "40235f7b-455b-4ce9-9ed5-3219f9b9b3cf",
+    "first_name": "Yannick",
+    "last_name": "Roy",
+    "legacy_email": "yanstricker@hotmail.com"
+  },
+  {
+    "legacy_user_id": 280,
+    "person_id": "c533eabf-1df3-4912-9feb-f0650c325cfa",
+    "first_name": "Benoit",
+    "last_name": "Rail",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 302,
+    "person_id": "670b3f1f-ac7e-4da0-be8c-852e11f94c95",
+    "first_name": "Mark",
+    "last_name": "MacDonald",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 278,
+    "person_id": "08b41238-2fa5-4f09-b6e5-978d1ff38e66",
+    "first_name": "Jean-Philippe",
+    "last_name": "Lortie",
+    "legacy_email": "jean_philippelortie1@hotmail.com"
+  },
+  {
+    "legacy_user_id": 281,
+    "person_id": "a6e61ea2-7f2f-4a07-a54a-bfc5f3ca732a",
+    "first_name": "Mathieu",
+    "last_name": "Carrière",
+    "legacy_email": "mathieuc371@gmail.com"
+  },
+  {
+    "legacy_user_id": 282,
+    "person_id": "c6263ce1-c8b9-4ecb-9bb1-648439a21e44",
+    "first_name": "Eric",
+    "last_name": "Tremblay",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 283,
+    "person_id": "79e279f1-4638-419c-ae03-08d5f8bd1a48",
+    "first_name": "Bernard",
+    "last_name": "Carrière",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 284,
+    "person_id": "ba20ec2b-6098-4e48-916c-5e9936452662",
+    "first_name": "Robert",
+    "last_name": "D'Amour",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 285,
+    "person_id": "7ba6e132-c0ed-4f80-a2be-67ea48aadddf",
+    "first_name": "Martin",
+    "last_name": "Lapointe",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 289,
+    "person_id": "7a044419-b950-4b5d-be4a-2b9675a6dd51",
+    "first_name": "Sébastien",
+    "last_name": "Lambert",
+    "legacy_email": "seblambert30@hotmail.com"
+  },
+  {
+    "legacy_user_id": 286,
+    "person_id": "7ea6b397-fd10-4ad8-b807-59e911d3772a",
+    "first_name": "Eric",
+    "last_name": "Desjardins",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 288,
+    "person_id": "3091e0d8-97be-4435-8167-ccee35cce0e6",
+    "first_name": "Bruno",
+    "last_name": "DiGirolamo",
+    "legacy_email": "bruno_digirolamo@hotmail.com"
+  },
+  {
+    "legacy_user_id": 291,
+    "person_id": "7828c554-517a-4b65-9f3d-f1621599161e",
+    "first_name": "Jean-François",
+    "last_name": "Marcotte",
+    "legacy_email": "jfmarcotte01@hotmail.com"
+  },
+  {
+    "legacy_user_id": 292,
+    "person_id": "3c8c892e-40ed-4c62-9d0c-53353336355b",
+    "first_name": "Pierre",
+    "last_name": "Richer",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 293,
+    "person_id": "c274e614-a0a3-4df4-9f8f-3c8b456d4772",
+    "first_name": "Pierre",
+    "last_name": "Brodeur",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 294,
+    "person_id": "4e981945-2b84-487a-9646-29bb174f1bd8",
+    "first_name": "Richard",
+    "last_name": "Brodeur",
+    "legacy_email": "brodeurr2@gmail.com"
+  },
+  {
+    "legacy_user_id": 295,
+    "person_id": "d5abf3aa-9e12-4dfc-baa9-96e49db956cb",
+    "first_name": "Alex",
+    "last_name": "Voyer",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 296,
+    "person_id": "0a4eddf9-7a5e-4dc1-a1c6-ba662acc0f5f",
+    "first_name": "Guy",
+    "last_name": "Brassard",
+    "legacy_email": "manonguybrassard@hotmail.com"
+  },
+  {
+    "legacy_user_id": 297,
+    "person_id": "1461bce5-a0a2-4ea4-95ec-994edb42d84d",
+    "first_name": "Olivier",
+    "last_name": "Charlier",
+    "legacy_email": "olivier_charlier@hotmail.com"
+  },
+  {
+    "legacy_user_id": 298,
+    "person_id": "889e8e36-5ec4-4abe-8bea-7255ef1422b9",
+    "first_name": "Yvan",
+    "last_name": "Charbonneau",
+    "legacy_email": "creation.art.prestige@live.ca"
+  },
+  {
+    "legacy_user_id": 299,
+    "person_id": "335d2035-5350-40d5-b606-1d9bc3370fd6",
+    "first_name": "Marquis",
+    "last_name": "Roy",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 300,
+    "person_id": "f5e4a765-d62e-4e58-ab81-e3cb25793a34",
+    "first_name": "Sébastien",
+    "last_name": "Dion",
+    "legacy_email": "dion_sebas@hotmail.com"
+  },
+  {
+    "legacy_user_id": 301,
+    "person_id": "12cb7a8b-551c-4494-a1bc-9ea42a92002e",
+    "first_name": "Sébastien",
+    "last_name": "Vaillancourt",
+    "legacy_email": "sebastienviavaillancourt@gmail.com"
+  },
+  {
+    "legacy_user_id": 304,
+    "person_id": "a982eae8-576a-4d90-9aa8-8c8f0b6c8153",
+    "first_name": "Richard",
+    "last_name": "Lacroix",
+    "legacy_email": "r.lacroix1957.com"
+  },
+  {
+    "legacy_user_id": 305,
+    "person_id": "c28202cf-4340-4aef-a44b-a05a5811a928",
+    "first_name": "Pierre",
+    "last_name": "Beaudoin",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 306,
+    "person_id": "eb732ef9-4760-4ff1-8235-2f07aff82f98",
+    "first_name": "Mikael",
+    "last_name": "Rancourt",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 307,
+    "person_id": "2f8fcef3-39b4-44f1-86e4-ab1f39240dcb",
+    "first_name": "Mario",
+    "last_name": "Lomaglio",
+    "legacy_email": "mariolomaglio29@gmail.com"
+  },
+  {
+    "legacy_user_id": 308,
+    "person_id": "1111d483-d693-41bb-a5a7-0421be9e3b38",
+    "first_name": "Julie",
+    "last_name": "Fournier",
+    "legacy_email": "fournier.julie@hotmail.com"
+  },
+  {
+    "legacy_user_id": 309,
+    "person_id": "0bb9fa99-e271-4671-83aa-9cf16bb9c284",
+    "first_name": "Stéphane",
+    "last_name": "Brunette",
+    "legacy_email": "stefbrunette@gmail.com"
+  },
+  {
+    "legacy_user_id": 310,
+    "person_id": "33712569-5d80-4abf-9984-9598ccf8e797",
+    "first_name": "Robert",
+    "last_name": "Gibson",
+    "legacy_email": "gibrob5775@gmail.com"
+  },
+  {
+    "legacy_user_id": 311,
+    "person_id": "6964b6e6-b04a-4664-bcd6-066608607cd5",
+    "first_name": "Daniel Test",
+    "last_name": "Perrault",
+    "legacy_email": "dperrault@ssti.ca"
+  },
+  {
+    "legacy_user_id": 312,
+    "person_id": "18600776-f9e6-4416-a218-519ba0e795e6",
+    "first_name": "Normand",
+    "last_name": "Paul",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 313,
+    "person_id": "8e4f3c85-7e14-4153-95c8-37bdafde4897",
+    "first_name": "Jessica",
+    "last_name": "Bruneau",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 314,
+    "person_id": "5a2a1389-c84d-49f5-acd0-4f7513bacd21",
+    "first_name": "Stéphane",
+    "last_name": "Lamarche",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 315,
+    "person_id": "b0759843-508b-4c0d-bb15-ac590b282a32",
+    "first_name": "Alexandre ",
+    "last_name": "séguin",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 316,
+    "person_id": "aebea6ca-2a0d-4ab7-8982-e6f0a6166d77",
+    "first_name": "Amélia",
+    "last_name": "De Bellefeuille",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 317,
+    "person_id": "4aea8ca3-91d5-4af3-b812-b9275a0c29a3",
+    "first_name": "Benoit",
+    "last_name": "Vachon",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 318,
+    "person_id": "dbd676c8-d853-4e65-ac06-ab51c804176c",
+    "first_name": "Normand",
+    "last_name": "Ouellet",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 319,
+    "person_id": "37d4e9b2-1d1c-4a59-99b1-d52075f23055",
+    "first_name": "Claude",
+    "last_name": "Roy",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 320,
+    "person_id": "7fc2d730-b5a0-415e-810b-8688f88a558a",
+    "first_name": "Rémy",
+    "last_name": "Champagne",
+    "legacy_email": "champagneremy@hotmail.com"
+  },
+  {
+    "legacy_user_id": 321,
+    "person_id": "37850f7d-6d8d-4902-ae2d-a8b63816d024",
+    "first_name": "Louis",
+    "last_name": "Charbonneau",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 322,
+    "person_id": "a3c21d58-8dcc-4c40-afdc-492d70c86950",
+    "first_name": "Sacha",
+    "last_name": "Boileau",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 323,
+    "person_id": "7cf6f21d-de32-4a5d-811c-10f2f4269706",
+    "first_name": "Michael",
+    "last_name": "Bolduc",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 324,
+    "person_id": "2b3cf094-111e-4709-a8b5-6c2f95a38ff2",
+    "first_name": "Mathieu",
+    "last_name": "Fournier",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 325,
+    "person_id": "61b5b0b7-6f21-4a92-aecd-cd492ee1e4f6",
+    "first_name": "Vincent",
+    "last_name": "Lamarre",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 326,
+    "person_id": "cafc98cd-47fc-43fb-b867-7e86892b40f0",
+    "first_name": "Fadia",
+    "last_name": "Saoul",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 327,
+    "person_id": "eb62f9ba-d268-4e2e-970d-1eaf6d01e498",
+    "first_name": "Yender",
+    "last_name": "Rodriguez",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 328,
+    "person_id": "a5bd1003-6f99-49cd-bdf8-222ea70fa5eb",
+    "first_name": "françois ",
+    "last_name": "dubois",
+    "legacy_email": "clotchi@hotmail.com"
+  },
+  {
+    "legacy_user_id": 329,
+    "person_id": "971de692-4d34-438d-ae99-310edf6fc49b",
+    "first_name": "Félix",
+    "last_name": "Mercure",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 330,
+    "person_id": "ab9168a6-694e-48b6-b4d8-4a37ebaca0f5",
+    "first_name": "Eric",
+    "last_name": "Lussier",
+    "legacy_email": "eric-lussier@hotmail.com"
+  },
+  {
+    "legacy_user_id": 331,
+    "person_id": "51adcbb2-60b2-4420-aecd-f0c90a3d58ef",
+    "first_name": "Cristel",
+    "last_name": "Whitaker",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 332,
+    "person_id": "131e8d4e-5196-4b54-8e30-abf32a1738a8",
+    "first_name": "Frédérick",
+    "last_name": "Dupras",
+    "legacy_email": "f.dupras@hotmail.ca"
+  },
+  {
+    "legacy_user_id": 333,
+    "person_id": "d37c1ed1-b7e6-442e-b5c2-13a9a3f1da12",
+    "first_name": "Louis",
+    "last_name": "Volper",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 334,
+    "person_id": "5ff7361f-7cdc-43d1-8aab-3218a7838909",
+    "first_name": "Martin",
+    "last_name": "Lalonde",
+    "legacy_email": "martinlalonde@msn.com"
+  },
+  {
+    "legacy_user_id": 335,
+    "person_id": "70d7883d-dd00-469c-802d-7b33ea42523f",
+    "first_name": "Pierre ",
+    "last_name": "Allegrezza",
+    "legacy_email": "pierreallegrezza@hotmail.com"
+  },
+  {
+    "legacy_user_id": 336,
+    "person_id": "f2b9cd31-1b05-4de4-b5a5-776eb63087b3",
+    "first_name": "Doris",
+    "last_name": "Fontaine",
+    "legacy_email": "grandcanyon@hotmail.ca"
+  },
+  {
+    "legacy_user_id": 337,
+    "person_id": "bf769884-bc02-442b-b24f-b95350d1e977",
+    "first_name": "Mario",
+    "last_name": "Fortin",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 338,
+    "person_id": "4ae8bad7-f131-4cc2-88a0-6b3284a04159",
+    "first_name": "Guillaume",
+    "last_name": "Bouchard",
+    "legacy_email": "placeholder@mail.ca"
+  },
+  {
+    "legacy_user_id": 339,
+    "person_id": "5f2b0706-acb8-41cb-8a46-8f26655cfa9c",
+    "first_name": "Jesse",
+    "last_name": "Fontaine",
+    "legacy_email": "grandcanyon@hotmail.ca"
+  },
+  {
+    "legacy_user_id": 340,
+    "person_id": "89bb874f-f070-43df-9961-3452908fc272",
+    "first_name": "Marc-Antoine",
+    "last_name": "Cléroux",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 341,
+    "person_id": "ebf04ac5-7a82-43ae-b002-6ecfd2b1ae8c",
+    "first_name": "David",
+    "last_name": "Siphengphet",
+    "legacy_email": "dave_siph@hotmail.ca"
+  },
+  {
+    "legacy_user_id": 342,
+    "person_id": "f3ca93f0-78b2-4857-9dab-47712b15b996",
+    "first_name": "Sylvain",
+    "last_name": "Mathieu",
+    "legacy_email": "s.mathieu19@gmail.com"
+  },
+  {
+    "legacy_user_id": 343,
+    "person_id": "7b570e2e-3dd0-422d-90f7-0ebce6c381b1",
+    "first_name": "Patrice",
+    "last_name": "White",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 344,
+    "person_id": "d0654ad8-a233-432c-accc-cb98867a3e9d",
+    "first_name": "Jean-Michel",
+    "last_name": "Benzahra",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 345,
+    "person_id": "af51e428-b43d-4377-96b3-cab176f16834",
+    "first_name": "Yvon",
+    "last_name": "Rioux",
+    "legacy_email": "belle-vivie@live.fr"
+  },
+  {
+    "legacy_user_id": 346,
+    "person_id": "7e697c3b-eaba-4329-8cb6-2f4f011f95ef",
+    "first_name": "Sébastien",
+    "last_name": "Mainville",
+    "legacy_email": "sebmain@hotmail.fr"
+  },
+  {
+    "legacy_user_id": 347,
+    "person_id": "96d70929-84ec-4946-b8df-0b8ea6d26104",
+    "first_name": "Michel",
+    "last_name": "Morand",
+    "legacy_email": "michelmorand@hotmail.com"
+  },
+  {
+    "legacy_user_id": 348,
+    "person_id": "ea2280d7-c774-4c7e-9aac-d3a8fb87b301",
+    "first_name": "Francois",
+    "last_name": "Lapointe",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 349,
+    "person_id": "44258ed6-b974-42bf-996e-80613ed5d1ab",
+    "first_name": "Alain",
+    "last_name": "Robitaille",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 350,
+    "person_id": "2a4bb568-7819-4db4-ae37-95845ce05c7f",
+    "first_name": "Louis",
+    "last_name": "Mercure",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 351,
+    "person_id": "fdcb2619-afb8-444b-a901-2f5b2bc2d38d",
+    "first_name": "Sébastien ",
+    "last_name": "Arnaud",
+    "legacy_email": "sebasrt8@icloud.com"
+  },
+  {
+    "legacy_user_id": 352,
+    "person_id": "2fef6df5-954f-4e95-83c6-8c34ff7a9495",
+    "first_name": "Marc-André",
+    "last_name": "Tavano",
+    "legacy_email": "mister-tavano@hotmail.com"
+  },
+  {
+    "legacy_user_id": 353,
+    "person_id": "9c5c08ae-5426-46f7-9f87-0f7b084df9bc",
+    "first_name": "Marco",
+    "last_name": "Tavano",
+    "legacy_email": "marcotavano2015@gmail.com"
+  },
+  {
+    "legacy_user_id": 354,
+    "person_id": "67a300fa-9e6d-4e65-9daf-af47140ac4a3",
+    "first_name": "Michel",
+    "last_name": "Garneau",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 355,
+    "person_id": "f34aa7b9-18a0-4b82-9b1f-6a61cc6cf9f5",
+    "first_name": "Daniel",
+    "last_name": "Dor",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 356,
+    "person_id": "cffae36c-de5e-4c7a-9397-4a2f185d2ac3",
+    "first_name": "Mikael",
+    "last_name": "Blais",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 357,
+    "person_id": "7edd096f-abbe-473d-825b-6498c71830c2",
+    "first_name": "Michèle",
+    "last_name": "Blackburn",
+    "legacy_email": "sylvainpoirier27@icloud.com"
+  },
+  {
+    "legacy_user_id": 358,
+    "person_id": "9ae79bef-0572-4e18-adbb-77f719b87e9b",
+    "first_name": "Sylvain",
+    "last_name": "Poirier",
+    "legacy_email": "sylvainpoirier27@icloud.com"
+  },
+  {
+    "legacy_user_id": 359,
+    "person_id": "991b6b7b-92a1-4903-bddc-061b97e8963b",
+    "first_name": "Joanie",
+    "last_name": "Grenon",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 360,
+    "person_id": "708c672a-5975-427d-bc15-48aeb7016dce",
+    "first_name": "Jean-Marc ",
+    "last_name": "Lemousy",
+    "legacy_email": "lemousyjm@hotmail.com"
+  },
+  {
+    "legacy_user_id": 361,
+    "person_id": "f15d55d7-8cd1-4752-bb4d-6e95f74940d9",
+    "first_name": "Laflèche",
+    "last_name": "Foisy",
+    "legacy_email": "laf69@yahoo.ca"
+  },
+  {
+    "legacy_user_id": 362,
+    "person_id": "7de1c390-434a-4f49-b196-5e50310037cc",
+    "first_name": "Patrick",
+    "last_name": "Dallaire",
+    "legacy_email": "patjoint@hotmail.com"
+  },
+  {
+    "legacy_user_id": 363,
+    "person_id": "b92a16c9-01e7-4faf-82bf-b38ce99cc383",
+    "first_name": "Michel",
+    "last_name": "Rochon",
+    "legacy_email": "michelrochon@bell.net"
+  },
+  {
+    "legacy_user_id": 364,
+    "person_id": "e13ec002-a575-4a0d-8f67-8d4d432d6f8b",
+    "first_name": "Nathalie",
+    "last_name": "Piché",
+    "legacy_email": "desiletsfrancine217@gmail.com"
+  },
+  {
+    "legacy_user_id": 365,
+    "person_id": "2075bdcb-4acf-4aab-99e4-f7b6f943db18",
+    "first_name": "Jason",
+    "last_name": "Roy",
+    "legacy_email": "jsonofroi418@gmail.com"
+  },
+  {
+    "legacy_user_id": 366,
+    "person_id": "e844a939-03ad-4bee-ba4e-2cd9bd8d2ac8",
+    "first_name": "Éric",
+    "last_name": "Despres",
+    "legacy_email": "motocrosse69@gmail.com"
+  },
+  {
+    "legacy_user_id": 367,
+    "person_id": "cfde8492-3cd1-4a13-8d54-1bc1be4f5dc3",
+    "first_name": "Carlos",
+    "last_name": "Betancourt",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 368,
+    "person_id": "382ced45-a477-46b0-a8b8-dc13640ac32a",
+    "first_name": "Guillaume",
+    "last_name": "Bélanger",
+    "legacy_email": "guimove@hotmail.com"
+  },
+  {
+    "legacy_user_id": 369,
+    "person_id": "e4c1fa09-2422-4d73-80fc-ab456870b019",
+    "first_name": "Patrick",
+    "last_name": "Venditti",
+    "legacy_email": "patvend@gmail.com"
+  },
+  {
+    "legacy_user_id": 370,
+    "person_id": "3a87d18d-6ac9-4362-a2b5-4044c17d9768",
+    "first_name": "Umberto",
+    "last_name": "Aguire",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 371,
+    "person_id": "96e09b51-3f6d-44ed-bcc7-5ae82d59c8eb",
+    "first_name": "Benoit",
+    "last_name": "Grignon",
+    "legacy_email": "benbiggrignon@gmail.com"
+  },
+  {
+    "legacy_user_id": 372,
+    "person_id": "cd192d02-432b-42d7-bbdf-abae476b2c7a",
+    "first_name": "Martin",
+    "last_name": "Grignon",
+    "legacy_email": "martin_platrier929@outlook.com"
+  },
+  {
+    "legacy_user_id": 373,
+    "person_id": "1a72d0a1-5235-4e8b-aeb1-229818080e83",
+    "first_name": "Alexandre",
+    "last_name": "Roireau",
+    "legacy_email": "alexandre_roireau@hotmail.com"
+  },
+  {
+    "legacy_user_id": 374,
+    "person_id": "edc46cd6-185a-4001-8166-4621843ed384",
+    "first_name": "Sergio",
+    "last_name": "Lago",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 375,
+    "person_id": "6a18c57f-e1fd-49ba-be60-48644aa5c31c",
+    "first_name": "Daniel",
+    "last_name": "Grenon",
+    "legacy_email": "nours3535.dg@gmail.com"
+  },
+  {
+    "legacy_user_id": 376,
+    "person_id": "7f8d11c8-50ea-47ac-b00f-1651cdfa9862",
+    "first_name": "Incatif",
+    "last_name": "Inactif",
+    "legacy_email": "inactif"
+  },
+  {
+    "legacy_user_id": 377,
+    "person_id": "2e6d9690-47af-4739-8866-29bbdedd9fe8",
+    "first_name": "André",
+    "last_name": "Jean",
+    "legacy_email": "andrej60@videotron.ca"
+  },
+  {
+    "legacy_user_id": 378,
+    "person_id": "7cc94463-e30c-4e7a-b7e4-ca1c8ce1cae5",
+    "first_name": "Guillaume",
+    "last_name": "Berardino",
+    "legacy_email": "guillaumeberardino@hotmail.com"
+  },
+  {
+    "legacy_user_id": 380,
+    "person_id": "d15afbfb-9f53-4e23-b6d3-c75e2eb0c2b0",
+    "first_name": "Frédéric",
+    "last_name": "Ducharme",
+    "legacy_email": "frederic.ducharme91@gmail.com"
+  },
+  {
+    "legacy_user_id": 379,
+    "person_id": "6250e1dc-c000-4c9e-a831-8bac5124160d",
+    "first_name": "Sylvie",
+    "last_name": "Dufour",
+    "legacy_email": "andrej60@videotron.ca"
+  },
+  {
+    "legacy_user_id": 381,
+    "person_id": "5aa76e41-0973-4da3-9600-ccf14109ef7e",
+    "first_name": "Samir",
+    "last_name": "Boualem",
+    "legacy_email": "samir.boualem@gmail.com"
+  },
+  {
+    "legacy_user_id": 382,
+    "person_id": "5cf31bb6-f24e-4161-9d98-70d65baff96c",
+    "first_name": "François",
+    "last_name": "Paradis",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 383,
+    "person_id": "6f142007-7efb-43c4-9778-2224798ebcee",
+    "first_name": "Philippe",
+    "last_name": "Turcot",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 384,
+    "person_id": "9e8a8225-24dc-4361-80f7-f90ffb04e3e8",
+    "first_name": "Mikael",
+    "last_name": "Foisy",
+    "legacy_email": "mikaelfoisy@hotmail.com"
+  },
+  {
+    "legacy_user_id": 393,
+    "person_id": "c0b75541-38b1-47c2-8434-1167ca7132d0",
+    "first_name": "Andres",
+    "last_name": "Farias-Vargas",
+    "legacy_email": "andres.fv@outlook.com"
+  },
+  {
+    "legacy_user_id": 385,
+    "person_id": "5e9a3012-2b4a-4a6f-99d9-cd557c229771",
+    "first_name": "Nathalie",
+    "last_name": "Paul",
+    "legacy_email": "nathaliepaul90@gmail.com"
+  },
+  {
+    "legacy_user_id": 386,
+    "person_id": "332eb6aa-4b63-4b2a-8d78-9f38ac29e504",
+    "first_name": "Rocco",
+    "last_name": "Gallotta",
+    "legacy_email": "gallottarg@gmail.com"
+  },
+  {
+    "legacy_user_id": 387,
+    "person_id": "110e2231-d30d-44e0-b3ae-4a2f49ab4783",
+    "first_name": "Mark",
+    "last_name": "St-Jacques ",
+    "legacy_email": "markstj28@gmail.com"
+  },
+  {
+    "legacy_user_id": 388,
+    "person_id": "8be0bdfa-0604-4460-97e0-4d6a152d85fc",
+    "first_name": "Anthony",
+    "last_name": "St-Jacques",
+    "legacy_email": "brisk321@hotmail.com"
+  },
+  {
+    "legacy_user_id": 389,
+    "person_id": "b65381ad-bde0-446b-8dcc-21d5027713ed",
+    "first_name": "Gabriel",
+    "last_name": "Aguirre-Villablanca",
+    "legacy_email": "gabvillablanca@gmail.com"
+  },
+  {
+    "legacy_user_id": 390,
+    "person_id": "8407d799-e40c-4ba0-8b39-c341d2a9218b",
+    "first_name": "Patrick",
+    "last_name": "Leboeuf",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 391,
+    "person_id": "c652e655-8937-4689-8080-745b4d63a4a8",
+    "first_name": "Virginie",
+    "last_name": "Castonguay",
+    "legacy_email": "castvie3@live.ca"
+  },
+  {
+    "legacy_user_id": 392,
+    "person_id": "df955360-0681-4aa9-af46-9c52fb133843",
+    "first_name": "Robert",
+    "last_name": "Goral",
+    "legacy_email": "robert_goral@hotmail.com"
+  },
+  {
+    "legacy_user_id": 394,
+    "person_id": "f644ade7-0412-474e-bb34-d98755dbf593",
+    "first_name": "Jean-François",
+    "last_name": "Tremblay",
+    "legacy_email": "j.ftremblay34@gmail.com"
+  },
+  {
+    "legacy_user_id": 395,
+    "person_id": "315e38cf-f973-41c4-a7cb-fdc1ddc2a97a",
+    "first_name": "Yannick",
+    "last_name": "Gauthier",
+    "legacy_email": "yannickgauthier1988@gmail.com"
+  },
+  {
+    "legacy_user_id": 396,
+    "person_id": "cfdf2bca-5c7b-48a1-b942-97deb0c692c2",
+    "first_name": "David",
+    "last_name": "Bourret",
+    "legacy_email": "davebourret@gmail.com"
+  },
+  {
+    "legacy_user_id": 397,
+    "person_id": "67e5c4c8-b2f7-4419-bf39-d95980b475bc",
+    "first_name": "Sébastien",
+    "last_name": "Tardif",
+    "legacy_email": "volcomseb@hotmail.com"
+  },
+  {
+    "legacy_user_id": 398,
+    "person_id": "da530cbe-3a32-410e-9358-143af34d999b",
+    "first_name": "Yves",
+    "last_name": "cloutier",
+    "legacy_email": "yvesleclou@msn.com"
+  },
+  {
+    "legacy_user_id": 399,
+    "person_id": "55d0bc16-a692-454b-8203-c76548ce1507",
+    "first_name": "Christian",
+    "last_name": "Salerno",
+    "legacy_email": "kristoss@outlook.com"
+  },
+  {
+    "legacy_user_id": 400,
+    "person_id": "d0f75bb2-0c02-49de-b738-141c14602cb7",
+    "first_name": "Marc",
+    "last_name": "Tremblay",
+    "legacy_email": "tremblaymchat@gmail.com"
+  },
+  {
+    "legacy_user_id": 401,
+    "person_id": "723bd349-14a2-4c02-b2f9-163ef9580b23",
+    "first_name": "Wisly",
+    "last_name": "Michel",
+    "legacy_email": "wislymichel@msn.com"
+  },
+  {
+    "legacy_user_id": 402,
+    "person_id": "c02c2bfd-66b1-4ec5-b1f4-648c08ee1ce6",
+    "first_name": "Eric",
+    "last_name": "Landry",
+    "legacy_email": "eric.landry.29@outlook.com"
+  },
+  {
+    "legacy_user_id": 403,
+    "person_id": "15ec0b91-1c09-4727-823f-6528472ada8e",
+    "first_name": "Gilles",
+    "last_name": "Bisson",
+    "legacy_email": "gillesbisson2012@gmail.com"
+  },
+  {
+    "legacy_user_id": 404,
+    "person_id": "d99fdf26-1b1c-4863-ab1e-766ed24a2225",
+    "first_name": "Cladio",
+    "last_name": "Filippone",
+    "legacy_email": "prestigecustomcoatings@hotmail.com"
+  },
+  {
+    "legacy_user_id": 405,
+    "person_id": "fff1dbbb-0bc5-4100-b352-92cf652f3b0a",
+    "first_name": "Olivier",
+    "last_name": "Fiset",
+    "legacy_email": "thefiset@hotmail.fr"
+  },
+  {
+    "legacy_user_id": 406,
+    "person_id": "ff300315-4e07-4b90-a6ca-8e39254fc499",
+    "first_name": "Nicholas",
+    "last_name": "Naccarata",
+    "legacy_email": "nicknaccarata@gmail.com"
+  },
+  {
+    "legacy_user_id": 407,
+    "person_id": "eb190668-d46d-40ab-a86b-a4565412a9b5",
+    "first_name": "Sylvain",
+    "last_name": "Beaudet",
+    "legacy_email": "gypaetes04@gmail.com"
+  },
+  {
+    "legacy_user_id": 408,
+    "person_id": "2a81cc69-95db-4000-b8dc-00d99e13cb34",
+    "first_name": "Anne-Sophie",
+    "last_name": "Mathon",
+    "legacy_email": "annemathon97@outlook.com"
+  },
+  {
+    "legacy_user_id": 409,
+    "person_id": "5a27c72a-96cf-45ff-ab42-0d93210e1fb9",
+    "first_name": "Patrick",
+    "last_name": "Rouillard",
+    "legacy_email": "patrickrouillard80@gmail.com"
+  },
+  {
+    "legacy_user_id": 410,
+    "person_id": "8a41509b-ee18-49a8-8026-e88e180792f4",
+    "first_name": "Dany",
+    "last_name": "Fiscaletti",
+    "legacy_email": "fito_f@hotmail.com"
+  },
+  {
+    "legacy_user_id": 411,
+    "person_id": "037dcc62-78fa-46ba-ac74-1f7c0ce6833f",
+    "first_name": "Hamza",
+    "last_name": "Shhadat",
+    "legacy_email": "grandcanyon@hotmail.ca"
+  },
+  {
+    "legacy_user_id": 412,
+    "person_id": "223d1ac7-37b6-42b9-9339-8f5eb923a208",
+    "first_name": "David",
+    "last_name": "Piquette",
+    "legacy_email": "piquette1206@hotmail.com"
+  },
+  {
+    "legacy_user_id": 413,
+    "person_id": "e17b5556-2dd8-492a-96ae-5978da2d40b8",
+    "first_name": "Mathéus",
+    "last_name": "Krazy",
+    "legacy_email": "cperrault"
+  },
+  {
+    "legacy_user_id": 414,
+    "person_id": "0e115c85-c2c6-46b4-9b46-58b004aabd37",
+    "first_name": "Nabil",
+    "last_name": "Felkai",
+    "legacy_email": "f_nabil1982@hotmail.fr"
+  },
+  {
+    "legacy_user_id": 415,
+    "person_id": "f6a79b75-5b63-4863-815e-b7e2c54a2170",
+    "first_name": "Normand",
+    "last_name": "David",
+    "legacy_email": "placeholder@mail.ca"
+  },
+  {
+    "legacy_user_id": 416,
+    "person_id": "b01d77fe-ced3-4d14-8eae-7e5983f3359e",
+    "first_name": "Alexandre",
+    "last_name": "Roquebrune",
+    "legacy_email": "placeholder@mail.ca"
+  },
+  {
+    "legacy_user_id": 417,
+    "person_id": "120c4b30-86db-414d-8509-d34c7f017c0b",
+    "first_name": "Mathieu",
+    "last_name": "Lemaire",
+    "legacy_email": "mathieu.lemaire@live.ca"
+  },
+  {
+    "legacy_user_id": 418,
+    "person_id": "0ae57e4c-17d6-46fe-addc-f290cfcd4dd7",
+    "first_name": "Louis",
+    "last_name": "Dalbec",
+    "legacy_email": "Louisdalbec@hotmail.fr"
+  },
+  {
+    "legacy_user_id": 419,
+    "person_id": "4115f145-8107-46fd-b68b-1dc6e3e73d61",
+    "first_name": "Charles-Edouard",
+    "last_name": "Boyle",
+    "legacy_email": "charles_boyle@icloud.com"
+  },
+  {
+    "legacy_user_id": 420,
+    "person_id": "1f911fc4-fe30-4547-804f-5e4d15c2cf2c",
+    "first_name": "Ludovic",
+    "last_name": "Campeau",
+    "legacy_email": "ludo_2496@hotmail.com"
+  },
+  {
+    "legacy_user_id": 421,
+    "person_id": "7aab6280-4b0f-4846-a974-e7517e0d8766",
+    "first_name": "Jonathan",
+    "last_name": "Sweeney",
+    "legacy_email": "jsweeney67@icloud.com"
+  },
+  {
+    "legacy_user_id": 422,
+    "person_id": "28a08b3a-cc1d-40f2-b6bb-0e7b86af3bd0",
+    "first_name": "Juan Manuel",
+    "last_name": "Arrieta Orozco",
+    "legacy_email": "Manucan987@gmail.com"
+  },
+  {
+    "legacy_user_id": 423,
+    "person_id": "4fbdc32e-844c-47fb-bdf9-7d11ea77d53b",
+    "first_name": "Jean-Paul",
+    "last_name": "Saavedra",
+    "legacy_email": "jp.saavedra83@gmail.com"
+  },
+  {
+    "legacy_user_id": 424,
+    "person_id": "cad296b9-20c4-49a0-bbdf-59c16ba23396",
+    "first_name": "Marc-Olivier",
+    "last_name": "Dini",
+    "legacy_email": "marco.dini@hotmail.ca"
+  },
+  {
+    "legacy_user_id": 425,
+    "person_id": "0442c4fc-2511-4b47-91a8-ae174f65a4b7",
+    "first_name": "Raphael",
+    "last_name": "Girard",
+    "legacy_email": "xxraphaelgirardxx@gmail.com"
+  },
+  {
+    "legacy_user_id": 426,
+    "person_id": "9787738c-ee54-467f-b885-8be4f6f395e6",
+    "first_name": "Gabriel",
+    "last_name": "White",
+    "legacy_email": "gab.white.09@gmail.com"
+  },
+  {
+    "legacy_user_id": 427,
+    "person_id": "d930bd94-0bf7-4f47-aa1c-e859e6cccd2c",
+    "first_name": "Marylou",
+    "last_name": "Desjardins",
+    "legacy_email": "loudesjardins1013@gmail.com"
+  },
+  {
+    "legacy_user_id": 428,
+    "person_id": "7018c0c2-bd87-4077-ab8a-3e26795f88fd",
+    "first_name": "Martin",
+    "last_name": "Binette",
+    "legacy_email": "binette_martin@outlook.com"
+  },
+  {
+    "legacy_user_id": 429,
+    "person_id": "67293b0d-f0a4-4e2f-8131-a863a9d7a826",
+    "first_name": "Michel",
+    "last_name": "Clusiau",
+    "legacy_email": "michelclusiau1956@gmail.com"
+  },
+  {
+    "legacy_user_id": 430,
+    "person_id": "47977012-1fba-4221-ac58-cd5fcb571751",
+    "first_name": "Danny",
+    "last_name": "Poissant",
+    "legacy_email": "dannypoissant8@gmail.com"
+  },
+  {
+    "legacy_user_id": 431,
+    "person_id": "80bb400a-6878-4761-bd71-713e5f2ae627",
+    "first_name": "René",
+    "last_name": "Poissant",
+    "legacy_email": "dannypoissant8@gmail.com"
+  },
+  {
+    "legacy_user_id": 432,
+    "person_id": "b35c7252-c81f-46dc-9b70-cd3e94adcb53",
+    "first_name": "Ewa",
+    "last_name": "Zoltko",
+    "legacy_email": "ewa_z@hotmail.com"
+  },
+  {
+    "legacy_user_id": 433,
+    "person_id": "e1f4700d-e915-463f-94cc-38a354c5b721",
+    "first_name": "Remi",
+    "last_name": "Guillome",
+    "legacy_email": "remiguillome@gmail.com"
+  },
+  {
+    "legacy_user_id": 434,
+    "person_id": "671c0670-9eb7-4237-bc98-1a641500d530",
+    "first_name": "Rémi",
+    "last_name": "Fréchette",
+    "legacy_email": "platragedimensionx@gmail.com"
+  },
+  {
+    "legacy_user_id": 435,
+    "person_id": "536cdb9a-cf0b-4d3e-9be1-7d9d3b6fa7c7",
+    "first_name": "Marc-André",
+    "last_name": "Ruel",
+    "legacy_email": "mruel1988@gmail.com"
+  },
+  {
+    "legacy_user_id": 436,
+    "person_id": "c3357c1d-60a7-4754-b728-b2e59f15c45e",
+    "first_name": "Patrick",
+    "last_name": "Saint-Laurent",
+    "legacy_email": "cperrault"
+  },
+  {
+    "legacy_user_id": 437,
+    "person_id": "99da8c01-ca44-4888-ac9a-630d59a5b203",
+    "first_name": "Robert",
+    "last_name": "Champagne",
+    "legacy_email": "cperrault"
+  },
+  {
+    "legacy_user_id": 438,
+    "person_id": "e713839e-9396-43a3-91df-0c48bfe5456e",
+    "first_name": "Mario",
+    "last_name": "Pelletier",
+    "legacy_email": "pelletiermp058@gmail.com"
+  },
+  {
+    "legacy_user_id": 439,
+    "person_id": "081e3f6f-edee-491a-afc6-dde57ee728a3",
+    "first_name": "Jimmy",
+    "last_name": "Daskalakis",
+    "legacy_email": "urbenpro@hotmail.com"
+  },
+  {
+    "legacy_user_id": 441,
+    "person_id": "514c3609-9f66-49c5-9c2d-bd9beb7f7e52",
+    "first_name": "Caroline",
+    "last_name": "Pitre-Labreche",
+    "legacy_email": "carolinepitrelabreche@gmail.com"
+  },
+  {
+    "legacy_user_id": 440,
+    "person_id": "bbaa5e0a-6c24-44f9-8ea7-ba22af0b1865",
+    "first_name": "Martino",
+    "last_name": "Mancini",
+    "legacy_email": "Mancini-m@hotmail.com"
+  },
+  {
+    "legacy_user_id": 442,
+    "person_id": "eb610819-2141-4194-847b-e08c4caa82ff",
+    "first_name": "André",
+    "last_name": "Richard",
+    "legacy_email": "a.richard101065@gmail.com"
+  },
+  {
+    "legacy_user_id": 443,
+    "person_id": "637515df-342d-4ff3-9322-dab8acb1c457",
+    "first_name": "Richard",
+    "last_name": "Czerwonka",
+    "legacy_email": "czerwonkarick71@gmail.com"
+  },
+  {
+    "legacy_user_id": 444,
+    "person_id": "109daf9b-aa79-432c-bec2-694404ed0326",
+    "first_name": "Jennifer",
+    "last_name": "Grenier",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 445,
+    "person_id": "a6f5fee0-2bf7-44fd-bcc7-2cfc2b667dcf",
+    "first_name": "Nicodemo",
+    "last_name": "De Minico",
+    "legacy_email": "nicodemodeminico@icloud.com"
+  },
+  {
+    "legacy_user_id": 446,
+    "person_id": "04e874b2-9913-4a28-97c9-279ac0ceed02",
+    "first_name": "Antonio",
+    "last_name": "Motillo",
+    "legacy_email": "antoniomottillo@icloud.com"
+  },
+  {
+    "legacy_user_id": 447,
+    "person_id": "68bcf837-2f8d-4c6c-b804-1794bfa29626",
+    "first_name": "Dominic",
+    "last_name": "Cicciola Perron",
+    "legacy_email": "Dominicciciolla@gmail.com"
+  },
+  {
+    "legacy_user_id": 448,
+    "person_id": "35eb8a1a-ec92-46bb-bcd3-f5bf956e7db1",
+    "first_name": "Émilie",
+    "last_name": "Cote Pelletier",
+    "legacy_email": "bebe_molle@msn.com"
+  },
+  {
+    "legacy_user_id": 449,
+    "person_id": "536c4e8f-b772-4917-a5c8-6efed918d8c1",
+    "first_name": "Faycal",
+    "last_name": "Bensekhar",
+    "legacy_email": "faycalbensekhar@gmail.com"
+  },
+  {
+    "legacy_user_id": 450,
+    "person_id": "e168c376-f58b-4a38-8dfa-ab22947f358f",
+    "first_name": "Jean-Marc",
+    "last_name": "Champagne",
+    "legacy_email": "zotac0808@gmail.com"
+  },
+  {
+    "legacy_user_id": 451,
+    "person_id": "9b86c222-75b1-42ef-9051-801890b4ab62",
+    "first_name": "Gaetan",
+    "last_name": "Gregoire",
+    "legacy_email": "gaetangregoire50@hotmail.com"
+  },
+  {
+    "legacy_user_id": 452,
+    "person_id": "d165a3f1-6ba5-49ed-add4-3b79667cf00c",
+    "first_name": "Martial",
+    "last_name": "Gagné",
+    "legacy_email": null
+  },
+  {
+    "legacy_user_id": 453,
+    "person_id": "9646b035-58b6-44e2-ae04-7c92520b5357",
+    "first_name": "Pascal",
+    "last_name": "Giroux",
+    "legacy_email": "pascal.giroux@hotmail.com"
+  },
+  {
+    "legacy_user_id": 454,
+    "person_id": "a0fd7988-4451-458e-a4f4-9366bdc8c97e",
+    "first_name": "Mathieu",
+    "last_name": "Brien",
+    "legacy_email": "mathieubrien83@hotmail.com"
+  }
+]
