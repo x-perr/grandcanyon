@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import {
   ArrowLeft,
   FolderKanban,
@@ -28,10 +29,11 @@ interface ProjectDetailPageProps {
 
 export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
   const { id } = await params
-  const [project, permissions, users] = await Promise.all([
+  const [project, permissions, users, t] = await Promise.all([
     getProject(id),
     getUserPermissions(),
     getUsersForSelect(),
+    getTranslations('projects'),
   ])
 
   if (!project) {
@@ -41,8 +43,8 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   const canEdit = hasPermission(permissions, 'projects.edit')
 
   const formatDate = (date: string | null) => {
-    if (!date) return 'Not set'
-    return new Date(date).toLocaleDateString('en-CA', {
+    if (!date) return t('detail.not_set')
+    return new Date(date).toLocaleDateString('fr-CA', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -79,7 +81,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         <Button variant="ghost" size="sm" asChild>
           <Link href="/projects">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Projects
+            {t('back_to_projects')}
           </Link>
         </Button>
       </div>
@@ -113,7 +115,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           <Button asChild>
             <Link href={`/projects/${project.id}/edit`}>
               <Pencil className="mr-2 h-4 w-4" />
-              Edit Project
+              {t('edit_project')}
             </Link>
           </Button>
         )}
@@ -122,10 +124,10 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
       {/* Tabs */}
       <Tabs defaultValue="details">
         <TabsList>
-          <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="team">Team ({project.members?.length ?? 0})</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks ({project.tasks?.length ?? 0})</TabsTrigger>
-          <TabsTrigger value="billing">Billing Roles ({project.billing_roles?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="details">{t('tabs.details')}</TabsTrigger>
+          <TabsTrigger value="team">{t('tabs.team')} ({project.members?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="tasks">{t('tabs.tasks')} ({project.tasks?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="billing">{t('tabs.billing_roles')} ({project.billing_roles?.length ?? 0})</TabsTrigger>
         </TabsList>
 
         {/* Details Tab */}
@@ -134,18 +136,18 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             {/* Project Info */}
             <Card>
               <CardHeader>
-                <CardTitle>Project Information</CardTitle>
+                <CardTitle>{t('detail.project_info')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {project.description && (
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Description</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('detail.description')}</p>
                     <p className="whitespace-pre-wrap">{project.description}</p>
                   </div>
                 )}
                 {project.project_manager && (
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Project Manager</span>
+                    <span className="text-muted-foreground">{t('detail.project_manager')}</span>
                     <span>
                       {project.project_manager.first_name} {project.project_manager.last_name}
                     </span>
@@ -153,14 +155,14 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                 )}
                 {project.work_type && (
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Work Type</span>
+                    <span className="text-muted-foreground">{t('detail.work_type')}</span>
                     <span>{project.work_type}</span>
                   </div>
                 )}
                 {project.is_global && (
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Visibility</span>
-                    <Badge variant="secondary">Global</Badge>
+                    <span className="text-muted-foreground">{t('detail.visibility')}</span>
+                    <Badge variant="secondary">{t('detail.global')}</Badge>
                   </div>
                 )}
               </CardContent>
@@ -169,20 +171,20 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             {/* Billing Info */}
             <Card>
               <CardHeader>
-                <CardTitle>Billing</CardTitle>
+                <CardTitle>{t('detail.billing')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Billing Type</span>
+                  <span className="text-muted-foreground">{t('detail.billing_type')}</span>
                   <Badge variant="outline">{billingTypeLabel}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Rate</span>
+                  <span className="text-muted-foreground">{t('detail.rate')}</span>
                   <span className="font-medium">{getBillingRate()}</span>
                 </div>
                 {project.po_number && (
                   <div className="flex items-center justify-between pt-2 border-t">
-                    <span className="text-muted-foreground">PO Number</span>
+                    <span className="text-muted-foreground">{t('detail.po_number')}</span>
                     <span className="font-mono">{project.po_number}</span>
                   </div>
                 )}
@@ -192,20 +194,20 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             {/* Timeline */}
             <Card>
               <CardHeader>
-                <CardTitle>Timeline</CardTitle>
+                <CardTitle>{t('detail.timeline')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium">Start Date</p>
+                    <p className="text-sm font-medium">{t('detail.start_date')}</p>
                     <p className="text-sm text-muted-foreground">{formatDate(project.start_date)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium">End Date</p>
+                    <p className="text-sm font-medium">{t('detail.end_date')}</p>
                     <p className="text-sm text-muted-foreground">{formatDate(project.end_date)}</p>
                   </div>
                 </div>
@@ -215,7 +217,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             {/* Location */}
             <Card>
               <CardHeader>
-                <CardTitle>Location</CardTitle>
+                <CardTitle>{t('detail.location')}</CardTitle>
               </CardHeader>
               <CardContent>
                 {project.address ? (
@@ -224,7 +226,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                     <address className="not-italic">{project.address}</address>
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">No address specified</p>
+                  <p className="text-sm text-muted-foreground">{t('detail.no_address')}</p>
                 )}
               </CardContent>
             </Card>

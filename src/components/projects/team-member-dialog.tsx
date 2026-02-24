@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -72,6 +73,8 @@ export function TeamMemberDialog({
   open,
   onOpenChange,
 }: TeamMemberDialogProps) {
+  const t = useTranslations('projects')
+  const tCommon = useTranslations('common')
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedUserId, setSelectedUserId] = useState('')
@@ -105,14 +108,14 @@ export function TeamMemberDialog({
         onOpenChange(false)
       }
     } catch {
-      setError('An unexpected error occurred')
+      setError(tCommon('errors.generic'))
     } finally {
       setIsPending(false)
     }
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-CA', {
+    return new Intl.NumberFormat('fr-CA', {
       style: 'currency',
       currency: 'CAD',
     }).format(amount)
@@ -123,11 +126,13 @@ export function TeamMemberDialog({
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{isEdit ? 'Update Team Member' : 'Add Team Member'}</DialogTitle>
+            <DialogTitle>
+              {isEdit ? t('team.edit_dialog_title') : t('team.add_dialog_title')}
+            </DialogTitle>
             <DialogDescription>
               {isEdit
-                ? `Update billing role for ${member.user?.first_name} ${member.user?.last_name}`
-                : 'Add a new member to this project team'}
+                ? t('team.edit_dialog_desc')
+                : t('team.add_dialog_desc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -140,10 +145,10 @@ export function TeamMemberDialog({
           <div className="grid gap-4 py-4">
             {!isEdit && (
               <div className="space-y-2">
-                <Label htmlFor="user">User *</Label>
+                <Label htmlFor="user">{t('team.member')} *</Label>
                 <Select value={selectedUserId} onValueChange={setSelectedUserId} required>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select user" />
+                    <SelectValue placeholder={t('team.select_member')} />
                   </SelectTrigger>
                   <SelectContent>
                     {availableUsers.map((user) => (
@@ -157,23 +162,23 @@ export function TeamMemberDialog({
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="billing_role">Billing Role</Label>
+              <Label htmlFor="billing_role">{t('team.billing_role')}</Label>
               <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select billing role (optional)" />
+                  <SelectValue placeholder={t('team.select_role')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No billing role</SelectItem>
+                  <SelectItem value="">{tCommon('labels.none')}</SelectItem>
                   {billingRoles.map((role) => (
                     <SelectItem key={role.id} value={role.id}>
-                      {role.name} ({formatCurrency(role.rate)}/hr)
+                      {role.name} ({formatCurrency(role.rate)}/h)
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {billingRoles.length === 0 && (
                 <p className="text-xs text-muted-foreground">
-                  No billing roles defined. Add them in the Billing Roles tab first.
+                  {t('billing_roles.no_roles_message')}
                 </p>
               )}
             </div>
@@ -186,11 +191,11 @@ export function TeamMemberDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
             <Button type="submit" disabled={isPending || (!isEdit && !selectedUserId)}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isEdit ? 'Update' : 'Add Member'}
+              {isEdit ? tCommon('actions.save') : t('team.add_member')}
             </Button>
           </DialogFooter>
         </form>

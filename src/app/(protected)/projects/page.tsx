@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { getProjects } from './actions'
 import { ProjectList } from '@/components/projects/project-list'
@@ -17,7 +18,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const page = Number(params.page) || 1
   const pageSize = 25
 
-  const [{ projects, count }, permissions] = await Promise.all([
+  const [{ projects, count }, permissions, t] = await Promise.all([
     getProjects({
       search,
       status: status || undefined,
@@ -25,6 +26,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
       offset: (page - 1) * pageSize,
     }),
     getUserPermissions(),
+    getTranslations('projects'),
   ])
 
   const canEdit = hasPermission(permissions, 'projects.edit')
@@ -32,8 +34,8 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-        <p className="text-muted-foreground">Manage your construction projects and tasks</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <ProjectList

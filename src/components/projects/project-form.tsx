@@ -2,6 +2,7 @@
 
 import { useState, useActionState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -47,6 +48,8 @@ interface ProjectFormProps {
 type FormState = { error?: string } | void
 
 export function ProjectForm({ project, clients, users, mode }: ProjectFormProps) {
+  const t = useTranslations('projects')
+  const tCommon = useTranslations('common')
   const [billingType, setBillingType] = useState(project?.billing_type ?? 'hourly')
   const [selectedClientId, setSelectedClientId] = useState(project?.client_id ?? '')
 
@@ -70,7 +73,7 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
         <Button variant="ghost" size="sm" asChild>
           <Link href={project ? `/projects/${project.id}` : '/projects'}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to {project ? 'Project' : 'Projects'}
+            {project ? t('back_to_project') : t('back_to_projects')}
           </Link>
         </Button>
       </div>
@@ -85,12 +88,12 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
       {/* Basic Info */}
       <Card>
         <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
-          <CardDescription>Project identification and client assignment</CardDescription>
+          <CardTitle>{t('form.basic_info')}</CardTitle>
+          <CardDescription>{t('form.basic_info_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="client_id">Client *</Label>
+            <Label htmlFor="client_id">{t('form.client')} *</Label>
             <Select
               name="client_id"
               value={selectedClientId}
@@ -99,7 +102,7 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
               disabled={mode === 'edit'}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select client" />
+                <SelectValue placeholder={t('form.select_client')} />
               </SelectTrigger>
               <SelectContent>
                 {clients.map((client) => (
@@ -110,28 +113,28 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
               </SelectContent>
             </Select>
             {mode === 'edit' && (
-              <p className="text-xs text-muted-foreground">Client cannot be changed after creation</p>
+              <p className="text-xs text-muted-foreground">{t('form.client_locked')}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label>Project Code</Label>
+            <Label>{t('form.project_code')}</Label>
             <Input
               value={mode === 'edit' ? project?.code ?? '' : generatedCode}
               disabled
               className="bg-muted"
             />
             <p className="text-xs text-muted-foreground">
-              {mode === 'create' ? 'Auto-generated from client' : 'Cannot be changed'}
+              {mode === 'create' ? t('form.project_code_help') : t('form.code_locked')}
             </p>
           </div>
 
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="name">Project Name *</Label>
+            <Label htmlFor="name">{t('form.name')} *</Label>
             <Input
               id="name"
               name="name"
-              placeholder="Phase 1 - Foundation Work"
+              placeholder={t('form.name_placeholder')}
               defaultValue={project?.name ?? ''}
               required
               maxLength={100}
@@ -139,21 +142,21 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
           </div>
 
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <Textarea
               id="description"
               name="description"
               rows={3}
-              placeholder="Detailed description of the project..."
+              placeholder={t('form.description_placeholder')}
               defaultValue={project?.description ?? ''}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="status">Status *</Label>
+            <Label htmlFor="status">{t('form.status')} *</Label>
             <Select name="status" defaultValue={project?.status ?? 'draft'}>
               <SelectTrigger>
-                <SelectValue placeholder="Select status" />
+                <SelectValue placeholder={t('form.select_status')} />
               </SelectTrigger>
               <SelectContent>
                 {projectStatuses.map((status) => (
@@ -166,13 +169,13 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="project_manager_id">Project Manager</Label>
+            <Label htmlFor="project_manager_id">{t('form.project_manager')}</Label>
             <Select name="project_manager_id" defaultValue={project?.project_manager_id ?? ''}>
               <SelectTrigger>
-                <SelectValue placeholder="Select PM (optional)" />
+                <SelectValue placeholder={t('form.select_pm')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">None</SelectItem>
+                <SelectItem value="">{tCommon('labels.none')}</SelectItem>
                 {users.map((user) => (
                   <SelectItem key={user.id} value={user.id}>
                     {user.first_name} {user.last_name}
@@ -187,36 +190,36 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
       {/* Billing */}
       <Card>
         <CardHeader>
-          <CardTitle>Billing Settings</CardTitle>
-          <CardDescription>Configure how this project is billed</CardDescription>
+          <CardTitle>{t('form.billing_info')}</CardTitle>
+          <CardDescription>{t('form.billing_info_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="billing_type">Billing Type *</Label>
+            <Label htmlFor="billing_type">{t('form.billing_type')} *</Label>
             <Select
               name="billing_type"
               value={billingType}
               onValueChange={(value) => setBillingType(value as typeof billingType)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select billing type" />
+                <SelectValue placeholder={t('form.select_billing_type')} />
               </SelectTrigger>
               <SelectContent>
                 {billingTypes.map((type) => (
                   <SelectItem key={type.value} value={type.value}>
-                    {type.label}
+                    {t(`form.billing_types.${type.value}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              {billingTypes.find((t) => t.value === billingType)?.description}
+              {billingTypes.find((bt) => bt.value === billingType)?.description}
             </p>
           </div>
 
           {billingType === 'hourly' && (
             <div className="space-y-2">
-              <Label htmlFor="hourly_rate">Default Hourly Rate *</Label>
+              <Label htmlFor="hourly_rate">{t('form.hourly_rate')} *</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   $
@@ -233,13 +236,13 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
                   required
                 />
               </div>
-              <p className="text-xs text-muted-foreground">Per hour rate</p>
+              <p className="text-xs text-muted-foreground">{t('form.per_hour_rate')}</p>
             </div>
           )}
 
           {billingType === 'fixed' && (
             <div className="space-y-2">
-              <Label htmlFor="fixed_price">Fixed Price *</Label>
+              <Label htmlFor="fixed_price">{t('form.fixed_price')} *</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   $
@@ -256,13 +259,13 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
                   required
                 />
               </div>
-              <p className="text-xs text-muted-foreground">Total project cost</p>
+              <p className="text-xs text-muted-foreground">{t('form.total_project_cost')}</p>
             </div>
           )}
 
           {billingType === 'per_unit' && (
             <div className="space-y-2">
-              <Label htmlFor="per_unit_rate">Per Unit Rate *</Label>
+              <Label htmlFor="per_unit_rate">{t('form.per_unit_rate')} *</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   $
@@ -279,7 +282,7 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
                   required
                 />
               </div>
-              <p className="text-xs text-muted-foreground">Rate per unit of work</p>
+              <p className="text-xs text-muted-foreground">{t('form.rate_per_unit')}</p>
             </div>
           )}
         </CardContent>
@@ -288,12 +291,12 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
       {/* Dates */}
       <Card>
         <CardHeader>
-          <CardTitle>Project Timeline</CardTitle>
-          <CardDescription>Start and end dates for the project</CardDescription>
+          <CardTitle>{t('form.timeline')}</CardTitle>
+          <CardDescription>{t('form.timeline_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="start_date">Start Date</Label>
+            <Label htmlFor="start_date">{t('form.start_date')}</Label>
             <Input
               id="start_date"
               name="start_date"
@@ -303,7 +306,7 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="end_date">End Date</Label>
+            <Label htmlFor="end_date">{t('form.end_date')}</Label>
             <Input
               id="end_date"
               name="end_date"
@@ -317,38 +320,38 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
       {/* Additional Details */}
       <Card>
         <CardHeader>
-          <CardTitle>Additional Details</CardTitle>
-          <CardDescription>Optional project information</CardDescription>
+          <CardTitle>{t('form.additional')}</CardTitle>
+          <CardDescription>{t('form.additional_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="address">Project Address</Label>
+            <Label htmlFor="address">{t('form.address')}</Label>
             <Input
               id="address"
               name="address"
-              placeholder="123 Construction Site Dr, Montreal, QC"
+              placeholder={t('form.address_placeholder')}
               defaultValue={project?.address ?? ''}
               maxLength={200}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="po_number">PO Number</Label>
+            <Label htmlFor="po_number">{t('form.po_number')}</Label>
             <Input
               id="po_number"
               name="po_number"
-              placeholder="PO-2024-001"
+              placeholder={t('form.po_placeholder')}
               defaultValue={project?.po_number ?? ''}
               maxLength={50}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="work_type">Work Type</Label>
+            <Label htmlFor="work_type">{t('form.work_type')}</Label>
             <Input
               id="work_type"
               name="work_type"
-              placeholder="Residential Construction"
+              placeholder={t('form.work_type_placeholder')}
               defaultValue={project?.work_type ?? ''}
               maxLength={100}
             />
@@ -361,7 +364,7 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
               defaultChecked={project?.is_global ?? false}
             />
             <Label htmlFor="is_global" className="cursor-pointer">
-              Global Project (visible to all users)
+              {t('form.is_global')}
             </Label>
           </div>
         </CardContent>
@@ -370,11 +373,13 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
       {/* Submit */}
       <div className="flex justify-end gap-4">
         <Button type="button" variant="outline" asChild>
-          <Link href={project ? `/projects/${project.id}` : '/projects'}>Cancel</Link>
+          <Link href={project ? `/projects/${project.id}` : '/projects'}>
+            {tCommon('actions.cancel')}
+          </Link>
         </Button>
         <Button type="submit" disabled={isPending || (mode === 'create' && !selectedClientId)}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {mode === 'create' ? 'Create Project' : 'Save Changes'}
+          {mode === 'create' ? t('form.create') : t('form.save_changes')}
         </Button>
       </div>
     </form>

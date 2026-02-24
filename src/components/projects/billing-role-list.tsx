@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { DollarSign, MoreHorizontal, Pencil, Trash2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -36,6 +37,8 @@ interface BillingRoleListProps {
 }
 
 export function BillingRoleList({ projectId, billingRoles, canEdit }: BillingRoleListProps) {
+  const t = useTranslations('projects')
+  const tCommon = useTranslations('common')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingRole, setEditingRole] = useState<BillingRole | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -66,7 +69,7 @@ export function BillingRoleList({ projectId, billingRoles, canEdit }: BillingRol
         setDeleteId(null)
       }
     } catch {
-      setDeleteError('Failed to delete billing role')
+      setDeleteError(tCommon('errors.unexpected'))
     } finally {
       setIsDeleting(false)
     }
@@ -84,15 +87,15 @@ export function BillingRoleList({ projectId, billingRoles, canEdit }: BillingRol
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-medium">Billing Roles ({billingRoles.length})</h3>
+          <h3 className="text-lg font-medium">{t('billing_roles.title')} ({billingRoles.length})</h3>
           <p className="text-sm text-muted-foreground">
-            Define hourly rates for different roles on this project
+            {t('billing_roles.description')}
           </p>
         </div>
         {canEdit && (
           <Button size="sm" onClick={handleAdd}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Role
+            {t('billing_roles.add_role')}
           </Button>
         )}
       </div>
@@ -102,11 +105,11 @@ export function BillingRoleList({ projectId, billingRoles, canEdit }: BillingRol
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-8">
             <DollarSign className="h-10 w-10 text-muted-foreground/50" />
-            <p className="mt-2 text-sm text-muted-foreground">No billing roles defined</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t('billing_roles.no_roles')}</p>
             {canEdit && (
               <Button size="sm" variant="outline" className="mt-4" onClick={handleAdd}>
                 <Plus className="mr-2 h-4 w-4" />
-                Add First Role
+                {t('billing_roles.add_first')}
               </Button>
             )}
           </CardContent>
@@ -123,7 +126,7 @@ export function BillingRoleList({ projectId, billingRoles, canEdit }: BillingRol
                   <div>
                     <div className="font-medium">{role.name}</div>
                     <p className="text-sm text-muted-foreground">
-                      {formatCurrency(role.rate)}/hour
+                      {t('billing_roles.per_hour', { rate: formatCurrency(role.rate) })}
                     </p>
                   </div>
                 </div>
@@ -132,13 +135,13 @@ export function BillingRoleList({ projectId, billingRoles, canEdit }: BillingRol
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                         <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Actions</span>
+                        <span className="sr-only">{tCommon('labels.actions')}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => handleEdit(role)}>
                         <Pencil className="mr-2 h-4 w-4" />
-                        Edit
+                        {tCommon('actions.edit')}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
@@ -146,7 +149,7 @@ export function BillingRoleList({ projectId, billingRoles, canEdit }: BillingRol
                         onClick={() => setDeleteId(role.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                        {tCommon('actions.delete')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -169,9 +172,9 @@ export function BillingRoleList({ projectId, billingRoles, canEdit }: BillingRol
       <Dialog open={!!deleteId} onOpenChange={() => { setDeleteId(null); setDeleteError(null); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Billing Role</DialogTitle>
+            <DialogTitle>{t('billing_roles.delete_title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete the &quot;{roleToDelete?.name}&quot; billing role?
+              {t('billing_roles.delete_message', { name: roleToDelete?.name ?? '' })}
             </DialogDescription>
           </DialogHeader>
           {deleteError && (
@@ -181,10 +184,10 @@ export function BillingRoleList({ projectId, billingRoles, canEdit }: BillingRol
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => { setDeleteId(null); setDeleteError(null); }} disabled={isDeleting}>
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              {isDeleting ? tCommon('actions.deleting') : tCommon('actions.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

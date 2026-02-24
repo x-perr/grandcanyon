@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -34,6 +35,8 @@ interface BillingRoleDialogProps {
 }
 
 export function BillingRoleDialog({ projectId, role, open, onOpenChange }: BillingRoleDialogProps) {
+  const t = useTranslations('projects')
+  const tCommon = useTranslations('common')
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -57,7 +60,7 @@ export function BillingRoleDialog({ projectId, role, open, onOpenChange }: Billi
         onOpenChange(false)
       }
     } catch {
-      setError('An unexpected error occurred')
+      setError(tCommon('errors.unexpected'))
     } finally {
       setIsPending(false)
     }
@@ -68,9 +71,9 @@ export function BillingRoleDialog({ projectId, role, open, onOpenChange }: Billi
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{isEdit ? 'Edit Billing Role' : 'Add Billing Role'}</DialogTitle>
+            <DialogTitle>{isEdit ? t('billing_roles.edit_role') : t('billing_roles.add_role')}</DialogTitle>
             <DialogDescription>
-              {isEdit ? 'Update the billing role details' : 'Add a new billing role for this project'}
+              {isEdit ? t('billing_roles.edit_dialog_desc') : t('billing_roles.add_dialog_desc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -82,11 +85,11 @@ export function BillingRoleDialog({ projectId, role, open, onOpenChange }: Billi
 
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Role Name *</Label>
+              <Label htmlFor="name">{t('billing_roles.role_name')} *</Label>
               <Input
                 id="name"
                 name="name"
-                placeholder="Senior Engineer"
+                placeholder={t('billing_roles.role_name_placeholder')}
                 defaultValue={role?.name ?? ''}
                 required
                 maxLength={100}
@@ -94,7 +97,7 @@ export function BillingRoleDialog({ projectId, role, open, onOpenChange }: Billi
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="rate">Hourly Rate *</Label>
+              <Label htmlFor="rate">{t('billing_roles.hourly_rate')} *</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   $
@@ -111,7 +114,7 @@ export function BillingRoleDialog({ projectId, role, open, onOpenChange }: Billi
                   required
                 />
               </div>
-              <p className="text-xs text-muted-foreground">Rate per hour in CAD</p>
+              <p className="text-xs text-muted-foreground">{t('billing_roles.rate_help')}</p>
             </div>
           </div>
 
@@ -122,11 +125,11 @@ export function BillingRoleDialog({ projectId, role, open, onOpenChange }: Billi
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isEdit ? 'Save Changes' : 'Add Role'}
+              {isEdit ? tCommon('actions.save_changes') : t('billing_roles.add_role')}
             </Button>
           </DialogFooter>
         </form>

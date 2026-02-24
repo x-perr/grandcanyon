@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { FolderKanban, MoreHorizontal, Pencil, Trash2, Plus, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SearchInput } from '@/components/ui/search-input'
@@ -63,6 +64,8 @@ export function ProjectList({
 }: ProjectListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('projects')
+  const tCommon = useTranslations('common')
   const [isPending, startTransition] = useTransition()
   const [search, setSearch] = useState(searchQuery)
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -131,7 +134,7 @@ export function ProjectList({
 
   const formatDate = (date: string | null) => {
     if (!date) return '-'
-    return new Date(date).toLocaleDateString('en-CA')
+    return new Date(date).toLocaleDateString('fr-CA')
   }
 
   return (
@@ -140,17 +143,17 @@ export function ProjectList({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 gap-2">
           <SearchInput
-            placeholder="Search by code, name..."
+            placeholder={t('search_placeholder')}
             value={search}
             onChange={updateSearch}
             className="flex-1 sm:max-w-sm"
           />
           <Select value={statusFilter || 'all'} onValueChange={updateStatus}>
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={tCommon('labels.status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="all">{t('all_statuses')}</SelectItem>
               {projectStatuses.map((status) => (
                 <SelectItem key={status.value} value={status.value}>
                   {status.label}
@@ -163,7 +166,7 @@ export function ProjectList({
           <Button asChild>
             <Link href="/projects/new">
               <Plus className="mr-2 h-4 w-4" />
-              New Project
+              {t('new_project')}
             </Link>
           </Button>
         )}
@@ -174,17 +177,17 @@ export function ProjectList({
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <FolderKanban className="h-12 w-12 text-muted-foreground/50" />
-            <h3 className="mt-4 text-lg font-semibold">No projects found</h3>
+            <h3 className="mt-4 text-lg font-semibold">{t('no_projects')}</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               {searchQuery || statusFilter
-                ? 'Try adjusting your search or filters'
-                : 'Get started by adding your first project'}
+                ? t('list.adjust_filters')
+                : t('no_projects_message')}
             </p>
             {canEdit && !searchQuery && !statusFilter && (
               <Button asChild className="mt-4">
                 <Link href="/projects/new">
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Project
+                  {t('list.add_project')}
                 </Link>
               </Button>
             )}
@@ -195,11 +198,11 @@ export function ProjectList({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[120px]">Code</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead className="hidden md:table-cell">Client</TableHead>
-                <TableHead className="hidden sm:table-cell">Status</TableHead>
-                <TableHead className="hidden lg:table-cell">Start</TableHead>
+                <TableHead className="w-[120px]">{t('list.code')}</TableHead>
+                <TableHead>{t('list.name')}</TableHead>
+                <TableHead className="hidden md:table-cell">{t('list.client')}</TableHead>
+                <TableHead className="hidden sm:table-cell">{t('list.status')}</TableHead>
+                <TableHead className="hidden lg:table-cell">{t('list.start')}</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
@@ -233,14 +236,14 @@ export function ProjectList({
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Actions</span>
+                          <span className="sr-only">{tCommon('labels.actions')}</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
                           <Link href={`/projects/${project.id}`}>
                             <ExternalLink className="mr-2 h-4 w-4" />
-                            View
+                            {tCommon('actions.view')}
                           </Link>
                         </DropdownMenuItem>
                         {canEdit && (
@@ -248,7 +251,7 @@ export function ProjectList({
                             <DropdownMenuItem asChild>
                               <Link href={`/projects/${project.id}/edit`}>
                                 <Pencil className="mr-2 h-4 w-4" />
-                                Edit
+                                {tCommon('actions.edit')}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -257,7 +260,7 @@ export function ProjectList({
                               onClick={() => setDeleteId(project.id)}
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
+                              {tCommon('actions.delete')}
                             </DropdownMenuItem>
                           </>
                         )}
@@ -275,8 +278,11 @@ export function ProjectList({
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Showing {(currentPage - 1) * pageSize + 1}-
-            {Math.min(currentPage * pageSize, totalCount)} of {totalCount}
+            {tCommon('pagination.showing', {
+              start: (currentPage - 1) * pageSize + 1,
+              end: Math.min(currentPage * pageSize, totalCount),
+              total: totalCount,
+            })}
           </p>
           <div className="flex gap-2">
             <Button
@@ -285,7 +291,7 @@ export function ProjectList({
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1 || isPending}
             >
-              Previous
+              {tCommon('actions.previous')}
             </Button>
             <Button
               variant="outline"
@@ -293,7 +299,7 @@ export function ProjectList({
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages || isPending}
             >
-              Next
+              {tCommon('actions.next')}
             </Button>
           </div>
         </div>
@@ -303,18 +309,20 @@ export function ProjectList({
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Project</DialogTitle>
+            <DialogTitle>{t('delete.title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {projectToDelete?.name} ({projectToDelete?.code})?
-              This action can be undone by an administrator.
+              {t('delete.message', {
+                name: projectToDelete?.name ?? '',
+                code: projectToDelete?.code ?? '',
+              })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)} disabled={isDeleting}>
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              {isDeleting ? tCommon('actions.deleting') : tCommon('actions.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

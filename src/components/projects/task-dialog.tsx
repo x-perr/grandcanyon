@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,6 +39,8 @@ interface TaskDialogProps {
 }
 
 export function TaskDialog({ projectId, task, open, onOpenChange }: TaskDialogProps) {
+  const t = useTranslations('projects')
+  const tCommon = useTranslations('common')
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -61,7 +64,7 @@ export function TaskDialog({ projectId, task, open, onOpenChange }: TaskDialogPr
         onOpenChange(false)
       }
     } catch {
-      setError('An unexpected error occurred')
+      setError(tCommon('errors.unexpected'))
     } finally {
       setIsPending(false)
     }
@@ -72,9 +75,9 @@ export function TaskDialog({ projectId, task, open, onOpenChange }: TaskDialogPr
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{isEdit ? 'Edit Task' : 'Add Task'}</DialogTitle>
+            <DialogTitle>{isEdit ? t('tasks.edit_task') : t('tasks.add_task')}</DialogTitle>
             <DialogDescription>
-              {isEdit ? `Update task ${task.code}` : 'Add a new task to this project'}
+              {isEdit ? t('tasks.edit_dialog_desc') : t('tasks.add_dialog_desc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -86,11 +89,11 @@ export function TaskDialog({ projectId, task, open, onOpenChange }: TaskDialogPr
 
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Task Name *</Label>
+              <Label htmlFor="name">{t('tasks.task_name')} *</Label>
               <Input
                 id="name"
                 name="name"
-                placeholder="Site preparation"
+                placeholder={t('tasks.task_name_placeholder')}
                 defaultValue={task?.name ?? ''}
                 required
                 maxLength={100}
@@ -98,11 +101,11 @@ export function TaskDialog({ projectId, task, open, onOpenChange }: TaskDialogPr
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{tCommon('labels.description')}</Label>
               <Textarea
                 id="description"
                 name="description"
-                placeholder="Optional description of the task..."
+                placeholder={t('tasks.description_placeholder')}
                 defaultValue={task?.description ?? ''}
                 rows={3}
               />
@@ -116,11 +119,11 @@ export function TaskDialog({ projectId, task, open, onOpenChange }: TaskDialogPr
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isEdit ? 'Save Changes' : 'Add Task'}
+              {isEdit ? tCommon('actions.save_changes') : t('tasks.add_task')}
             </Button>
           </DialogFooter>
         </form>

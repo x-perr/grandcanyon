@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { User, MoreHorizontal, Pencil, Trash2, Plus, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -68,6 +69,8 @@ export function TeamList({
   availableUsers,
   canEdit,
 }: TeamListProps) {
+  const t = useTranslations('projects')
+  const tCommon = useTranslations('common')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingMember, setEditingMember] = useState<Member | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -106,7 +109,7 @@ export function TeamList({
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-CA', {
+    return new Intl.NumberFormat('fr-CA', {
       style: 'currency',
       currency: 'CAD',
     }).format(amount)
@@ -116,11 +119,11 @@ export function TeamList({
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">Team Members ({members.length})</h3>
+        <h3 className="text-lg font-medium">{t('team.title')} ({members.length})</h3>
         {canEdit && usersNotInTeam.length > 0 && (
           <Button size="sm" onClick={handleAdd}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Member
+            {t('team.add_member')}
           </Button>
         )}
       </div>
@@ -130,11 +133,11 @@ export function TeamList({
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-8">
             <User className="h-10 w-10 text-muted-foreground/50" />
-            <p className="mt-2 text-sm text-muted-foreground">No team members assigned</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t('team.no_members')}</p>
             {canEdit && usersNotInTeam.length > 0 && (
               <Button size="sm" variant="outline" className="mt-4" onClick={handleAdd}>
                 <Plus className="mr-2 h-4 w-4" />
-                Add First Member
+                {t('team.add_first')}
               </Button>
             )}
           </CardContent>
@@ -155,7 +158,7 @@ export function TeamList({
                       </span>
                       {!member.is_active && (
                         <Badge variant="secondary" className="text-xs">
-                          Inactive
+                          {t('team.inactive')}
                         </Badge>
                       )}
                     </div>
@@ -163,7 +166,7 @@ export function TeamList({
                     {member.billing_role && (
                       <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                         <DollarSign className="h-3.5 w-3.5" />
-                        {member.billing_role.name} @ {formatCurrency(member.billing_role.rate)}/hr
+                        {member.billing_role.name} @ {formatCurrency(member.billing_role.rate)}/h
                       </div>
                     )}
                   </div>
@@ -173,13 +176,13 @@ export function TeamList({
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                         <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Actions</span>
+                        <span className="sr-only">{tCommon('labels.actions')}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => handleEdit(member)}>
                         <Pencil className="mr-2 h-4 w-4" />
-                        Change Role
+                        {t('team.change_role')}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
@@ -187,7 +190,7 @@ export function TeamList({
                         onClick={() => setDeleteId(member.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Remove
+                        {tCommon('actions.remove')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -212,18 +215,19 @@ export function TeamList({
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remove Team Member</DialogTitle>
+            <DialogTitle>{t('team.remove_title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to remove {memberToDelete?.user?.first_name}{' '}
-              {memberToDelete?.user?.last_name} from this project?
+              {t('team.remove_message', {
+                name: `${memberToDelete?.user?.first_name} ${memberToDelete?.user?.last_name}`,
+              })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)} disabled={isDeleting}>
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? 'Removing...' : 'Remove'}
+              {isDeleting ? t('team.removing') : tCommon('actions.remove')}
             </Button>
           </DialogFooter>
         </DialogContent>
