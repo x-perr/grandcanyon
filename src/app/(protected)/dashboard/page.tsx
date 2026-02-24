@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -10,10 +11,11 @@ import { RecentActivity } from '@/components/dashboard/recent-activity'
 import { getDashboardStats, getRecentActivity } from './actions'
 
 export default async function DashboardPage() {
-  const [profile, stats, activities] = await Promise.all([
+  const [profile, stats, activities, t] = await Promise.all([
     getProfile(),
     getDashboardStats(),
     getRecentActivity(10),
+    getTranslations('dashboard'),
   ])
 
   const firstName = profile?.first_name || 'User'
@@ -22,10 +24,10 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          Welcome back, {firstName}
+          {t('welcome', { name: firstName })}
         </h1>
         <p className="text-muted-foreground">
-          Here&apos;s what&apos;s happening with your projects today.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -35,44 +37,52 @@ export default async function DashboardPage() {
       </Suspense>
 
       {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Common tasks and shortcuts</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          <Button asChild>
-            <Link href="/timesheets/new">
-              <Clock className="mr-2 h-4 w-4" />
-              New Timesheet
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/projects/new">
-              <FolderKanban className="mr-2 h-4 w-4" />
-              New Project
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/expenses/new">
-              <Receipt className="mr-2 h-4 w-4" />
-              New Expense
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/reports">
-              <FileText className="mr-2 h-4 w-4" />
-              Reports
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
+      <QuickActions />
 
       {/* Recent Activity */}
       <Suspense fallback={<ActivitySkeleton />}>
         <RecentActivity activities={activities} />
       </Suspense>
     </div>
+  )
+}
+
+async function QuickActions() {
+  const t = await getTranslations('dashboard.quick_actions')
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('title')}</CardTitle>
+        <CardDescription>{t('subtitle')}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-wrap gap-2">
+        <Button asChild>
+          <Link href="/timesheets/new">
+            <Clock className="mr-2 h-4 w-4" />
+            {t('new_timesheet')}
+          </Link>
+        </Button>
+        <Button variant="outline" asChild>
+          <Link href="/projects/new">
+            <FolderKanban className="mr-2 h-4 w-4" />
+            {t('new_project')}
+          </Link>
+        </Button>
+        <Button variant="outline" asChild>
+          <Link href="/expenses/new">
+            <Receipt className="mr-2 h-4 w-4" />
+            {t('new_expense')}
+          </Link>
+        </Button>
+        <Button variant="outline" asChild>
+          <Link href="/reports">
+            <FileText className="mr-2 h-4 w-4" />
+            {t('view_reports')}
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -99,8 +109,8 @@ function ActivitySkeleton() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Activity</CardTitle>
-        <CardDescription>Latest updates from your team</CardDescription>
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-4 w-48" />
       </CardHeader>
       <CardContent className="space-y-4">
         {[1, 2, 3, 4, 5].map((i) => (

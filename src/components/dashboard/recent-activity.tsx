@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Clock, Receipt, FileText, CheckCircle, XCircle, Send, CreditCard } from 'lucide-react'
 import type { ActivityItem } from '@/app/(protected)/dashboard/actions'
@@ -9,16 +10,18 @@ interface RecentActivityProps {
 }
 
 export function RecentActivity({ activities }: RecentActivityProps) {
+  const t = useTranslations('dashboard.recent_activity')
+
   if (activities.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-          <CardDescription>Latest updates from your team</CardDescription>
+          <CardTitle>{t('title')}</CardTitle>
+          <CardDescription>{t('subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-center text-muted-foreground py-8">
-            No recent activity to display.
+            {t('no_activity')}
           </p>
         </CardContent>
       </Card>
@@ -28,8 +31,8 @@ export function RecentActivity({ activities }: RecentActivityProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Activity</CardTitle>
-        <CardDescription>Latest updates from your team</CardDescription>
+        <CardTitle>{t('title')}</CardTitle>
+        <CardDescription>{t('subtitle')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {activities.map((activity) => (
@@ -99,6 +102,8 @@ function getActivityIcon(activity: ActivityItem) {
   }
 }
 
+// Note: Action verbs come from backend activity data
+// Could be enhanced with i18n for activity-specific messages
 function getActionVerb(action: ActivityItem['action']): string {
   switch (action) {
     case 'submitted':

@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '@/lib/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { LoginForm } from '@/components/auth/login-form'
@@ -9,6 +10,8 @@ export default async function LoginPage() {
   if (user) {
     redirect('/dashboard')
   }
+
+  const t = await getTranslations('auth.login')
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 p-4">
@@ -21,7 +24,7 @@ export default async function LoginPage() {
           </div>
           <CardTitle className="text-2xl">Grand Canyon</CardTitle>
           <CardDescription>
-            Sign in to your account to continue
+            {t('subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>

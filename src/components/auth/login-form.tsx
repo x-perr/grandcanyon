@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
+import { useTranslations } from 'next-intl'
 import { login, type LoginState } from '@/app/(auth)/login/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,23 +13,24 @@ const initialState: LoginState = {}
 
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(login, initialState)
+  const t = useTranslations('auth.login')
 
   return (
     <form action={formAction} className="space-y-4">
       {state.error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{state.error}</AlertDescription>
+          <AlertDescription>{t('error')}</AlertDescription>
         </Alert>
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t('email')}</Label>
         <Input
           id="email"
           name="email"
           type="email"
-          placeholder="admin@grandcanyon.local"
+          placeholder={t('email_placeholder')}
           required
           autoComplete="email"
           disabled={pending}
@@ -36,11 +38,12 @@ export function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{t('password')}</Label>
         <Input
           id="password"
           name="password"
           type="password"
+          placeholder={t('password_placeholder')}
           required
           autoComplete="current-password"
           disabled={pending}
@@ -51,18 +54,12 @@ export function LoginForm() {
         {pending ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Signing in...
+            {t('logging_in')}
           </>
         ) : (
-          'Sign In'
+          t('submit')
         )}
       </Button>
-
-      <p className="text-center text-sm text-muted-foreground">
-        <span className="text-primary/50 cursor-not-allowed">
-          Forgot password?
-        </span>
-      </p>
     </form>
   )
 }
