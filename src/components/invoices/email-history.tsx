@@ -4,23 +4,28 @@ import { Mail, CheckCircle, XCircle, Clock } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import type { InvoiceEmail } from '@/app/(protected)/invoices/actions'
+import { useTranslations } from 'next-intl'
+import { useLocale } from 'next-intl'
 
 interface EmailHistoryProps {
   emails: InvoiceEmail[]
 }
 
 export function EmailHistory({ emails }: EmailHistoryProps) {
+  const t = useTranslations('invoices.email_history')
+  const locale = useLocale()
+
   if (emails.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Mail className="h-4 w-4" />
-            Email History
+            {t('title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-sm">No emails sent yet</p>
+          <p className="text-muted-foreground text-sm">{t('no_emails')}</p>
         </CardContent>
       </Card>
     )
@@ -43,32 +48,32 @@ export function EmailHistory({ emails }: EmailHistoryProps) {
       case 'delivered':
         return (
           <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
-            Delivered
+            {t('status_delivered')}
           </Badge>
         )
       case 'failed':
         return (
           <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700">
-            Failed
+            {t('status_failed')}
           </Badge>
         )
       case 'bounced':
         return (
           <Badge variant="outline" className="border-orange-200 bg-orange-50 text-orange-700">
-            Bounced
+            {t('status_bounced')}
           </Badge>
         )
       default:
         return (
           <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700">
-            Sent
+            {t('status_sent')}
           </Badge>
         )
     }
   }
 
   const formatDateTime = (date: string) => {
-    return new Date(date).toLocaleDateString('en-CA', {
+    return new Date(date).toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-CA', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -82,7 +87,7 @@ export function EmailHistory({ emails }: EmailHistoryProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Mail className="h-4 w-4" />
-          Email History ({emails.length})
+          {t('title')} ({emails.length})
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -97,7 +102,7 @@ export function EmailHistory({ emails }: EmailHistoryProps) {
                 <div>
                   <p className="text-sm font-medium">{email.sent_to}</p>
                   <p className="text-xs text-muted-foreground">
-                    {formatDateTime(email.sent_at)} by {email.sent_by_name}
+                    {formatDateTime(email.sent_at)} {t('sent_by').toLowerCase()} {email.sent_by_name}
                   </p>
                   {email.error_message && (
                     <p className="text-xs text-red-600 mt-1">{email.error_message}</p>

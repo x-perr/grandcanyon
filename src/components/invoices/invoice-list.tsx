@@ -34,6 +34,7 @@ import { markInvoicePaid } from '@/app/(protected)/invoices/actions'
 import type { InvoiceWithRelations, ClientForSelect } from '@/app/(protected)/invoices/actions'
 import type { InvoiceStatus } from '@/lib/validations/invoice'
 import { toast } from 'sonner'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface InvoiceListProps {
   invoices: InvoiceWithRelations[]
@@ -65,6 +66,9 @@ export function InvoiceList({
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
   const [search, setSearch] = useState(filters.search ?? '')
+  const t = useTranslations('invoices')
+  const tc = useTranslations('common')
+  const locale = useLocale()
 
   const totalPages = Math.ceil(totalCount / pageSize)
 
@@ -110,7 +114,7 @@ export function InvoiceList({
     if (result.error) {
       toast.error(result.error)
     } else {
-      toast.success('Invoice marked as paid')
+      toast.success(t('toast.marked_paid'))
       startTransition(() => {
         router.refresh()
       })
@@ -119,7 +123,7 @@ export function InvoiceList({
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return '-'
-    return new Date(dateStr).toLocaleDateString('en-CA', {
+    return new Date(dateStr).toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-CA', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -133,19 +137,19 @@ export function InvoiceList({
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">{formatCurrency(summary.draft)}</div>
-            <p className="text-xs text-muted-foreground">Draft</p>
+            <p className="text-xs text-muted-foreground">{t('summary.draft')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-blue-600">{formatCurrency(summary.sent)}</div>
-            <p className="text-xs text-muted-foreground">Outstanding</p>
+            <p className="text-xs text-muted-foreground">{t('summary.outstanding')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-green-600">{formatCurrency(summary.paid)}</div>
-            <p className="text-xs text-muted-foreground">Paid</p>
+            <p className="text-xs text-muted-foreground">{t('summary.paid_ytd')}</p>
           </CardContent>
         </Card>
       </div>
@@ -154,7 +158,7 @@ export function InvoiceList({
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex-1 min-w-[200px]">
           <SearchInput
-            placeholder="Search invoice # or client..."
+            placeholder={t('search_placeholder')}
             value={search}
             onChange={handleSearch}
           />
@@ -164,10 +168,10 @@ export function InvoiceList({
           onValueChange={(v) => updateFilters({ clientId: v === 'all' ? undefined : v })}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="All Clients" />
+            <SelectValue placeholder={t('all_clients')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Clients</SelectItem>
+            <SelectItem value="all">{t('all_clients')}</SelectItem>
             {clients.map((client) => (
               <SelectItem key={client.id} value={client.id}>
                 {client.name}
@@ -180,13 +184,13 @@ export function InvoiceList({
           onValueChange={(v) => updateFilters({ status: v === 'all' ? undefined : v })}
         >
           <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="All Statuses" />
+            <SelectValue placeholder={t('all_statuses')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="sent">Sent</SelectItem>
-            <SelectItem value="paid">Paid</SelectItem>
+            <SelectItem value="all">{t('all_statuses')}</SelectItem>
+            <SelectItem value="draft">{tc('status.draft')}</SelectItem>
+            <SelectItem value="sent">{tc('status.sent')}</SelectItem>
+            <SelectItem value="paid">{tc('status.paid')}</SelectItem>
           </SelectContent>
         </Select>
         <Select
@@ -194,10 +198,10 @@ export function InvoiceList({
           onValueChange={(v) => updateFilters({ year: v === 'all' ? undefined : v })}
         >
           <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="All Years" />
+            <SelectValue placeholder={t('all_years')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Years</SelectItem>
+            <SelectItem value="all">{t('all_years')}</SelectItem>
             {years.map((year) => (
               <SelectItem key={year} value={year.toString()}>
                 {year}
@@ -212,15 +216,15 @@ export function InvoiceList({
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <FileText className="h-12 w-12 text-muted-foreground/50" />
-            <h3 className="mt-4 text-lg font-semibold">No invoices found</h3>
+            <h3 className="mt-4 text-lg font-semibold">{t('no_invoices')}</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               {filters.search || filters.clientId || filters.status || filters.year
-                ? 'Try adjusting your filters'
-                : 'Create your first invoice to get started'}
+                ? tc('pagination.try_adjusting_filters')
+                : t('no_invoices_message')}
             </p>
             {!filters.search && !filters.clientId && !filters.status && (
               <Button asChild className="mt-4">
-                <Link href="/invoices/new">Create Invoice</Link>
+                <Link href="/invoices/new">{t('new_invoice')}</Link>
               </Button>
             )}
           </CardContent>
@@ -230,12 +234,12 @@ export function InvoiceList({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Invoice #</TableHead>
-                <TableHead className="hidden md:table-cell">Client</TableHead>
-                <TableHead className="hidden lg:table-cell">Project</TableHead>
-                <TableHead className="hidden sm:table-cell">Date</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('list.invoice_number')}</TableHead>
+                <TableHead className="hidden md:table-cell">{t('list.client')}</TableHead>
+                <TableHead className="hidden lg:table-cell">{t('list.project')}</TableHead>
+                <TableHead className="hidden sm:table-cell">{t('list.date')}</TableHead>
+                <TableHead className="text-right">{t('list.total')}</TableHead>
+                <TableHead>{t('list.status')}</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
@@ -272,26 +276,26 @@ export function InvoiceList({
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm">
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Actions</span>
+                          <span className="sr-only">{t('list.actions')}</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
                           <Link href={`/invoices/${invoice.id}`}>
                             <ExternalLink className="mr-2 h-4 w-4" />
-                            View Details
+                            {t('actions.view')}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link href={`/api/invoices/${invoice.id}/pdf`} target="_blank">
                             <Download className="mr-2 h-4 w-4" />
-                            Download PDF
+                            {t('actions.download_pdf')}
                           </Link>
                         </DropdownMenuItem>
                         {invoice.status === 'sent' && (
                           <DropdownMenuItem onClick={(e) => handleMarkPaid(invoice.id, e as unknown as React.MouseEvent)}>
                             <Check className="mr-2 h-4 w-4" />
-                            Mark as Paid
+                            {t('actions.mark_paid')}
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
@@ -308,8 +312,11 @@ export function InvoiceList({
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Showing {(currentPage - 1) * pageSize + 1}-
-            {Math.min(currentPage * pageSize, totalCount)} of {totalCount}
+            {tc('pagination.showing', {
+              start: (currentPage - 1) * pageSize + 1,
+              end: Math.min(currentPage * pageSize, totalCount),
+              total: totalCount,
+            })}
           </p>
           <div className="flex gap-2">
             <Button
@@ -318,7 +325,7 @@ export function InvoiceList({
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1 || isPending}
             >
-              Previous
+              {tc('actions.previous')}
             </Button>
             <Button
               variant="outline"
@@ -326,7 +333,7 @@ export function InvoiceList({
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages || isPending}
             >
-              Next
+              {tc('actions.next')}
             </Button>
           </div>
         </div>

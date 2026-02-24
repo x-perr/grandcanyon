@@ -18,6 +18,7 @@ import {
 import { submitExpense, copyPreviousWeek } from '@/app/(protected)/expenses/actions'
 import { toast } from 'sonner'
 import type { Tables } from '@/types/database'
+import { useTranslations } from 'next-intl'
 
 interface ExpenseActionsProps {
   expense: Tables<'expenses'>
@@ -28,6 +29,7 @@ interface ExpenseActionsProps {
 export function ExpenseActions({ expense, isEditable, hasEntries }: ExpenseActionsProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const t = useTranslations('expenses')
 
   const handleSubmit = async () => {
     startTransition(async () => {
@@ -35,7 +37,7 @@ export function ExpenseActions({ expense, isEditable, hasEntries }: ExpenseActio
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success('Expense report submitted for approval')
+        toast.success(t('toast.submitted'))
         router.refresh()
       }
     })
@@ -47,7 +49,7 @@ export function ExpenseActions({ expense, isEditable, hasEntries }: ExpenseActio
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success(`Copied ${result.entriesCopied} entries from previous week`)
+        toast.success(t('actions.copied', { count: result.entriesCopied ?? 0 }))
         router.refresh()
       }
     })
@@ -57,7 +59,7 @@ export function ExpenseActions({ expense, isEditable, hasEntries }: ExpenseActio
     return (
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground">
-          This expense report is {expense.status} and cannot be edited.
+          {t('actions.not_editable', { status: expense.status ?? '' })}
         </span>
       </div>
     )
@@ -72,7 +74,7 @@ export function ExpenseActions({ expense, isEditable, hasEntries }: ExpenseActio
         disabled={isPending}
       >
         <Copy className="mr-2 h-4 w-4" />
-        Copy Previous Week
+        {t('actions.copy_previous')}
       </Button>
 
       <AlertDialog>
@@ -82,21 +84,20 @@ export function ExpenseActions({ expense, isEditable, hasEntries }: ExpenseActio
             disabled={isPending || !hasEntries}
           >
             <Send className="mr-2 h-4 w-4" />
-            Submit for Approval
+            {t('actions.submit_approval')}
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Submit Expense Report</AlertDialogTitle>
+            <AlertDialogTitle>{t('actions.submit_title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will submit your expense report for manager approval.
-              You won&apos;t be able to make changes until it&apos;s approved or rejected.
+              {t('actions.submit_desc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('actions.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleSubmit}>
-              Submit
+              {t('actions.submit')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

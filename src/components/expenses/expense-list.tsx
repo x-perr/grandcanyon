@@ -18,6 +18,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { formatWeekRange, formatDateISO, getCurrentWeekStart, parseDateISO } from '@/lib/date'
 import { formatCurrency } from '@/lib/validations/expense'
 import type { ExpenseWithUser } from '@/app/(protected)/expenses/actions'
+import { useTranslations } from 'next-intl'
 
 interface ExpenseListProps {
   expenses: ExpenseWithUser[]
@@ -35,6 +36,7 @@ export function ExpenseList({
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
+  const t = useTranslations('expenses')
 
   const totalPages = Math.ceil(totalCount / pageSize)
   const currentWeekStart = formatDateISO(getCurrentWeekStart())
@@ -53,12 +55,12 @@ export function ExpenseList({
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Receipt className="h-12 w-12 text-muted-foreground/50" />
-            <h3 className="mt-4 text-lg font-semibold">No expense reports yet</h3>
+            <h3 className="mt-4 text-lg font-semibold">{t('list.no_reports')}</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Start tracking your expenses by creating a report for the current week
+              {t('list.no_reports_desc')}
             </p>
             <Button asChild className="mt-4">
-              <Link href={`/expenses/${currentWeekStart}`}>Enter Current Week</Link>
+              <Link href={`/expenses/${currentWeekStart}`}>{t('enter_current_week')}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -67,10 +69,10 @@ export function ExpenseList({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Week</TableHead>
-                <TableHead className="text-center">Items</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead className="hidden sm:table-cell">Status</TableHead>
+                <TableHead>{t('list.week')}</TableHead>
+                <TableHead className="text-center">{t('list.items')}</TableHead>
+                <TableHead className="text-right">{t('list.total')}</TableHead>
+                <TableHead className="hidden sm:table-cell">{t('list.status')}</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
@@ -91,7 +93,7 @@ export function ExpenseList({
                         <div className="font-medium">
                           {weekRange}
                           {isCurrentWeek && (
-                            <span className="ml-2 text-xs text-primary">(Current)</span>
+                            <span className="ml-2 text-xs text-primary">{t('list.current_badge')}</span>
                           )}
                         </div>
                         <div className="text-sm text-muted-foreground sm:hidden">
@@ -112,7 +114,7 @@ export function ExpenseList({
                       <Button variant="ghost" size="sm" asChild>
                         <Link href={`/expenses/${expense.week_start}`}>
                           <ExternalLink className="h-4 w-4" />
-                          <span className="sr-only">View</span>
+                          <span className="sr-only">{t('list.view')}</span>
                         </Link>
                       </Button>
                     </TableCell>
@@ -128,8 +130,11 @@ export function ExpenseList({
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Showing {(currentPage - 1) * pageSize + 1}-
-            {Math.min(currentPage * pageSize, totalCount)} of {totalCount}
+            {t('pagination.showing', {
+              start: (currentPage - 1) * pageSize + 1,
+              end: Math.min(currentPage * pageSize, totalCount),
+              total: totalCount,
+            })}
           </p>
           <div className="flex gap-2">
             <Button
@@ -138,7 +143,7 @@ export function ExpenseList({
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1 || isPending}
             >
-              Previous
+              {t('pagination.previous')}
             </Button>
             <Button
               variant="outline"
@@ -146,7 +151,7 @@ export function ExpenseList({
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages || isPending}
             >
-              Next
+              {t('pagination.next')}
             </Button>
           </div>
         </div>

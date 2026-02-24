@@ -26,6 +26,7 @@ import { saveExpenseEntry } from '@/app/(protected)/expenses/actions'
 import { calculateExpenseTotals, formatCurrency } from '@/lib/validations/expense'
 import { toast } from 'sonner'
 import type { ExpenseEntryWithRelations, ExpenseType, ProjectForExpense } from '@/app/(protected)/expenses/actions'
+import { useTranslations } from 'next-intl'
 
 interface ExpenseEntryDialogProps {
   open: boolean
@@ -48,6 +49,7 @@ export function ExpenseEntryDialog({
 }: ExpenseEntryDialogProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const t = useTranslations('expenses')
 
   // Form state
   const [expenseTypeId, setExpenseTypeId] = useState('')
@@ -110,7 +112,7 @@ export function ExpenseEntryDialog({
     e.preventDefault()
 
     if (!expenseTypeId || !projectId || !description) {
-      toast.error('Please fill in all required fields')
+      toast.error(t('entry.required_fields'))
       return
     }
 
@@ -131,7 +133,7 @@ export function ExpenseEntryDialog({
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success(entry ? 'Entry updated' : 'Entry added')
+        toast.success(entry ? t('entry.updated') : t('entry.added'))
         onOpenChange(false)
         router.refresh()
       }
@@ -143,19 +145,19 @@ export function ExpenseEntryDialog({
       <DialogContent className="max-w-lg">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{entry ? 'Edit Expense' : 'Add Expense'}</DialogTitle>
+            <DialogTitle>{entry ? t('entry.edit_expense') : t('entry.add_expense')}</DialogTitle>
             <DialogDescription>
-              {entry ? 'Update the expense entry details.' : 'Add a new expense entry for this week.'}
+              {entry ? t('entry.edit_desc') : t('entry.add_desc')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
             {/* Expense Type */}
             <div className="grid gap-2">
-              <Label htmlFor="expenseType">Expense Type *</Label>
+              <Label htmlFor="expenseType">{t('entry.expense_type_required')}</Label>
               <Select value={expenseTypeId} onValueChange={setExpenseTypeId}>
                 <SelectTrigger id="expenseType">
-                  <SelectValue placeholder="Select type..." />
+                  <SelectValue placeholder={t('entry.select_type_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {expenseTypes.map((type) => (
@@ -174,10 +176,10 @@ export function ExpenseEntryDialog({
 
             {/* Project */}
             <div className="grid gap-2">
-              <Label htmlFor="project">Project *</Label>
+              <Label htmlFor="project">{t('entry.project_required')}</Label>
               <Select value={projectId} onValueChange={(v) => { setProjectId(v); setTaskId(''); }}>
                 <SelectTrigger id="project">
-                  <SelectValue placeholder="Select project..." />
+                  <SelectValue placeholder={t('entry.select_project_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {projects.map((project) => (
@@ -192,13 +194,13 @@ export function ExpenseEntryDialog({
             {/* Task (Optional) */}
             {tasks.length > 0 && (
               <div className="grid gap-2">
-                <Label htmlFor="task">Task (Optional)</Label>
+                <Label htmlFor="task">{t('entry.task_optional')}</Label>
                 <Select value={taskId} onValueChange={setTaskId}>
                   <SelectTrigger id="task">
-                    <SelectValue placeholder="Select task..." />
+                    <SelectValue placeholder={t('entry.select_task')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="">{t('entry.task_none')}</SelectItem>
                     {tasks.map((task) => (
                       <SelectItem key={task.id} value={task.id}>
                         {task.code} - {task.name}
@@ -211,7 +213,7 @@ export function ExpenseEntryDialog({
 
             {/* Date */}
             <div className="grid gap-2">
-              <Label htmlFor="date">Date *</Label>
+              <Label htmlFor="date">{t('entry.date_required')}</Label>
               <Input
                 id="date"
                 type="date"
@@ -223,31 +225,31 @@ export function ExpenseEntryDialog({
 
             {/* Description */}
             <div className="grid gap-2">
-              <Label htmlFor="description">Description *</Label>
+              <Label htmlFor="description">{t('entry.description_required')}</Label>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="What was this expense for?"
+                placeholder={t('entry.description_placeholder')}
                 required
               />
             </div>
 
             {/* Receipt Number */}
             <div className="grid gap-2">
-              <Label htmlFor="receipt">Receipt # (Optional)</Label>
+              <Label htmlFor="receipt">{t('entry.receipt_optional')}</Label>
               <Input
                 id="receipt"
                 value={receiptNumber}
                 onChange={(e) => setReceiptNumber(e.target.value)}
-                placeholder="INV-12345"
+                placeholder={t('entry.receipt_number_placeholder')}
               />
             </div>
 
             {/* Quantity and Unit Price */}
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="quantity">Quantity *</Label>
+                <Label htmlFor="quantity">{t('entry.quantity_required')}</Label>
                 <Input
                   id="quantity"
                   type="number"
@@ -259,7 +261,7 @@ export function ExpenseEntryDialog({
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="unitPrice">Unit Price *</Label>
+                <Label htmlFor="unitPrice">{t('entry.unit_price_required')}</Label>
                 <Input
                   id="unitPrice"
                   type="number"
@@ -275,19 +277,19 @@ export function ExpenseEntryDialog({
             {/* Totals Display */}
             <div className="rounded-md bg-muted p-3 space-y-1 text-sm">
               <div className="flex justify-between">
-                <span>Subtotal:</span>
+                <span>{t('entry.subtotal')}</span>
                 <span className="font-mono">{formatCurrency(totals.subtotal)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>GST (5%):</span>
+                <span>{t('entry.gst_5')}</span>
                 <span className="font-mono">{formatCurrency(totals.gst_amount)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>QST (9.975%):</span>
+                <span>{t('entry.qst_10')}</span>
                 <span className="font-mono">{formatCurrency(totals.qst_amount)}</span>
               </div>
               <div className="flex justify-between font-medium border-t pt-1 mt-1">
-                <span>Total:</span>
+                <span>{t('entry.total')}</span>
                 <span className="font-mono">{formatCurrency(totals.total)}</span>
               </div>
             </div>
@@ -300,17 +302,17 @@ export function ExpenseEntryDialog({
                 onCheckedChange={(checked) => setIsBillable(checked === true)}
               />
               <Label htmlFor="billable" className="text-sm font-normal">
-                Billable to client
+                {t('entry.billable')}
               </Label>
             </div>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t('entry.cancel')}
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? 'Saving...' : entry ? 'Update' : 'Add'}
+              {isPending ? t('entry.saving') : entry ? t('entry.update') : t('entry.add')}
             </Button>
           </DialogFooter>
         </form>

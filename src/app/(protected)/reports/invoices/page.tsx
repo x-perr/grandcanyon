@@ -11,20 +11,23 @@ import {
   getClientsForFilter,
 } from '../actions'
 import { parseReportFilters } from '@/lib/validations/report'
+import { getTranslations } from 'next-intl/server'
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-const statusOptions = [
-  { value: 'draft', label: 'Draft' },
-  { value: 'sent', label: 'Sent' },
-  { value: 'paid', label: 'Paid' },
-]
-
 export default async function InvoiceReportPage({ searchParams }: PageProps) {
   const params = await searchParams
   const filters = parseReportFilters(params)
+  const t = await getTranslations('reports.invoices')
+  const tc = await getTranslations('common.status')
+
+  const statusOptions = [
+    { value: 'draft', label: tc('draft') },
+    { value: 'sent', label: tc('sent') },
+    { value: 'paid', label: tc('paid') },
+  ]
 
   const [data, aging, totals, projects, clients] = await Promise.all([
     getInvoiceReportData(filters),
@@ -40,9 +43,9 @@ export default async function InvoiceReportPage({ searchParams }: PageProps) {
       <div className="flex items-center gap-3">
         <FileText className="h-6 w-6 text-muted-foreground" />
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Invoice Report</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">
-            View invoices by client, status, and date range with aging analysis
+            {t('subtitle')}
           </p>
         </div>
       </div>

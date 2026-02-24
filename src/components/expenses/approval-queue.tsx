@@ -32,6 +32,7 @@ import { approveExpense, rejectExpense } from '@/app/(protected)/expenses/action
 import { toast } from 'sonner'
 import { useState } from 'react'
 import type { ExpenseWithUser } from '@/app/(protected)/expenses/actions'
+import { useTranslations } from 'next-intl'
 
 interface ExpenseApprovalQueueProps {
   expenses: ExpenseWithUser[]
@@ -41,6 +42,7 @@ export function ExpenseApprovalQueue({ expenses }: ExpenseApprovalQueueProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [rejectReason, setRejectReason] = useState('')
+  const t = useTranslations('expenses')
 
   const handleApprove = async (expenseId: string) => {
     startTransition(async () => {
@@ -48,7 +50,7 @@ export function ExpenseApprovalQueue({ expenses }: ExpenseApprovalQueueProps) {
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success('Expense report approved')
+        toast.success(t('approval.approved'))
         router.refresh()
       }
     })
@@ -60,7 +62,7 @@ export function ExpenseApprovalQueue({ expenses }: ExpenseApprovalQueueProps) {
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success('Expense report rejected')
+        toast.success(t('approval.rejected'))
         setRejectReason('')
         router.refresh()
       }
@@ -72,9 +74,9 @@ export function ExpenseApprovalQueue({ expenses }: ExpenseApprovalQueueProps) {
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Check className="h-12 w-12 text-green-500/50" />
-          <h3 className="mt-4 text-lg font-semibold">All caught up!</h3>
+          <h3 className="mt-4 text-lg font-semibold">{t('approval.all_caught_up')}</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            No expense reports pending approval
+            {t('approval.no_pending')}
           </p>
         </CardContent>
       </Card>
@@ -86,11 +88,11 @@ export function ExpenseApprovalQueue({ expenses }: ExpenseApprovalQueueProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Employee</TableHead>
-            <TableHead>Week</TableHead>
-            <TableHead className="text-center">Items</TableHead>
-            <TableHead className="text-right">Total</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>{t('approval.employee')}</TableHead>
+            <TableHead>{t('approval.week')}</TableHead>
+            <TableHead className="text-center">{t('approval.items')}</TableHead>
+            <TableHead className="text-right">{t('approval.total')}</TableHead>
+            <TableHead className="text-right">{t('approval.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -104,7 +106,7 @@ export function ExpenseApprovalQueue({ expenses }: ExpenseApprovalQueueProps) {
                 <TableCell>
                   <div>
                     <div className="font-medium">
-                      {user ? `${user.first_name} ${user.last_name}` : 'Unknown'}
+                      {user ? `${user.first_name} ${user.last_name}` : t('approval.unknown')}
                     </div>
                     <div className="text-sm text-muted-foreground">{user?.email}</div>
                   </div>
@@ -119,7 +121,7 @@ export function ExpenseApprovalQueue({ expenses }: ExpenseApprovalQueueProps) {
                     <Button variant="ghost" size="sm" asChild>
                       <Link href={`/expenses/${expense.week_start}/review?id=${expense.id}`}>
                         <ExternalLink className="h-4 w-4" />
-                        <span className="sr-only">Review</span>
+                        <span className="sr-only">{t('approval.review')}</span>
                       </Link>
                     </Button>
 
@@ -131,7 +133,7 @@ export function ExpenseApprovalQueue({ expenses }: ExpenseApprovalQueueProps) {
                       disabled={isPending}
                     >
                       <Check className="h-4 w-4" />
-                      <span className="sr-only">Approve</span>
+                      <span className="sr-only">{t('approval.approve')}</span>
                     </Button>
 
                     <AlertDialog>
@@ -143,31 +145,30 @@ export function ExpenseApprovalQueue({ expenses }: ExpenseApprovalQueueProps) {
                           disabled={isPending}
                         >
                           <X className="h-4 w-4" />
-                          <span className="sr-only">Reject</span>
+                          <span className="sr-only">{t('approval.reject')}</span>
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Reject Expense Report</AlertDialogTitle>
+                          <AlertDialogTitle>{t('approval.reject_title')}</AlertDialogTitle>
                           <AlertDialogDescription>
-                            This will return the expense report to {user?.first_name} for revision.
-                            Optionally provide a reason for rejection.
+                            {t('approval.reject_desc', { name: user?.first_name ?? '' })}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <Textarea
-                          placeholder="Reason for rejection (optional)"
+                          placeholder={t('approval.reject_placeholder')}
                           value={rejectReason}
                           onChange={(e) => setRejectReason(e.target.value)}
                         />
                         <AlertDialogFooter>
                           <AlertDialogCancel onClick={() => setRejectReason('')}>
-                            Cancel
+                            {t('actions.cancel')}
                           </AlertDialogCancel>
                           <AlertDialogAction
                             className="bg-red-600 hover:bg-red-700"
                             onClick={() => handleReject(expense.id)}
                           >
-                            Reject
+                            {t('approval.reject')}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>

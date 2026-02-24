@@ -22,6 +22,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { formatCurrency } from '@/lib/tax'
 import { updateInvoice } from '@/app/(protected)/invoices/actions'
 import type { InvoiceWithRelations } from '@/app/(protected)/invoices/actions'
+import { useTranslations } from 'next-intl'
 
 interface InvoiceEditFormProps {
   invoice: InvoiceWithRelations
@@ -29,6 +30,8 @@ interface InvoiceEditFormProps {
 
 export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
   const router = useRouter()
+  const t = useTranslations('invoices')
+  const tc = useTranslations('common')
 
   const handleSubmit = async (_prevState: unknown, formData: FormData) => {
     const data = {
@@ -70,7 +73,7 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
       <Button variant="ghost" size="sm" asChild>
         <Link href={`/invoices/${invoice.id}`}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Invoice
+          {t('detail.back_to_invoice')}
         </Link>
       </Button>
 
@@ -87,17 +90,17 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <FileText className="h-4 w-4" />
-              Invoice Details
+              {t('detail.invoice_details')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Invoice Number</Label>
+              <Label>{t('detail.invoice_number')}</Label>
               <Input value={invoice.invoice_number} disabled className="bg-muted font-mono" />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="invoice_date">Invoice Date</Label>
+                <Label htmlFor="invoice_date">{t('detail.invoice_date')}</Label>
                 <Input
                   id="invoice_date"
                   name="invoice_date"
@@ -107,7 +110,7 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="due_date">Due Date</Label>
+                <Label htmlFor="due_date">{t('detail.due_date')}</Label>
                 <Input
                   id="due_date"
                   name="due_date"
@@ -119,7 +122,7 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="period_start">Period Start</Label>
+                <Label htmlFor="period_start">{t('detail.period_start')}</Label>
                 <Input
                   id="period_start"
                   name="period_start"
@@ -129,7 +132,7 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="period_end">Period End</Label>
+                <Label htmlFor="period_end">{t('detail.period_end')}</Label>
                 <Input
                   id="period_end"
                   name="period_end"
@@ -147,7 +150,7 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <Building2 className="h-4 w-4" />
-              Bill To
+              {t('detail.bill_to')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -165,16 +168,16 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
                   </div>
                 )}
                 <div className="mt-3 pt-3 border-t text-sm text-muted-foreground">
-                  <div className="font-medium text-foreground">Tax Settings:</div>
+                  <div className="font-medium text-foreground">{t('detail.tax_settings')}:</div>
                   <div>
-                    {invoice.client.charges_gst !== false ? 'GST (5%)' : 'No GST'}
+                    {invoice.client.charges_gst !== false ? t('detail.gst') : t('detail.no_gst')}
                     {' + '}
-                    {invoice.client.charges_qst !== false ? 'QST (9.975%)' : 'No QST'}
+                    {invoice.client.charges_qst !== false ? t('detail.qst') : t('detail.no_qst')}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="text-muted-foreground">No client selected</div>
+              <div className="text-muted-foreground">{t('detail.no_client')}</div>
             )}
           </CardContent>
         </Card>
@@ -183,9 +186,9 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
       {/* Line Items (read-only for now) */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Line Items</CardTitle>
+          <CardTitle className="text-base">{t('detail.line_items')}</CardTitle>
           <CardDescription>
-            Line items cannot be edited after creation. To change items, cancel this invoice and create a new one.
+            {t('edit.line_items_readonly')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -193,10 +196,10 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50%]">Description</TableHead>
-                  <TableHead className="text-right">Qty</TableHead>
-                  <TableHead className="text-right">Rate</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="w-[50%]">{tc('labels.description')}</TableHead>
+                  <TableHead className="text-right">{tc('labels.qty')}</TableHead>
+                  <TableHead className="text-right">{tc('labels.rate')}</TableHead>
+                  <TableHead className="text-right">{tc('labels.amount')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -218,7 +221,7 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
               <TableFooter>
                 <TableRow>
                   <TableCell colSpan={3} className="text-right">
-                    Subtotal
+                    {tc('labels.subtotal')}
                   </TableCell>
                   <TableCell className="text-right font-mono">
                     {formatCurrency(invoice.subtotal)}
@@ -227,7 +230,7 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
                 {invoice.client?.charges_gst !== false && (invoice.gst_amount ?? 0) > 0 && (
                   <TableRow>
                     <TableCell colSpan={3} className="text-right text-muted-foreground">
-                      GST (5%)
+                      {t('detail.gst')}
                     </TableCell>
                     <TableCell className="text-right font-mono text-muted-foreground">
                       {formatCurrency(invoice.gst_amount ?? 0)}
@@ -237,7 +240,7 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
                 {invoice.client?.charges_qst !== false && (invoice.qst_amount ?? 0) > 0 && (
                   <TableRow>
                     <TableCell colSpan={3} className="text-right text-muted-foreground">
-                      QST (9.975%)
+                      {t('detail.qst')}
                     </TableCell>
                     <TableCell className="text-right font-mono text-muted-foreground">
                       {formatCurrency(invoice.qst_amount ?? 0)}
@@ -246,7 +249,7 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
                 )}
                 <TableRow className="bg-muted/50">
                   <TableCell colSpan={3} className="text-right font-semibold">
-                    Total
+                    {tc('labels.total')}
                   </TableCell>
                   <TableCell className="text-right font-mono font-bold text-lg">
                     {formatCurrency(invoice.total)}
@@ -261,14 +264,14 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
       {/* Notes */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Notes</CardTitle>
-          <CardDescription>Optional notes for this invoice</CardDescription>
+          <CardTitle className="text-base">{tc('labels.notes')}</CardTitle>
+          <CardDescription>{t('edit.notes_description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Textarea
             id="notes"
             name="notes"
-            placeholder="Add any notes for this invoice (e.g., payment terms, special instructions)..."
+            placeholder={t('edit.notes_placeholder')}
             defaultValue={invoice.notes ?? ''}
             rows={3}
           />
@@ -278,11 +281,11 @@ export function InvoiceEditForm({ invoice }: InvoiceEditFormProps) {
       {/* Submit */}
       <div className="flex justify-end gap-4">
         <Button type="button" variant="outline" asChild>
-          <Link href={`/invoices/${invoice.id}`}>Cancel</Link>
+          <Link href={`/invoices/${invoice.id}`}>{tc('actions.cancel')}</Link>
         </Button>
         <Button type="submit" disabled={isPending}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Save Changes
+          {tc('actions.save_changes')}
         </Button>
       </div>
     </form>

@@ -32,6 +32,7 @@ import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { formatCurrency } from '@/lib/tax'
 import { InvoiceActions } from '@/components/invoices/invoice-actions'
 import { EmailHistory } from '@/components/invoices/email-history'
+import { getTranslations, getLocale } from 'next-intl/server'
 
 interface InvoiceDetailPageProps {
   params: Promise<{ id: string }>
@@ -39,11 +40,13 @@ interface InvoiceDetailPageProps {
 
 export default async function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   const { id } = await params
-  const [invoice, permissions, emails, clientEmail] = await Promise.all([
+  const [invoice, permissions, emails, clientEmail, t, locale] = await Promise.all([
     getInvoice(id),
     getUserPermissions(),
     getInvoiceEmails(id),
     getClientEmailForInvoice(id),
+    getTranslations('invoices'),
+    getLocale(),
   ])
 
   if (!invoice) {
@@ -53,8 +56,8 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
   const canEdit = hasPermission(permissions, 'invoices.create')
 
   const formatDate = (date: string | null) => {
-    if (!date) return 'Not set'
-    return new Date(date).toLocaleDateString('en-CA', {
+    if (!date) return t('detail.not_set')
+    return new Date(date).toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-CA', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -63,7 +66,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
 
   const formatDateTime = (date: string | null) => {
     if (!date) return null
-    return new Date(date).toLocaleDateString('en-CA', {
+    return new Date(date).toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-CA', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -92,12 +95,12 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
 
   // Format values for InvoiceActions props
   const dueDateFormatted = invoice.due_date
-    ? new Date(invoice.due_date).toLocaleDateString('en-CA', {
+    ? new Date(invoice.due_date).toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-CA', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       })
-    : 'Upon Receipt'
+    : t('detail.upon_receipt')
 
   return (
     <div className="space-y-6">
@@ -106,7 +109,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
         <Button variant="ghost" size="sm" asChild>
           <Link href="/invoices">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Invoices
+            {t('detail.back_to_invoices')}
           </Link>
         </Button>
       </div>
@@ -143,7 +146,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
           <Button variant="outline" asChild>
             <a href={`/api/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
               <FileDown className="mr-2 h-4 w-4" />
-              Download PDF
+              {t('actions.download_pdf')}
             </a>
           </Button>
 
@@ -152,7 +155,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
             <Button asChild>
               <Link href={`/invoices/${invoice.id}/edit`}>
                 <Pencil className="mr-2 h-4 w-4" />
-                Edit
+                {t('actions.edit')}
               </Link>
             </Button>
           )}
@@ -178,7 +181,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
           <div className="flex items-center justify-between">
             <div>
               <p className={`text-sm ${isPaid ? 'text-green-600' : isSent ? 'text-blue-600' : 'text-muted-foreground'}`}>
-                {isPaid ? 'Paid' : isSent ? 'Amount Due' : 'Draft Total'}
+                {isPaid ? t('detail.paid') : isSent ? t('detail.amount_due') : t('detail.draft_total')}
               </p>
               <p className={`text-3xl font-bold ${isPaid ? 'text-green-700' : isSent ? 'text-blue-700' : ''}`}>
                 {formatCurrency(invoice.total)}
@@ -186,13 +189,13 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
             </div>
             {isSent && invoice.due_date && (
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">Due Date</p>
+                <p className="text-sm text-muted-foreground">{t('detail.due_date')}</p>
                 <p className="font-medium">{formatDate(invoice.due_date)}</p>
               </div>
             )}
             {isPaid && invoice.paid_at && (
               <div className="text-right">
-                <p className="text-sm text-green-600">Paid On</p>
+                <p className="text-sm text-green-600">{t('detail.paid_on')}</p>
                 <p className="font-medium text-green-700">{formatDate(invoice.paid_at)}</p>
               </div>
             )}
@@ -203,8 +206,8 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
       {/* Tabs */}
       <Tabs defaultValue="details">
         <TabsList>
-          <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="lines">Line Items ({invoice.lines?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="details">{t('detail.tabs_details')}</TabsTrigger>
+          <TabsTrigger value="lines">{t('detail.line_items')} ({invoice.lines?.length ?? 0})</TabsTrigger>
         </TabsList>
 
         {/* Details Tab */}
@@ -215,37 +218,37 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-4 w-4" />
-                  Invoice Information
+                  {t('detail.invoice_info')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Invoice Number</span>
+                  <span className="text-muted-foreground">{t('detail.invoice_number')}</span>
                   <span className="font-mono font-medium">{invoice.invoice_number}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Invoice Date</span>
+                  <span className="text-muted-foreground">{t('detail.invoice_date')}</span>
                   <span>{formatDate(invoice.invoice_date)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Due Date</span>
+                  <span className="text-muted-foreground">{t('detail.due_date')}</span>
                   <span>{formatDate(invoice.due_date)}</span>
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t">
-                  <span className="text-muted-foreground">Billing Period</span>
+                  <span className="text-muted-foreground">{t('detail.billing_period')}</span>
                   <span>
                     {formatDate(invoice.period_start)} - {formatDate(invoice.period_end)}
                   </span>
                 </div>
                 {invoice.sent_at && (
                   <div className="flex items-center justify-between pt-2 border-t">
-                    <span className="text-muted-foreground">Sent</span>
+                    <span className="text-muted-foreground">{t('detail.sent')}</span>
                     <span>{formatDateTime(invoice.sent_at)}</span>
                   </div>
                 )}
                 {invoice.paid_at && (
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Paid</span>
+                    <span className="text-muted-foreground">{t('detail.paid')}</span>
                     <span className="text-green-600 font-medium">{formatDateTime(invoice.paid_at)}</span>
                   </div>
                 )}
@@ -257,7 +260,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
-                  Bill To
+                  {t('detail.bill_to')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -305,16 +308,16 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
 
                     {/* Tax Settings */}
                     <div className="pt-3 border-t text-sm">
-                      <p className="font-medium">Tax Settings</p>
+                      <p className="font-medium">{t('detail.tax_settings')}</p>
                       <p className="text-muted-foreground">
-                        {invoice.client.charges_gst !== false ? 'GST (5%)' : 'No GST'}
+                        {invoice.client.charges_gst !== false ? t('detail.gst') : 'No GST'}
                         {' + '}
-                        {invoice.client.charges_qst !== false ? 'QST (9.975%)' : 'No QST'}
+                        {invoice.client.charges_qst !== false ? t('detail.qst') : 'No QST'}
                       </p>
                     </div>
                   </>
                 ) : (
-                  <p className="text-muted-foreground">Client information not available</p>
+                  <p className="text-muted-foreground">{t('detail.client_not_available')}</p>
                 )}
               </CardContent>
             </Card>
@@ -327,7 +330,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
           {invoice.notes && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Notes</CardTitle>
+                <CardTitle className="text-base">{t('detail.notes')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="whitespace-pre-wrap">{invoice.notes}</p>
@@ -340,10 +343,9 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
         <TabsContent value="lines" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Line Items</CardTitle>
+              <CardTitle>{t('detail.line_items')}</CardTitle>
               <CardDescription>
-                {invoice.lines?.length ?? 0} item{(invoice.lines?.length ?? 0) !== 1 ? 's' : ''} totaling{' '}
-                {formatCurrency(invoice.subtotal)}
+                {t('detail.items_totaling', { count: invoice.lines?.length ?? 0, amount: formatCurrency(invoice.subtotal) })}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -351,10 +353,10 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[50%]">Description</TableHead>
-                      <TableHead className="text-right">Qty</TableHead>
-                      <TableHead className="text-right">Rate</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
+                      <TableHead className="w-[50%]">{t('detail.description')}</TableHead>
+                      <TableHead className="text-right">{t('detail.quantity')}</TableHead>
+                      <TableHead className="text-right">{t('detail.rate')}</TableHead>
+                      <TableHead className="text-right">{t('detail.amount')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -376,7 +378,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
                   <TableFooter>
                     <TableRow>
                       <TableCell colSpan={3} className="text-right">
-                        Subtotal
+                        {t('detail.subtotal')}
                       </TableCell>
                       <TableCell className="text-right font-mono">
                         {formatCurrency(invoice.subtotal)}
@@ -385,7 +387,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
                     {invoice.client?.charges_gst !== false && (invoice.gst_amount ?? 0) > 0 && (
                       <TableRow>
                         <TableCell colSpan={3} className="text-right text-muted-foreground">
-                          GST (5%)
+                          {t('detail.gst')}
                         </TableCell>
                         <TableCell className="text-right font-mono text-muted-foreground">
                           {formatCurrency(invoice.gst_amount ?? 0)}
@@ -395,7 +397,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
                     {invoice.client?.charges_qst !== false && (invoice.qst_amount ?? 0) > 0 && (
                       <TableRow>
                         <TableCell colSpan={3} className="text-right text-muted-foreground">
-                          QST (9.975%)
+                          {t('detail.qst')}
                         </TableCell>
                         <TableCell className="text-right font-mono text-muted-foreground">
                           {formatCurrency(invoice.qst_amount ?? 0)}
@@ -404,7 +406,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
                     )}
                     <TableRow className="bg-muted/50">
                       <TableCell colSpan={3} className="text-right font-semibold">
-                        Total
+                        {t('detail.total')}
                       </TableCell>
                       <TableCell className="text-right font-mono font-bold text-lg">
                         {formatCurrency(invoice.total)}
@@ -420,7 +422,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
           {invoice.notes && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Notes</CardTitle>
+                <CardTitle className="text-base">{t('detail.notes')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="whitespace-pre-wrap">{invoice.notes}</p>

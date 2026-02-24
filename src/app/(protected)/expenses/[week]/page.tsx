@@ -9,6 +9,7 @@ import { ExpenseGrid } from '@/components/expenses/expense-grid'
 import { ExpenseActions } from '@/components/expenses/expense-actions'
 import { parseDateISO, formatWeekRange, getMonday, formatDateISO } from '@/lib/date'
 import { getProfile } from '@/lib/auth'
+import { getTranslations } from 'next-intl/server'
 
 interface ExpenseEntryPageProps {
   params: Promise<{ week: string }>
@@ -34,6 +35,9 @@ export default async function ExpenseEntryPage({ params, searchParams }: Expense
     redirect(`/expenses/${weekStart}`)
   }
 
+  // Get translations
+  const t = await getTranslations('expenses')
+
   // Get or create the expense report
   const result = await getOrCreateExpense(weekStart, impersonateUserId)
 
@@ -46,12 +50,12 @@ export default async function ExpenseEntryPage({ params, searchParams }: Expense
             <Button variant="ghost" size="sm" asChild>
               <Link href="/expenses">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
+                {t('back')}
               </Link>
             </Button>
           </div>
           <div className="rounded-md border border-destructive bg-destructive/10 p-4">
-            <p className="text-destructive">{result.error || 'Failed to load expense report'}</p>
+            <p className="text-destructive">{result.error || t('detail.failed_load')}</p>
           </div>
         </div>
       )
@@ -91,16 +95,16 @@ export default async function ExpenseEntryPage({ params, searchParams }: Expense
           <Button variant="ghost" size="sm" asChild>
             <Link href="/expenses">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              {t('back')}
             </Link>
           </Button>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
-              Expenses: {weekRange}
+              {t('detail.title', { weekRange })}
             </h1>
             {isImpersonating && (
               <p className="text-sm text-orange-600">
-                Entering expenses for: {userName}
+                {t('detail.entering_for', { name: userName })}
               </p>
             )}
           </div>
@@ -115,8 +119,7 @@ export default async function ExpenseEntryPage({ params, searchParams }: Expense
       {isImpersonating && (
         <div className="rounded-md border border-orange-200 bg-orange-50 p-3">
           <p className="text-sm text-orange-800">
-            You are entering expenses on behalf of <strong>{userName}</strong>.
-            All entries will be attributed to their expense report.
+            {t('detail.impersonation_banner', { name: userName })}
           </p>
         </div>
       )}
@@ -124,7 +127,7 @@ export default async function ExpenseEntryPage({ params, searchParams }: Expense
       {/* Rejection Reason */}
       {fullExpense.rejection_reason && (
         <div className="rounded-md border border-destructive bg-destructive/10 p-4">
-          <p className="text-sm font-medium text-destructive">Rejection Reason:</p>
+          <p className="text-sm font-medium text-destructive">{t('detail.rejection_reason')}</p>
           <p className="text-sm text-destructive">{fullExpense.rejection_reason}</p>
         </div>
       )}

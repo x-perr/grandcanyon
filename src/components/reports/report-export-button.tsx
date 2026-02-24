@@ -3,6 +3,7 @@
 import { Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { generateCSV, downloadCSV, type ColumnDefinition } from '@/lib/csv'
+import { useTranslations } from 'next-intl'
 
 interface ReportExportButtonProps<T extends Record<string, unknown>> {
   data: T[]
@@ -17,6 +18,8 @@ export function ReportExportButton<T extends Record<string, unknown>>({
   filename,
   disabled = false,
 }: ReportExportButtonProps<T>) {
+  const t = useTranslations('reports.export')
+
   const handleExport = () => {
     if (data.length === 0) return
 
@@ -33,7 +36,7 @@ export function ReportExportButton<T extends Record<string, unknown>>({
       disabled={disabled || data.length === 0}
     >
       <Download className="mr-2 h-4 w-4" />
-      Export CSV
+      {t('csv')}
     </Button>
   )
 }

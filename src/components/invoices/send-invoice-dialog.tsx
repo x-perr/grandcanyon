@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'sonner'
 import { sendInvoiceWithEmail } from '@/app/(protected)/invoices/actions'
+import { useTranslations } from 'next-intl'
 
 interface SendInvoiceDialogProps {
   open: boolean
@@ -44,6 +45,8 @@ export function SendInvoiceDialog({
   const [isPending, startTransition] = useTransition()
   const [email, setEmail] = useState(clientEmail ?? '')
   const [customMessage, setCustomMessage] = useState('')
+  const t = useTranslations('invoices')
+  const tc = useTranslations('common')
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -55,13 +58,13 @@ export function SendInvoiceDialog({
 
   const handleSend = () => {
     if (!email) {
-      toast.error('Please enter an email address')
+      toast.error(t('send.validation_email_required'))
       return
     }
 
     // Basic email validation
     if (!email.includes('@') || !email.includes('.')) {
-      toast.error('Please enter a valid email address')
+      toast.error(t('send.validation_email_invalid'))
       return
     }
 
@@ -71,7 +74,7 @@ export function SendInvoiceDialog({
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success(`Invoice sent to ${email}`)
+        toast.success(t('send.success', { email }))
         onOpenChange(false)
         router.refresh()
       }
@@ -84,9 +87,9 @@ export function SendInvoiceDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            Send Invoice {invoiceNumber}
+            {t('send.send_title', { number: invoiceNumber })}
           </DialogTitle>
-          <DialogDescription>Send this invoice as PDF to {clientName}</DialogDescription>
+          <DialogDescription>{t('send.send_description', { client: clientName })}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -94,69 +97,68 @@ export function SendInvoiceDialog({
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                This client does not have a billing email on file. Please enter the recipient email
-                manually.
+                {t('send.no_email_warning')}
               </AlertDescription>
             </Alert>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">Recipient Email</Label>
+            <Label htmlFor="email">{t('send.recipient_email')}</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="client@example.com"
+              placeholder={t('send.email_placeholder')}
               disabled={isPending}
             />
           </div>
 
           <div className="rounded-md border p-3 bg-muted/50 text-sm space-y-2">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Client / Client:</span>
+              <span className="text-muted-foreground">{t('detail.client')}:</span>
               <span className="font-medium">{clientName}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Montant / Amount:</span>
+              <span className="text-muted-foreground">{tc('labels.total')}:</span>
               <span className="font-medium">{total}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Échéance / Due:</span>
+              <span className="text-muted-foreground">{t('detail.due_date')}:</span>
               <span>{dueDate}</span>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="customMessage">Custom Message (Optional)</Label>
+            <Label htmlFor="customMessage">{t('send.custom_message')}</Label>
             <Textarea
               id="customMessage"
               value={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
-              placeholder="Add a personal note to include in the email..."
+              placeholder={t('send.message_placeholder')}
               rows={3}
               disabled={isPending}
             />
             <p className="text-xs text-muted-foreground">
-              This message will be included in the email body along with the invoice details.
+              {t('send.message_help')}
             </p>
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
-            Cancel
+            {tc('actions.cancel')}
           </Button>
           <Button onClick={handleSend} disabled={isPending || !email}>
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Sending...
+                {t('send.sending')}
               </>
             ) : (
               <>
                 <Mail className="mr-2 h-4 w-4" />
-                Send Invoice
+                {t('send.send_invoice')}
               </>
             )}
           </Button>

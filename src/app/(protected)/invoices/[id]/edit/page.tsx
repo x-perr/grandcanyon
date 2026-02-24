@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { getInvoice } from '../../actions'
 import { InvoiceEditForm } from '@/components/invoices/invoice-edit-form'
+import { getTranslations } from 'next-intl/server'
 
 interface EditInvoicePageProps {
   params: Promise<{ id: string }>
@@ -26,12 +27,14 @@ export default async function EditInvoicePage({ params }: EditInvoicePageProps) 
     redirect(`/invoices/${id}`)
   }
 
+  const t = await getTranslations('invoices')
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Edit Invoice</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('edit.title')}</h1>
         <p className="text-muted-foreground">
-          Update invoice {invoice.invoice_number} for {invoice.client?.name ?? 'Unknown Client'}
+          {t('edit.subtitle', { number: invoice.invoice_number, client: invoice.client?.name ?? 'Unknown Client' })}
         </p>
       </div>
 

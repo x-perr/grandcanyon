@@ -10,6 +10,7 @@ import {
   getUsersForFilter,
 } from '../actions'
 import { parseReportFilters } from '@/lib/validations/report'
+import { getTranslations } from 'next-intl/server'
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
@@ -18,6 +19,7 @@ interface PageProps {
 export default async function TimesheetReportPage({ searchParams }: PageProps) {
   const params = await searchParams
   const filters = parseReportFilters(params)
+  const t = await getTranslations('reports.timesheets')
 
   const [data, summary, projects, users] = await Promise.all([
     getTimesheetReportData(filters),
@@ -32,9 +34,9 @@ export default async function TimesheetReportPage({ searchParams }: PageProps) {
       <div className="flex items-center gap-3">
         <Clock className="h-6 w-6 text-muted-foreground" />
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Timesheet Report</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">
-            View timesheet hours by user, project, and date range
+            {t('subtitle')}
           </p>
         </div>
       </div>

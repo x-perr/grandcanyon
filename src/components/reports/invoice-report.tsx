@@ -17,6 +17,7 @@ import type { InvoiceReportRow, InvoiceAgingSummary } from '@/app/(protected)/re
 import { ReportExportButton } from './report-export-button'
 import type { ColumnDefinition } from '@/lib/csv'
 import { formatCurrencyForCSV, formatDateForCSV } from '@/lib/csv'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface InvoiceReportProps {
   data: InvoiceReportRow[]
@@ -28,22 +29,26 @@ interface InvoiceReportProps {
   }
 }
 
-const csvColumns: ColumnDefinition<InvoiceReportRow>[] = [
-  { key: 'invoiceNumber', header: 'Invoice #' },
-  { key: 'clientName', header: 'Client' },
-  { key: 'projectCode', header: 'Project Code' },
-  { key: 'projectName', header: 'Project Name' },
-  { key: 'invoiceDate', header: 'Invoice Date', format: (v) => formatDateForCSV(v as string) },
-  { key: 'dueDate', header: 'Due Date', format: (v) => formatDateForCSV(v as string) },
-  { key: 'status', header: 'Status' },
-  { key: 'daysPastDue', header: 'Days Past Due', format: (v) => v !== null ? String(v) : '' },
-  { key: 'subtotal', header: 'Subtotal', format: (v) => formatCurrencyForCSV(v as number) },
-  { key: 'gst', header: 'GST', format: (v) => formatCurrencyForCSV(v as number) },
-  { key: 'qst', header: 'QST', format: (v) => formatCurrencyForCSV(v as number) },
-  { key: 'total', header: 'Total', format: (v) => formatCurrencyForCSV(v as number) },
-]
-
 export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
+  const t = useTranslations('reports.invoices')
+  const tc = useTranslations('common')
+  const locale = useLocale()
+
+  const csvColumns: ColumnDefinition<InvoiceReportRow>[] = [
+    { key: 'invoiceNumber', header: 'Invoice #' },
+    { key: 'clientName', header: 'Client' },
+    { key: 'projectCode', header: 'Project Code' },
+    { key: 'projectName', header: 'Project Name' },
+    { key: 'invoiceDate', header: 'Invoice Date', format: (v) => formatDateForCSV(v as string) },
+    { key: 'dueDate', header: 'Due Date', format: (v) => formatDateForCSV(v as string) },
+    { key: 'status', header: 'Status' },
+    { key: 'daysPastDue', header: 'Days Past Due', format: (v) => v !== null ? String(v) : '' },
+    { key: 'subtotal', header: 'Subtotal', format: (v) => formatCurrencyForCSV(v as number) },
+    { key: 'gst', header: 'GST', format: (v) => formatCurrencyForCSV(v as number) },
+    { key: 'qst', header: 'QST', format: (v) => formatCurrencyForCSV(v as number) },
+    { key: 'total', header: 'Total', format: (v) => formatCurrencyForCSV(v as number) },
+  ]
+
   const totalAll = totals.draft + totals.sent + totals.paid
 
   return (
@@ -53,7 +58,7 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Draft
+              {tc('status.draft')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -66,7 +71,7 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Sent (Outstanding)
+              {t('summary.sent_outstanding')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -79,7 +84,7 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Paid
+              {tc('status.paid')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -92,7 +97,7 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total
+              {tc('labels.total')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -107,30 +112,30 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
       {aging.total > 0 && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Aging Analysis (Sent Invoices)</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('aging.title')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-4">
               <div>
-                <p className="text-sm text-muted-foreground">Current (0-30 days)</p>
+                <p className="text-sm text-muted-foreground">{t('aging.current')}</p>
                 <p className="text-lg font-semibold text-green-600">
                   {formatCurrency(aging.current)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">31-60 days</p>
+                <p className="text-sm text-muted-foreground">{t('aging.days_31_60')}</p>
                 <p className="text-lg font-semibold text-yellow-600">
                   {formatCurrency(aging.days30to60)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">61-90 days</p>
+                <p className="text-sm text-muted-foreground">{t('aging.days_61_90')}</p>
                 <p className="text-lg font-semibold text-orange-600">
                   {formatCurrency(aging.days60to90)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Over 90 days</p>
+                <p className="text-sm text-muted-foreground">{t('aging.over_90')}</p>
                 <p className="text-lg font-semibold text-red-600">
                   {formatCurrency(aging.over90)}
                 </p>
@@ -154,7 +159,7 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
         <Card>
           <CardContent className="py-10">
             <p className="text-center text-muted-foreground">
-              No invoice data found for the selected filters.
+              {t('no_data')}
             </p>
           </CardContent>
         </Card>
@@ -163,13 +168,13 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Invoice #</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead className="hidden md:table-cell">Project</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="hidden sm:table-cell">Days Past Due</TableHead>
-                <TableHead className="text-right">Total</TableHead>
+                <TableHead>{t('columns.invoice')}</TableHead>
+                <TableHead>{t('columns.client')}</TableHead>
+                <TableHead className="hidden md:table-cell">{t('columns.project')}</TableHead>
+                <TableHead>{t('columns.date')}</TableHead>
+                <TableHead>{tc('labels.status')}</TableHead>
+                <TableHead className="hidden sm:table-cell">{t('columns.days_past_due')}</TableHead>
+                <TableHead className="text-right">{tc('labels.total')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -190,7 +195,7 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
                     </span>
                   </TableCell>
                   <TableCell>
-                    {formatDate(row.invoiceDate)}
+                    {formatDate(row.invoiceDate, locale)}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={row.status as 'draft' | 'sent' | 'paid' | 'void'} />
@@ -198,7 +203,7 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
                   <TableCell className="hidden sm:table-cell">
                     {row.daysPastDue !== null ? (
                       <span className={getAgingColor(row.daysPastDue)}>
-                        {row.daysPastDue} days
+                        {t('columns.days_count', { count: row.daysPastDue })}
                       </span>
                     ) : (
                       '—'
@@ -213,7 +218,7 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
             <TableFooter>
               <TableRow>
                 <TableCell colSpan={6} className="font-semibold">
-                  Total ({data.length} invoices)
+                  {t('summary.total_invoices', { count: data.length })}
                 </TableCell>
                 <TableCell className="text-right font-semibold">
                   {formatCurrency(data.reduce((sum, row) => sum + row.total, 0))}
@@ -227,9 +232,9 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
   )
 }
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string, locale: string): string {
   const date = new Date(dateStr)
-  return date.toLocaleDateString('en-CA', {
+  return date.toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-CA', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

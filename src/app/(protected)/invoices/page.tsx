@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import type { Enums } from '@/types/database'
+import { getTranslations } from 'next-intl/server'
 
 interface InvoicesPageProps {
   searchParams: Promise<{
@@ -27,7 +28,7 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
   const pageSize = 25
   const year = params.year ? Number(params.year) : undefined
 
-  const [{ invoices, count }, summary, clients, years, permissions] = await Promise.all([
+  const [{ invoices, count }, summary, clients, years, permissions, t] = await Promise.all([
     getInvoices({
       search: params.search,
       clientId: params.clientId,
@@ -40,6 +41,7 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
     getClientsForInvoice(),
     getInvoiceYears(),
     getUserPermissions(),
+    getTranslations('invoices'),
   ])
 
   const canCreate = hasPermission(permissions, 'invoices.create')
@@ -48,14 +50,14 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Invoices</h1>
-          <p className="text-muted-foreground">Generate and manage client invoices</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         {canCreate && (
           <Button asChild>
             <Link href="/invoices/new">
               <Plus className="mr-2 h-4 w-4" />
-              New Invoice
+              {t('new_invoice')}
             </Link>
           </Button>
         )}

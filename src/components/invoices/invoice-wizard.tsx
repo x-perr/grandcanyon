@@ -13,6 +13,7 @@ import { getDefaultInvoiceDates, getDefaultPeriod, type InvoiceLineFormData } fr
 import { toast } from 'sonner'
 import { ChevronLeft, ChevronRight, Loader2, Save, Send } from 'lucide-react'
 import type { ClientForSelect, ProjectForSelect, UninvoicedEntry } from '@/app/(protected)/invoices/actions'
+import { useTranslations } from 'next-intl'
 
 interface InvoiceWizardProps {
   step: 1 | 2 | 3
@@ -46,6 +47,7 @@ export function InvoiceWizard({
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const t = useTranslations('invoices')
 
   // Local state for form values
   const [clientId, setClientId] = useState(initialValues.client_id ?? '')
@@ -94,13 +96,13 @@ export function InvoiceWizard({
   const handleNext = () => {
     if (step === 1) {
       if (!clientId || !projectId) {
-        toast.error('Please select a client and project')
+        toast.error(t('wizard.validation_select_client_project'))
         return
       }
       goToStep(2)
     } else if (step === 2) {
       if (selectedEntryIds.length === 0) {
-        toast.error('Please select at least one entry')
+        toast.error(t('wizard.validation_select_entries'))
         return
       }
       goToStep(3)
@@ -248,16 +250,16 @@ export function InvoiceWizard({
 
       // Navigate to the new invoice
       if ('invoiceId' in result && result.invoiceId) {
-        toast.success('Invoice created!')
+        toast.success(t('toast.created'))
         router.push(`/invoices/${result.invoiceId}`)
       } else {
         console.error('No invoiceId in result:', result)
-        toast.error('Invoice created but navigation failed')
+        toast.error(t('toast.error_send'))
         setIsSubmitting(false)
       }
     } catch (error) {
       console.error('Error creating invoice:', error)
-      toast.error('Failed to create invoice')
+      toast.error(t('toast.error_send'))
       setIsSubmitting(false)
     }
   }
@@ -266,7 +268,7 @@ export function InvoiceWizard({
     // First save as draft, then send
     // The createInvoice action redirects, so we can't easily chain
     // For now, just save as draft - user can send from detail page
-    toast.info('Creating invoice... You can send it from the detail page.')
+    toast.info(t('wizard.creating_info'))
     await handleSaveDraft()
   }
 
@@ -343,7 +345,7 @@ export function InvoiceWizard({
       <div className="flex items-center justify-between">
         <Button variant="outline" onClick={handleBack} disabled={isPending || isSubmitting}>
           <ChevronLeft className="mr-2 h-4 w-4" />
-          {step === 1 ? 'Cancel' : 'Back'}
+          {step === 1 ? t('wizard.cancel') : t('wizard.back')}
         </Button>
 
         <div className="flex gap-2">
@@ -352,7 +354,7 @@ export function InvoiceWizard({
               onClick={handleNext}
               disabled={isPending || (step === 2 && selectedEntryIds.length === 0)}
             >
-              Continue
+              {t('wizard.continue')}
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
@@ -367,7 +369,7 @@ export function InvoiceWizard({
                 ) : (
                   <Save className="mr-2 h-4 w-4" />
                 )}
-                Save as Draft
+                {t('wizard.save_as_draft')}
               </Button>
               <Button
                 onClick={handleCreateAndSend}
@@ -378,7 +380,7 @@ export function InvoiceWizard({
                 ) : (
                   <Send className="mr-2 h-4 w-4" />
                 )}
-                Create Invoice
+                {t('wizard.create_invoice')}
               </Button>
             </>
           )}

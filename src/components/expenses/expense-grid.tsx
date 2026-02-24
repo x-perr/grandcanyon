@@ -19,6 +19,7 @@ import { formatCurrency } from '@/lib/validations/expense'
 import { toast } from 'sonner'
 import type { Tables } from '@/types/database'
 import type { ExpenseEntryWithRelations, ExpenseType, ProjectForExpense } from '@/app/(protected)/expenses/actions'
+import { useTranslations } from 'next-intl'
 
 interface ExpenseGridProps {
   expense: Tables<'expenses'>
@@ -41,9 +42,10 @@ export function ExpenseGrid({
   const [isPending, startTransition] = useTransition()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingEntry, setEditingEntry] = useState<ExpenseEntryWithRelations | null>(null)
+  const t = useTranslations('expenses')
 
   const handleDelete = async (entryId: string) => {
-    if (!confirm('Are you sure you want to delete this expense entry?')) {
+    if (!confirm(t('grid.delete_confirm'))) {
       return
     }
 
@@ -52,7 +54,7 @@ export function ExpenseGrid({
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success('Entry deleted')
+        toast.success(t('grid.deleted'))
         router.refresh()
       }
     })
@@ -86,7 +88,7 @@ export function ExpenseGrid({
         <div className="flex justify-end">
           <Button onClick={handleAddEntry} disabled={isPending}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Expense
+            {t('grid.add_expense')}
           </Button>
         </div>
       )}
@@ -106,10 +108,10 @@ export function ExpenseGrid({
       {entries.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-muted-foreground">No expense entries yet.</p>
+            <p className="text-muted-foreground">{t('grid.no_entries')}</p>
             {isEditable && (
               <Button onClick={handleAddEntry} variant="link" className="mt-2">
-                Add your first expense
+                {t('grid.add_first')}
               </Button>
             )}
           </CardContent>
@@ -119,17 +121,17 @@ export function ExpenseGrid({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Project</TableHead>
-                <TableHead className="max-w-[200px]">Description</TableHead>
-                <TableHead className="text-right">Qty</TableHead>
-                <TableHead className="text-right">Unit Price</TableHead>
-                <TableHead className="text-right">Subtotal</TableHead>
-                <TableHead className="text-right">GST</TableHead>
-                <TableHead className="text-right">QST</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead className="text-center">Billable</TableHead>
+                <TableHead>{t('table.date')}</TableHead>
+                <TableHead>{t('table.type')}</TableHead>
+                <TableHead>{t('table.project')}</TableHead>
+                <TableHead className="max-w-[200px]">{t('table.description')}</TableHead>
+                <TableHead className="text-right">{t('grid.qty')}</TableHead>
+                <TableHead className="text-right">{t('grid.unit_price')}</TableHead>
+                <TableHead className="text-right">{t('grid.subtotal')}</TableHead>
+                <TableHead className="text-right">{t('table.gst')}</TableHead>
+                <TableHead className="text-right">{t('table.qst')}</TableHead>
+                <TableHead className="text-right">{t('table.total')}</TableHead>
+                <TableHead className="text-center">{t('table.billable')}</TableHead>
                 {isEditable && <TableHead className="w-[50px]"></TableHead>}
               </TableRow>
             </TableHeader>
@@ -186,7 +188,7 @@ export function ExpenseGrid({
                         disabled={isPending}
                       >
                         <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete</span>
+                        <span className="sr-only">{t('entry.delete_confirm')}</span>
                       </Button>
                     </TableCell>
                   )}
@@ -196,7 +198,7 @@ export function ExpenseGrid({
               {/* Totals Row */}
               <TableRow className="bg-muted/50 font-medium">
                 <TableCell colSpan={6} className="text-right">
-                  Totals:
+                  {t('grid.totals')}
                 </TableCell>
                 <TableCell className="text-right font-mono">
                   {formatCurrency(totalSubtotal)}

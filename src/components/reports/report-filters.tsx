@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select'
 import type { ProjectForFilter, UserForFilter, ClientForFilter } from '@/app/(protected)/reports/actions'
 import { getDateRangeFromPreset, type DateRangePreset } from '@/lib/validations/report'
+import { useTranslations } from 'next-intl'
 
 interface ReportFiltersProps {
   basePath: string // e.g., '/reports/timesheets'
@@ -37,15 +38,6 @@ interface ReportFiltersProps {
   }
 }
 
-const datePresets: { value: DateRangePreset; label: string }[] = [
-  { value: 'this_week', label: 'This Week' },
-  { value: 'last_week', label: 'Last Week' },
-  { value: 'this_month', label: 'This Month' },
-  { value: 'last_month', label: 'Last Month' },
-  { value: 'this_quarter', label: 'This Quarter' },
-  { value: 'this_year', label: 'This Year' },
-]
-
 export function ReportFilters({
   basePath,
   projects = [],
@@ -61,6 +53,17 @@ export function ReportFilters({
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
+  const t = useTranslations('reports.filters')
+  const tc = useTranslations('common.time')
+
+  const datePresets: { value: DateRangePreset; label: string }[] = [
+    { value: 'this_week', label: tc('this_week') },
+    { value: 'last_week', label: tc('last_week') },
+    { value: 'this_month', label: tc('this_month') },
+    { value: 'last_month', label: tc('last_month') },
+    { value: 'this_quarter', label: tc('this_quarter') },
+    { value: 'this_year', label: tc('this_year') },
+  ]
 
   const [startDate, setStartDate] = useState(currentFilters.startDate ?? '')
   const [endDate, setEndDate] = useState(currentFilters.endDate ?? '')
@@ -143,7 +146,7 @@ export function ReportFilters({
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex-1 min-w-[150px]">
           <Label htmlFor="startDate" className="text-sm text-muted-foreground">
-            From
+            {t('from')}
           </Label>
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -161,7 +164,7 @@ export function ReportFilters({
 
         <div className="flex-1 min-w-[150px]">
           <Label htmlFor="endDate" className="text-sm text-muted-foreground">
-            To
+            {t('to')}
           </Label>
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -180,7 +183,7 @@ export function ReportFilters({
         {/* Project Filter */}
         {showProjectFilter && projects.length > 0 && (
           <div className="flex-1 min-w-[180px]">
-            <Label className="text-sm text-muted-foreground">Project</Label>
+            <Label className="text-sm text-muted-foreground">{t('project')}</Label>
             <Select
               value={currentFilters.projectId ?? 'all'}
               onValueChange={(value) =>
@@ -189,10 +192,10 @@ export function ReportFilters({
               disabled={isPending}
             >
               <SelectTrigger>
-                <SelectValue placeholder="All Projects" />
+                <SelectValue placeholder={t('all_projects')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Projects</SelectItem>
+                <SelectItem value="all">{t('all_projects')}</SelectItem>
                 {projects.map((project) => (
                   <SelectItem key={project.id} value={project.id}>
                     {project.code} - {project.name}
@@ -206,7 +209,7 @@ export function ReportFilters({
         {/* User Filter */}
         {showUserFilter && users.length > 0 && (
           <div className="flex-1 min-w-[180px]">
-            <Label className="text-sm text-muted-foreground">User</Label>
+            <Label className="text-sm text-muted-foreground">{t('user')}</Label>
             <Select
               value={currentFilters.userId ?? 'all'}
               onValueChange={(value) =>
@@ -215,10 +218,10 @@ export function ReportFilters({
               disabled={isPending}
             >
               <SelectTrigger>
-                <SelectValue placeholder="All Users" />
+                <SelectValue placeholder={t('all_users')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Users</SelectItem>
+                <SelectItem value="all">{t('all_users')}</SelectItem>
                 {users.map((user) => (
                   <SelectItem key={user.id} value={user.id}>
                     {user.firstName} {user.lastName}
@@ -232,7 +235,7 @@ export function ReportFilters({
         {/* Client Filter */}
         {showClientFilter && clients.length > 0 && (
           <div className="flex-1 min-w-[180px]">
-            <Label className="text-sm text-muted-foreground">Client</Label>
+            <Label className="text-sm text-muted-foreground">{t('client')}</Label>
             <Select
               value={currentFilters.clientId ?? 'all'}
               onValueChange={(value) =>
@@ -241,10 +244,10 @@ export function ReportFilters({
               disabled={isPending}
             >
               <SelectTrigger>
-                <SelectValue placeholder="All Clients" />
+                <SelectValue placeholder={t('all_clients')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Clients</SelectItem>
+                <SelectItem value="all">{t('all_clients')}</SelectItem>
                 {clients.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
                     {client.code} - {client.name}
@@ -258,7 +261,7 @@ export function ReportFilters({
         {/* Status Filter */}
         {showStatusFilter && statusOptions.length > 0 && (
           <div className="flex-1 min-w-[150px]">
-            <Label className="text-sm text-muted-foreground">Status</Label>
+            <Label className="text-sm text-muted-foreground">{t('status')}</Label>
             <Select
               value={currentFilters.status ?? 'all'}
               onValueChange={(value) =>
@@ -267,10 +270,10 @@ export function ReportFilters({
               disabled={isPending}
             >
               <SelectTrigger>
-                <SelectValue placeholder="All Statuses" />
+                <SelectValue placeholder={t('all_statuses')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="all">{t('all_statuses')}</SelectItem>
                 {statusOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -288,7 +291,7 @@ export function ReportFilters({
             size="icon"
             onClick={handleClearFilters}
             disabled={isPending}
-            title="Clear all filters"
+            title={t('clear_filters')}
           >
             <X className="h-4 w-4" />
           </Button>

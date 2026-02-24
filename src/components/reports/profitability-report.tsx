@@ -17,6 +17,7 @@ import type { ProfitabilityReportRow } from '@/app/(protected)/reports/actions'
 import { ReportExportButton } from './report-export-button'
 import type { ColumnDefinition } from '@/lib/csv'
 import { formatCurrencyForCSV, formatHoursForCSV, formatPercentForCSV } from '@/lib/csv'
+import { useTranslations } from 'next-intl'
 
 interface ProfitabilityReportProps {
   data: ProfitabilityReportRow[]
@@ -29,23 +30,26 @@ interface ProfitabilityReportProps {
   }
 }
 
-const csvColumns: ColumnDefinition<ProfitabilityReportRow>[] = [
-  { key: 'projectCode', header: 'Project Code' },
-  { key: 'projectName', header: 'Project Name' },
-  { key: 'clientName', header: 'Client' },
-  { key: 'billingType', header: 'Billing Type' },
-  { key: 'fixedPrice', header: 'Fixed Price', format: (v) => v !== null ? formatCurrencyForCSV(v as number) : '' },
-  { key: 'totalHours', header: 'Hours', format: (v) => formatHoursForCSV(v as number) },
-  { key: 'laborCost', header: 'Labor Cost', format: (v) => formatCurrencyForCSV(v as number) },
-  { key: 'expenseCost', header: 'Expense Cost', format: (v) => formatCurrencyForCSV(v as number) },
-  { key: 'totalCost', header: 'Total Cost', format: (v) => formatCurrencyForCSV(v as number) },
-  { key: 'invoicedAmount', header: 'Invoiced', format: (v) => formatCurrencyForCSV(v as number) },
-  { key: 'profitLoss', header: 'Profit/Loss', format: (v) => formatCurrencyForCSV(v as number) },
-  { key: 'marginPercent', header: 'Margin %', format: (v) => v !== null ? formatPercentForCSV(v as number) : '' },
-  { key: 'status', header: 'Status' },
-]
-
 export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps) {
+  const t = useTranslations('reports.profitability')
+  const tc = useTranslations('common')
+
+  const csvColumns: ColumnDefinition<ProfitabilityReportRow>[] = [
+    { key: 'projectCode', header: 'Project Code' },
+    { key: 'projectName', header: 'Project Name' },
+    { key: 'clientName', header: 'Client' },
+    { key: 'billingType', header: 'Billing Type' },
+    { key: 'fixedPrice', header: 'Fixed Price', format: (v) => v !== null ? formatCurrencyForCSV(v as number) : '' },
+    { key: 'totalHours', header: 'Hours', format: (v) => formatHoursForCSV(v as number) },
+    { key: 'laborCost', header: 'Labor Cost', format: (v) => formatCurrencyForCSV(v as number) },
+    { key: 'expenseCost', header: 'Expense Cost', format: (v) => formatCurrencyForCSV(v as number) },
+    { key: 'totalCost', header: 'Total Cost', format: (v) => formatCurrencyForCSV(v as number) },
+    { key: 'invoicedAmount', header: 'Invoiced', format: (v) => formatCurrencyForCSV(v as number) },
+    { key: 'profitLoss', header: 'Profit/Loss', format: (v) => formatCurrencyForCSV(v as number) },
+    { key: 'marginPercent', header: 'Margin %', format: (v) => v !== null ? formatPercentForCSV(v as number) : '' },
+    { key: 'status', header: 'Status' },
+  ]
+
   const overallMargin = summary.totalInvoiced > 0
     ? ((summary.totalProfitLoss / summary.totalInvoiced) * 100).toFixed(1)
     : '0.0'
@@ -61,7 +65,7 @@ export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps)
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Hours
+              {t('summary.total_hours')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -72,7 +76,7 @@ export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps)
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Cost
+              {t('summary.total_cost')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -80,7 +84,7 @@ export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps)
               {formatCurrency(totalCost)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Labor: {formatCurrency(summary.totalLaborCost)}
+              {t('columns.labor_cost')}: {formatCurrency(summary.totalLaborCost)}
             </p>
           </CardContent>
         </Card>
@@ -88,7 +92,7 @@ export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps)
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Invoiced
+              {t('summary.total_invoiced')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -101,7 +105,7 @@ export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps)
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Profit/Loss
+              {t('summary.profit_loss')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -109,7 +113,7 @@ export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps)
               {formatCurrency(summary.totalProfitLoss)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {overallMargin}% margin
+              {overallMargin}% {t('columns.margin')}
             </p>
           </CardContent>
         </Card>
@@ -117,15 +121,15 @@ export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps)
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Projects
+              {t('summary.projects')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.length}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              <span className="text-green-600">{profitableProjects} profitable</span>
+              <span className="text-green-600">{t('summary.profitable_count', { count: profitableProjects })}</span>
               {lossProjects > 0 && (
-                <span className="text-red-600 ml-2">{lossProjects} loss</span>
+                <span className="text-red-600 ml-2">{t('summary.loss_count', { count: lossProjects })}</span>
               )}
             </p>
           </CardContent>
@@ -146,7 +150,7 @@ export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps)
         <Card>
           <CardContent className="py-10">
             <p className="text-center text-muted-foreground">
-              No project data found for the selected filters.
+              {t('no_data')}
             </p>
           </CardContent>
         </Card>
@@ -155,15 +159,15 @@ export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps)
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Project</TableHead>
-                <TableHead className="hidden md:table-cell">Client</TableHead>
-                <TableHead className="hidden lg:table-cell">Type</TableHead>
-                <TableHead className="text-right">Hours</TableHead>
-                <TableHead className="text-right hidden sm:table-cell">Cost</TableHead>
-                <TableHead className="text-right">Invoiced</TableHead>
-                <TableHead className="text-right">P/L</TableHead>
-                <TableHead className="text-right hidden sm:table-cell">Margin</TableHead>
-                <TableHead className="hidden lg:table-cell">Status</TableHead>
+                <TableHead>{t('columns.project')}</TableHead>
+                <TableHead className="hidden md:table-cell">{t('columns.client')}</TableHead>
+                <TableHead className="hidden lg:table-cell">{t('columns.type')}</TableHead>
+                <TableHead className="text-right">{t('columns.hours')}</TableHead>
+                <TableHead className="text-right hidden sm:table-cell">{t('columns.cost')}</TableHead>
+                <TableHead className="text-right">{t('columns.invoiced')}</TableHead>
+                <TableHead className="text-right">{t('columns.pl')}</TableHead>
+                <TableHead className="text-right hidden sm:table-cell">{t('columns.margin')}</TableHead>
+                <TableHead className="hidden lg:table-cell">{tc('labels.status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -219,10 +223,10 @@ export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps)
             <TableFooter>
               <TableRow>
                 <TableCell colSpan={3} className="font-semibold hidden lg:table-cell">
-                  Total ({data.length} projects)
+                  {t('summary.total_projects', { count: data.length })}
                 </TableCell>
                 <TableCell colSpan={2} className="font-semibold lg:hidden">
-                  Total
+                  {tc('labels.total')}
                 </TableCell>
                 <TableCell className="text-right font-semibold">
                   {summary.totalHours.toFixed(1)}

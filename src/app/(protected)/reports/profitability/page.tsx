@@ -10,6 +10,7 @@ import {
   getClientsForFilter,
 } from '../actions'
 import { parseReportFilters } from '@/lib/validations/report'
+import { getTranslations } from 'next-intl/server'
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
@@ -18,6 +19,7 @@ interface PageProps {
 export default async function ProfitabilityReportPage({ searchParams }: PageProps) {
   const params = await searchParams
   const filters = parseReportFilters(params)
+  const t = await getTranslations('reports.profitability')
 
   const [data, summary, projects, clients] = await Promise.all([
     getProfitabilityReportData(filters),
@@ -32,9 +34,9 @@ export default async function ProfitabilityReportPage({ searchParams }: PageProp
       <div className="flex items-center gap-3">
         <TrendingUp className="h-6 w-6 text-muted-foreground" />
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Profitability Report</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">
-            View project profitability with labor costs, expenses, and margins
+            {t('subtitle')}
           </p>
         </div>
       </div>

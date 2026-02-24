@@ -2,6 +2,7 @@ import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { getClientsForInvoice, getProjectsForClient, getUninvoicedEntries, getNextInvoiceNumber } from '../actions'
 import { InvoiceWizard } from '@/components/invoices/invoice-wizard'
+import { getTranslations } from 'next-intl/server'
 
 interface NewInvoicePageProps {
   searchParams: Promise<{
@@ -42,14 +43,16 @@ export default async function NewInvoicePage({ searchParams }: NewInvoicePagePro
   // Get client tax settings for step 3
   const selectedClient = clients.find((c) => c.id === params.client_id)
 
+  const t = await getTranslations('invoices')
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Create Invoice</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('wizard.title')}</h1>
         <p className="text-muted-foreground">
-          {step === 1 && 'Select a client and project'}
-          {step === 2 && 'Select time entries to include'}
-          {step === 3 && 'Review and create your invoice'}
+          {step === 1 && t('wizard.step1_desc')}
+          {step === 2 && t('wizard.step2_desc')}
+          {step === 3 && t('wizard.step3_desc')}
         </p>
       </div>
 

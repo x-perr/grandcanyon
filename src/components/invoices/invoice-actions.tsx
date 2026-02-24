@@ -24,6 +24,7 @@ import {
 import { toast } from 'sonner'
 import { markInvoicePaid, cancelInvoice, deleteInvoice } from '@/app/(protected)/invoices/actions'
 import { SendInvoiceDialog } from './send-invoice-dialog'
+import { useTranslations } from 'next-intl'
 
 interface InvoiceActionsProps {
   invoiceId: string
@@ -51,6 +52,8 @@ export function InvoiceActions({
   const [isPending, startTransition] = useTransition()
   const [dialogAction, setDialogAction] = useState<ActionType>(null)
   const [sendDialogOpen, setSendDialogOpen] = useState(false)
+  const t = useTranslations('invoices')
+  const tc = useTranslations('common')
 
   const isDraft = status === 'draft'
   const isSent = status === 'sent'
@@ -66,7 +69,7 @@ export function InvoiceActions({
           case 'pay':
             result = await markInvoicePaid(invoiceId)
             if (result?.success) {
-              toast.success('Invoice marked as paid')
+              toast.success(t('toast.marked_paid'))
             }
             break
           case 'cancel':
@@ -83,7 +86,7 @@ export function InvoiceActions({
           toast.error(result.error)
         }
       } catch (error) {
-        toast.error('An error occurred')
+        toast.error(t('actions.error_occurred'))
         console.error('Invoice action error:', error)
       }
 
@@ -96,24 +99,23 @@ export function InvoiceActions({
     switch (dialogAction) {
       case 'pay':
         return {
-          title: 'Mark as Paid',
-          description: 'This will mark the invoice as paid. This action cannot be undone.',
-          actionLabel: 'Mark as Paid',
+          title: t('actions.mark_paid_title'),
+          description: t('actions.mark_paid_description'),
+          actionLabel: t('actions.mark_paid'),
           variant: 'default' as const,
         }
       case 'cancel':
         return {
-          title: 'Cancel Invoice',
-          description:
-            'This will void the invoice and unlock any associated timesheets. The timesheet entries will be available for re-invoicing.',
-          actionLabel: 'Cancel Invoice',
+          title: t('actions.cancel_title'),
+          description: t('actions.cancel_description'),
+          actionLabel: t('actions.cancel_invoice'),
           variant: 'destructive' as const,
         }
       case 'delete':
         return {
-          title: 'Delete Invoice',
-          description: 'This will permanently delete the invoice. This action cannot be undone.',
-          actionLabel: 'Delete Invoice',
+          title: t('actions.delete_title'),
+          description: t('actions.delete_description'),
+          actionLabel: t('actions.delete_invoice'),
           variant: 'destructive' as const,
         }
       default:
@@ -133,7 +135,7 @@ export function InvoiceActions({
             ) : (
               <MoreHorizontal className="h-4 w-4" />
             )}
-            <span className="sr-only">More actions</span>
+            <span className="sr-only">{t('actions.more_actions')}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -141,7 +143,7 @@ export function InvoiceActions({
           {isDraft && (
             <DropdownMenuItem onClick={() => setSendDialogOpen(true)}>
               <Send className="mr-2 h-4 w-4" />
-              Send Invoice
+              {t('actions.send_invoice')}
             </DropdownMenuItem>
           )}
 
@@ -149,7 +151,7 @@ export function InvoiceActions({
           {isSent && (
             <DropdownMenuItem onClick={() => setDialogAction('pay')}>
               <CheckCircle className="mr-2 h-4 w-4" />
-              Mark as Paid
+              {t('actions.mark_paid')}
             </DropdownMenuItem>
           )}
 
@@ -162,7 +164,7 @@ export function InvoiceActions({
                 className="text-destructive focus:text-destructive"
               >
                 <XCircle className="mr-2 h-4 w-4" />
-                Cancel Invoice
+                {t('actions.cancel_invoice')}
               </DropdownMenuItem>
             </>
           )}
@@ -174,7 +176,7 @@ export function InvoiceActions({
               className="text-destructive focus:text-destructive"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              Delete Invoice
+              {t('actions.delete_invoice')}
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
@@ -203,7 +205,7 @@ export function InvoiceActions({
             <AlertDialogDescription>{dialogConfig?.description}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>{tc('actions.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => handleAction(dialogAction)}
               disabled={isPending}

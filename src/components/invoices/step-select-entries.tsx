@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { formatCurrency, calculateLineAmount } from '@/lib/tax'
 import { Clock, Calendar } from 'lucide-react'
 import type { UninvoicedEntry } from '@/app/(protected)/invoices/actions'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface StepSelectEntriesProps {
   entries: UninvoicedEntry[]
@@ -37,6 +38,10 @@ export function StepSelectEntries({
   onPeriodStartChange,
   onPeriodEndChange,
 }: StepSelectEntriesProps) {
+  const t = useTranslations('invoices')
+  const tc = useTranslations('common')
+  const locale = useLocale()
+
   // Filter entries by period
   const filteredEntries = useMemo(() => {
     return entries.filter((entry) => {
@@ -79,7 +84,7 @@ export function StepSelectEntries({
 
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return '-'
-    return new Date(dateStr).toLocaleDateString('en-CA', {
+    return new Date(dateStr).toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-CA', {
       month: 'short',
       day: 'numeric',
     })
@@ -94,9 +99,9 @@ export function StepSelectEntries({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold">Step 2: Select Time Entries</h2>
+        <h2 className="text-xl font-semibold">{t('wizard.step2_title')}</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Choose which approved time entries to include in this invoice
+          {t('wizard.step2_desc')}
         </p>
       </div>
 
@@ -105,14 +110,14 @@ export function StepSelectEntries({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <Calendar className="h-4 w-4" />
-            Billing Period
+            {t('wizard.billing_period')}
           </CardTitle>
-          <CardDescription>Filter entries by date range</CardDescription>
+          <CardDescription>{t('wizard.filter_by_date')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="period_start">From</Label>
+              <Label htmlFor="period_start">{tc('labels.from')}</Label>
               <Input
                 id="period_start"
                 type="date"
@@ -121,7 +126,7 @@ export function StepSelectEntries({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="period_end">To</Label>
+              <Label htmlFor="period_end">{tc('labels.to')}</Label>
               <Input
                 id="period_end"
                 type="date"
@@ -138,10 +143,9 @@ export function StepSelectEntries({
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Clock className="h-12 w-12 text-muted-foreground/50" />
-            <h3 className="mt-4 text-lg font-semibold">No uninvoiced entries</h3>
+            <h3 className="mt-4 text-lg font-semibold">{t('wizard.no_uninvoiced_entries')}</h3>
             <p className="mt-2 text-sm text-muted-foreground text-center">
-              There are no approved, billable time entries available for this project
-              {(periodStart || periodEnd) && ' in the selected period'}.
+              {(periodStart || periodEnd) ? t('wizard.no_entries_in_period') : t('wizard.no_entries_message')}
             </p>
           </CardContent>
         </Card>
@@ -150,10 +154,10 @@ export function StepSelectEntries({
           {/* Select All */}
           <div className="flex items-center justify-between">
             <Button variant="outline" size="sm" onClick={handleSelectAll}>
-              {selectedEntryIds.length === filteredEntries.length ? 'Deselect All' : 'Select All'}
+              {selectedEntryIds.length === filteredEntries.length ? t('wizard.deselect_all') : t('wizard.select_all')}
             </Button>
             <span className="text-sm text-muted-foreground">
-              {selectedEntryIds.length} of {filteredEntries.length} selected
+              {t('wizard.x_of_y_selected', { selected: selectedEntryIds.length, total: filteredEntries.length })}
             </span>
           </div>
 
@@ -163,13 +167,13 @@ export function StepSelectEntries({
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[50px]"></TableHead>
-                  <TableHead>Week</TableHead>
-                  <TableHead className="hidden sm:table-cell">Employee</TableHead>
-                  <TableHead className="hidden md:table-cell">Task</TableHead>
-                  <TableHead className="hidden lg:table-cell">Role</TableHead>
-                  <TableHead className="text-right">Hours</TableHead>
-                  <TableHead className="text-right hidden sm:table-cell">Rate</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead>{t('wizard.week')}</TableHead>
+                  <TableHead className="hidden sm:table-cell">{t('wizard.employee')}</TableHead>
+                  <TableHead className="hidden md:table-cell">{t('wizard.task')}</TableHead>
+                  <TableHead className="hidden lg:table-cell">{t('wizard.role')}</TableHead>
+                  <TableHead className="text-right">{tc('labels.hours')}</TableHead>
+                  <TableHead className="text-right hidden sm:table-cell">{tc('labels.rate')}</TableHead>
+                  <TableHead className="text-right">{tc('labels.amount')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -228,11 +232,11 @@ export function StepSelectEntries({
           <Card className="bg-muted/50">
             <CardContent className="pt-4">
               <div className="flex items-center justify-between text-lg font-semibold">
-                <span>Selected Total</span>
+                <span>{t('wizard.selected_total')}</span>
                 <div className="text-right">
                   <div>{formatCurrency(totalAmount)}</div>
                   <div className="text-sm font-normal text-muted-foreground">
-                    {totalHours.toFixed(1)} hours
+                    {t('wizard.hours', { hours: totalHours.toFixed(1) })}
                   </div>
                 </div>
               </div>

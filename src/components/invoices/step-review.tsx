@@ -17,6 +17,7 @@ import { formatCurrency, type TaxCalculation } from '@/lib/tax'
 import { FileText, Building2, FolderKanban } from 'lucide-react'
 import type { InvoiceLineFormData } from '@/lib/validations/invoice'
 import type { ClientForSelect, ProjectForSelect } from '@/app/(protected)/invoices/actions'
+import { useTranslations } from 'next-intl'
 
 interface StepReviewProps {
   invoiceNumber: string
@@ -50,12 +51,15 @@ export function StepReview({
   client,
   project,
 }: StepReviewProps) {
+  const t = useTranslations('invoices')
+  const tc = useTranslations('common')
+
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold">Step 3: Review Invoice</h2>
+        <h2 className="text-xl font-semibold">{t('wizard.step3_title')}</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Review the invoice details before creating
+          {t('wizard.step3_desc')}
         </p>
       </div>
 
@@ -66,12 +70,12 @@ export function StepReview({
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <FileText className="h-4 w-4" />
-              Invoice Details
+              {t('wizard.invoice_details')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="invoice_number">Invoice Number</Label>
+              <Label htmlFor="invoice_number">{t('wizard.invoice_number')}</Label>
               <Input
                 id="invoice_number"
                 value={invoiceNumber}
@@ -81,7 +85,7 @@ export function StepReview({
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="invoice_date">Invoice Date</Label>
+                <Label htmlFor="invoice_date">{t('wizard.invoice_date')}</Label>
                 <Input
                   id="invoice_date"
                   type="date"
@@ -90,7 +94,7 @@ export function StepReview({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="due_date">Due Date</Label>
+                <Label htmlFor="due_date">{t('wizard.due_date')}</Label>
                 <Input
                   id="due_date"
                   type="date"
@@ -107,7 +111,7 @@ export function StepReview({
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <Building2 className="h-4 w-4" />
-              Bill To
+              {t('detail.bill_to')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -125,16 +129,16 @@ export function StepReview({
                   </div>
                 )}
                 <div className="mt-3 pt-3 border-t text-sm text-muted-foreground">
-                  <div className="font-medium text-foreground">Tax Settings:</div>
+                  <div className="font-medium text-foreground">{t('detail.tax_settings')}:</div>
                   <div>
-                    {clientTaxSettings?.charges_gst !== false ? 'GST (5%)' : 'No GST'}
+                    {clientTaxSettings?.charges_gst !== false ? t('detail.gst') : 'No GST'}
                     {' + '}
-                    {clientTaxSettings?.charges_qst !== false ? 'QST (9.975%)' : 'No QST'}
+                    {clientTaxSettings?.charges_qst !== false ? t('detail.qst') : 'No QST'}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="text-muted-foreground">No client selected</div>
+              <div className="text-muted-foreground">{t('wizard.no_client_selected')}</div>
             )}
           </CardContent>
         </Card>
@@ -143,18 +147,18 @@ export function StepReview({
       {/* Line Items */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Line Items</CardTitle>
-          <CardDescription>Items to be billed</CardDescription>
+          <CardTitle className="text-base">{t('wizard.line_items')}</CardTitle>
+          <CardDescription>{t('wizard.items_to_bill')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50%]">Description</TableHead>
-                  <TableHead className="text-right">Qty</TableHead>
-                  <TableHead className="text-right">Rate</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="w-[50%]">{tc('labels.description')}</TableHead>
+                  <TableHead className="text-right">{tc('labels.quantity')}</TableHead>
+                  <TableHead className="text-right">{tc('labels.rate')}</TableHead>
+                  <TableHead className="text-right">{tc('labels.amount')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -176,7 +180,7 @@ export function StepReview({
               <TableFooter>
                 <TableRow>
                   <TableCell colSpan={3} className="text-right">
-                    Subtotal
+                    {t('detail.subtotal')}
                   </TableCell>
                   <TableCell className="text-right font-mono">
                     {formatCurrency(totals.subtotal)}
@@ -185,7 +189,7 @@ export function StepReview({
                 {clientTaxSettings?.charges_gst !== false && (
                   <TableRow>
                     <TableCell colSpan={3} className="text-right text-muted-foreground">
-                      GST (5%)
+                      {t('detail.gst')}
                     </TableCell>
                     <TableCell className="text-right font-mono text-muted-foreground">
                       {formatCurrency(totals.gst)}
@@ -195,7 +199,7 @@ export function StepReview({
                 {clientTaxSettings?.charges_qst !== false && (
                   <TableRow>
                     <TableCell colSpan={3} className="text-right text-muted-foreground">
-                      QST (9.975%)
+                      {t('detail.qst')}
                     </TableCell>
                     <TableCell className="text-right font-mono text-muted-foreground">
                       {formatCurrency(totals.qst)}
@@ -204,7 +208,7 @@ export function StepReview({
                 )}
                 <TableRow className="bg-muted/50">
                   <TableCell colSpan={3} className="text-right font-semibold">
-                    Total
+                    {t('detail.total')}
                   </TableCell>
                   <TableCell className="text-right font-mono font-bold text-lg">
                     {formatCurrency(totals.total)}
@@ -219,12 +223,12 @@ export function StepReview({
       {/* Notes */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Notes</CardTitle>
-          <CardDescription>Optional notes for this invoice</CardDescription>
+          <CardTitle className="text-base">{t('wizard.notes')}</CardTitle>
+          <CardDescription>{t('wizard.notes_optional')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Textarea
-            placeholder="Add any notes for this invoice (e.g., payment terms, special instructions)..."
+            placeholder={t('wizard.notes_placeholder')}
             value={notes}
             onChange={(e) => onNotesChange(e.target.value)}
             rows={3}
@@ -238,7 +242,7 @@ export function StepReview({
           <div className="text-center">
             <div className="text-3xl font-bold text-green-700">{formatCurrency(totals.total)}</div>
             <div className="text-sm text-green-600 mt-1">
-              Invoice #{invoiceNumber} • {lines.length} line item{lines.length !== 1 ? 's' : ''}
+              {t('wizard.invoice_summary', { number: invoiceNumber, count: lines.length })}
             </div>
           </div>
         </CardContent>

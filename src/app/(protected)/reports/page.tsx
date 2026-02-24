@@ -2,14 +2,16 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Clock, FileText, TrendingUp, ArrowRight } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
-export default function ReportsPage() {
+export default async function ReportsPage() {
+  const t = await getTranslations('reports')
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
         <p className="text-muted-foreground">
-          View project and financial reports
+          {t('subtitle')}
         </p>
       </div>
 
@@ -22,19 +24,18 @@ export default function ReportsPage() {
                 <Clock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <CardTitle>Timesheet Report</CardTitle>
-                <CardDescription>Hours by user and project</CardDescription>
+                <CardTitle>{t('timesheets.title')}</CardTitle>
+                <CardDescription>{t('timesheets.card_subtitle')}</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              View detailed timesheet data filtered by date range, user, or project.
-              Track billable vs non-billable hours and calculate labor value.
+              {t('timesheets.card_description')}
             </p>
             <Button asChild variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
               <Link href="/reports/timesheets">
-                View Report
+                {t('view_report')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -49,19 +50,18 @@ export default function ReportsPage() {
                 <FileText className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <CardTitle>Invoice Report</CardTitle>
-                <CardDescription>Revenue and aging analysis</CardDescription>
+                <CardTitle>{t('invoices.title')}</CardTitle>
+                <CardDescription>{t('invoices.card_subtitle')}</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Track invoices by status and client with aging analysis.
-              Monitor outstanding balances and payment trends.
+              {t('invoices.card_description')}
             </p>
             <Button asChild variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
               <Link href="/reports/invoices">
-                View Report
+                {t('view_report')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -76,19 +76,18 @@ export default function ReportsPage() {
                 <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
-                <CardTitle>Profitability Report</CardTitle>
-                <CardDescription>Project margins and P&L</CardDescription>
+                <CardTitle>{t('profitability.title')}</CardTitle>
+                <CardDescription>{t('profitability.card_subtitle')}</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Analyze project profitability by comparing labor costs and expenses
-              against invoiced revenue. Track profit margins across all projects.
+              {t('profitability.card_description')}
             </p>
             <Button asChild variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
               <Link href="/reports/profitability">
-                View Report
+                {t('view_report')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
