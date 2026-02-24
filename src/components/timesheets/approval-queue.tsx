@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Check, X, Eye, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/ui/status-badge'
@@ -34,6 +35,8 @@ interface ApprovalQueueProps {
 }
 
 export function ApprovalQueue({ timesheets }: ApprovalQueueProps) {
+  const t = useTranslations('timesheets')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [rejectDialog, setRejectDialog] = useState<string | null>(null)
@@ -47,13 +50,13 @@ export function ApprovalQueue({ timesheets }: ApprovalQueueProps) {
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success('Timesheet approved')
+        toast.success(t('toast.approved'))
         startTransition(() => {
           router.refresh()
         })
       }
     } catch {
-      toast.error('Failed to approve timesheet')
+      toast.error(t('toast.approve_failed'))
     } finally {
       setProcessingId(null)
     }
@@ -67,7 +70,7 @@ export function ApprovalQueue({ timesheets }: ApprovalQueueProps) {
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success('Timesheet rejected')
+        toast.success(t('toast.rejected'))
         setRejectDialog(null)
         setRejectReason('')
         startTransition(() => {
@@ -75,7 +78,7 @@ export function ApprovalQueue({ timesheets }: ApprovalQueueProps) {
         })
       }
     } catch {
-      toast.error('Failed to reject timesheet')
+      toast.error(t('toast.reject_failed'))
     } finally {
       setProcessingId(null)
     }
@@ -86,15 +89,18 @@ export function ApprovalQueue({ timesheets }: ApprovalQueueProps) {
   }
 
   const timesheetToReject = timesheets.find((ts) => ts.id === rejectDialog)
+  const rejectUserName = timesheetToReject?.user
+    ? `${timesheetToReject.user.first_name} ${timesheetToReject.user.last_name}`
+    : ''
 
   if (timesheets.length === 0) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Users className="h-12 w-12 text-muted-foreground/50" />
-          <h3 className="mt-4 text-lg font-semibold">No pending approvals</h3>
+          <h3 className="mt-4 text-lg font-semibold">{t('approval.no_pending')}</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Timesheets from your team members will appear here when submitted
+            {t('approval.no_pending_message')}
           </p>
         </CardContent>
       </Card>
@@ -107,11 +113,11 @@ export function ApprovalQueue({ timesheets }: ApprovalQueueProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Employee</TableHead>
-              <TableHead>Week</TableHead>
-              <TableHead className="text-right">Hours</TableHead>
-              <TableHead className="hidden sm:table-cell">Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('table.employee')}</TableHead>
+              <TableHead>{t('table.week')}</TableHead>
+              <TableHead className="text-right">{t('table.hours')}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t('table.status')}</TableHead>
+              <TableHead className="text-right">{t('table.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -147,7 +153,7 @@ export function ApprovalQueue({ timesheets }: ApprovalQueueProps) {
                         disabled={isProcessing}
                       >
                         <Eye className="h-4 w-4" />
-                        <span className="sr-only">Review</span>
+                        <span className="sr-only">{t('approval.review')}</span>
                       </Button>
                       <Button
                         variant="ghost"
@@ -157,7 +163,7 @@ export function ApprovalQueue({ timesheets }: ApprovalQueueProps) {
                         disabled={isProcessing || isPending}
                       >
                         <Check className="h-4 w-4" />
-                        <span className="sr-only">Approve</span>
+                        <span className="sr-only">{t('approval.approve')}</span>
                       </Button>
                       <Button
                         variant="ghost"
@@ -167,7 +173,7 @@ export function ApprovalQueue({ timesheets }: ApprovalQueueProps) {
                         disabled={isProcessing || isPending}
                       >
                         <X className="h-4 w-4" />
-                        <span className="sr-only">Reject</span>
+                        <span className="sr-only">{t('approval.reject')}</span>
                       </Button>
                     </div>
                   </TableCell>
@@ -182,22 +188,17 @@ export function ApprovalQueue({ timesheets }: ApprovalQueueProps) {
       <Dialog open={!!rejectDialog} onOpenChange={() => setRejectDialog(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reject Timesheet</DialogTitle>
+            <DialogTitle>{t('approval.reject_title')}</DialogTitle>
             <DialogDescription>
-              {timesheetToReject?.user && (
-                <>
-                  Reject timesheet for {timesheetToReject.user.first_name}{' '}
-                  {timesheetToReject.user.last_name}?
-                </>
-              )}
+              {t('approval.reject_message', { name: rejectUserName })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="reason">Reason (optional)</Label>
+              <Label htmlFor="reason">{t('approval.rejection_reason')}</Label>
               <Textarea
                 id="reason"
-                placeholder="Enter a reason for rejection..."
+                placeholder={t('approval.rejection_reason_placeholder')}
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 rows={3}
@@ -213,14 +214,14 @@ export function ApprovalQueue({ timesheets }: ApprovalQueueProps) {
               }}
               disabled={!!processingId}
             >
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
             <Button
               variant="destructive"
               onClick={handleReject}
               disabled={!!processingId}
             >
-              {processingId ? 'Rejecting...' : 'Reject'}
+              {processingId ? t('approval.rejecting') : t('approval.reject')}
             </Button>
           </DialogFooter>
         </DialogContent>

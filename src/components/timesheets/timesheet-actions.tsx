@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Send, Copy, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -23,6 +24,8 @@ interface TimesheetActionsProps {
 }
 
 export function TimesheetActions({ timesheet, isEditable, hasEntries }: TimesheetActionsProps) {
+  const t = useTranslations('timesheets')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [showSubmitDialog, setShowSubmitDialog] = useState(false)
@@ -36,14 +39,14 @@ export function TimesheetActions({ timesheet, isEditable, hasEntries }: Timeshee
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success('Timesheet submitted for approval')
+        toast.success(t('toast.submitted'))
         setShowSubmitDialog(false)
         startTransition(() => {
           router.refresh()
         })
       }
     } catch {
-      toast.error('Failed to submit timesheet')
+      toast.error(t('toast.submit_failed'))
     } finally {
       setIsSubmitting(false)
     }
@@ -56,13 +59,13 @@ export function TimesheetActions({ timesheet, isEditable, hasEntries }: Timeshee
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success(`Copied ${result.entriesCopied} entries from previous week`)
+        toast.success(t('toast.copied', { count: result.entriesCopied ?? 0 }))
         startTransition(() => {
           router.refresh()
         })
       }
     } catch {
-      toast.error('Failed to copy entries')
+      toast.error(t('toast.copy_failed'))
     } finally {
       setIsCopying(false)
     }
@@ -86,7 +89,7 @@ export function TimesheetActions({ timesheet, isEditable, hasEntries }: Timeshee
           ) : (
             <Copy className="mr-2 h-4 w-4" />
           )}
-          Copy Last Week
+          {t('actions.copy_last_week')}
         </Button>
 
         <Button
@@ -95,7 +98,7 @@ export function TimesheetActions({ timesheet, isEditable, hasEntries }: Timeshee
           disabled={!hasEntries || isPending}
         >
           <Send className="mr-2 h-4 w-4" />
-          Submit for Approval
+          {t('actions.submit_for_approval')}
         </Button>
       </div>
 
@@ -103,10 +106,9 @@ export function TimesheetActions({ timesheet, isEditable, hasEntries }: Timeshee
       <Dialog open={showSubmitDialog} onOpenChange={setShowSubmitDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Submit Timesheet</DialogTitle>
+            <DialogTitle>{t('actions.submit_title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to submit this timesheet for approval? You won&apos;t be able to
-              make changes after submission.
+              {t('actions.submit_message')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -115,18 +117,18 @@ export function TimesheetActions({ timesheet, isEditable, hasEntries }: Timeshee
               onClick={() => setShowSubmitDialog(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
             <Button onClick={handleSubmit} disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Submitting...
+                  {t('actions.submitting')}
                 </>
               ) : (
                 <>
                   <Send className="mr-2 h-4 w-4" />
-                  Submit
+                  {t('actions.submit')}
                 </>
               )}
             </Button>

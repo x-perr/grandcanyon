@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/ui/status-badge'
@@ -18,6 +19,7 @@ interface TimesheetEntryPageProps {
 export default async function TimesheetEntryPage({ params, searchParams }: TimesheetEntryPageProps) {
   const { week } = await params
   const { user: impersonateUserId } = await searchParams
+  const t = await getTranslations('timesheets')
 
   // Validate week format (YYYY-MM-DD)
   if (!/^\d{4}-\d{2}-\d{2}$/.test(week)) {
@@ -46,12 +48,12 @@ export default async function TimesheetEntryPage({ params, searchParams }: Times
             <Button variant="ghost" size="sm" asChild>
               <Link href="/timesheets">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
+                {t('back')}
               </Link>
             </Button>
           </div>
           <div className="rounded-md border border-destructive bg-destructive/10 p-4">
-            <p className="text-destructive">{result.error || 'Failed to load timesheet'}</p>
+            <p className="text-destructive">{result.error || t('failed_to_load')}</p>
           </div>
         </div>
       )
@@ -90,16 +92,16 @@ export default async function TimesheetEntryPage({ params, searchParams }: Times
           <Button variant="ghost" size="sm" asChild>
             <Link href="/timesheets">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              {t('back')}
             </Link>
           </Button>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
-              Week of {weekRange}
+              {t('week_of', { date: weekRange })}
             </h1>
             {isImpersonating && (
               <p className="text-sm text-orange-600">
-                Entering time for: {userName}
+                {t('entering_time_for', { name: userName })}
               </p>
             )}
           </div>
@@ -114,8 +116,7 @@ export default async function TimesheetEntryPage({ params, searchParams }: Times
       {isImpersonating && (
         <div className="rounded-md border border-orange-200 bg-orange-50 p-3">
           <p className="text-sm text-orange-800">
-            You are entering time on behalf of <strong>{userName}</strong>.
-            All entries will be attributed to their timesheet.
+            {t('impersonation_banner', { name: userName })}
           </p>
         </div>
       )}
@@ -123,7 +124,7 @@ export default async function TimesheetEntryPage({ params, searchParams }: Times
       {/* Rejection Reason */}
       {fullTimesheet.rejection_reason && (
         <div className="rounded-md border border-destructive bg-destructive/10 p-4">
-          <p className="text-sm font-medium text-destructive">Rejection Reason:</p>
+          <p className="text-sm font-medium text-destructive">{t('rejection_reason_label')}</p>
           <p className="text-sm text-destructive">{fullTimesheet.rejection_reason}</p>
         </div>
       )}

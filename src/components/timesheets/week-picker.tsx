@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,6 +20,7 @@ interface WeekPickerProps {
 }
 
 export function WeekPicker({ weekStart, basePath = '/timesheets' }: WeekPickerProps) {
+  const t = useTranslations('timesheets')
   const router = useRouter()
   const currentDate = parseDateISO(weekStart)
   const weekRange = formatWeekRange(currentDate)
@@ -43,7 +45,7 @@ export function WeekPicker({ weekStart, basePath = '/timesheets' }: WeekPickerPr
     <div className="flex items-center justify-center gap-2">
       <Button variant="outline" size="sm" onClick={goToPreviousWeek}>
         <ChevronLeft className="h-4 w-4" />
-        <span className="hidden sm:inline">Previous</span>
+        <span className="hidden sm:inline">{t('week_picker.previous')}</span>
       </Button>
 
       <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-4 py-2">
@@ -52,13 +54,13 @@ export function WeekPicker({ weekStart, basePath = '/timesheets' }: WeekPickerPr
       </div>
 
       <Button variant="outline" size="sm" onClick={goToNextWeek}>
-        <span className="hidden sm:inline">Next</span>
+        <span className="hidden sm:inline">{t('week_picker.next')}</span>
         <ChevronRight className="h-4 w-4" />
       </Button>
 
       {!isCurrent && (
         <Button variant="secondary" size="sm" onClick={goToCurrentWeek}>
-          Current Week
+          {t('current_week')}
         </Button>
       )}
     </div>

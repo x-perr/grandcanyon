@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -38,6 +39,8 @@ interface NewEntry {
 }
 
 export function EntryDialog({ projects, onAdd }: EntryDialogProps) {
+  const t = useTranslations('timesheets')
+  const tCommon = useTranslations('common')
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [projectId, setProjectId] = useState<string>('')
@@ -89,28 +92,28 @@ export function EntryDialog({ projects, onAdd }: EntryDialogProps) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Plus className="mr-2 h-4 w-4" />
-          Add Entry
+          {t('entry.add_entry')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Time Entry</DialogTitle>
+          <DialogTitle>{t('entry.title')}</DialogTitle>
           <DialogDescription>
-            Select a project and optionally a task and billing role for this entry.
+            {t('entry.dialog_desc')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           {/* Project */}
           <div className="space-y-2">
-            <Label htmlFor="project">Project *</Label>
+            <Label htmlFor="project">{t('entry.project_required')}</Label>
             <Select value={projectId} onValueChange={(value) => {
               setProjectId(value)
               setTaskId('')
               setBillingRoleId('')
             }}>
               <SelectTrigger id="project">
-                <SelectValue placeholder="Select a project" />
+                <SelectValue placeholder={t('entry.select_project')} />
               </SelectTrigger>
               <SelectContent>
                 {projects.map((project) => (
@@ -125,14 +128,14 @@ export function EntryDialog({ projects, onAdd }: EntryDialogProps) {
 
           {/* Task */}
           <div className="space-y-2">
-            <Label htmlFor="task">Task (optional)</Label>
+            <Label htmlFor="task">{t('entry.task_optional')}</Label>
             <Select
               value={taskId}
               onValueChange={setTaskId}
               disabled={availableTasks.length === 0}
             >
               <SelectTrigger id="task">
-                <SelectValue placeholder={availableTasks.length === 0 ? "No tasks available" : "Select a task"} />
+                <SelectValue placeholder={availableTasks.length === 0 ? t('entry.no_tasks') : t('entry.select_task')} />
               </SelectTrigger>
               <SelectContent>
                 {availableTasks.map((task) => (
@@ -147,14 +150,14 @@ export function EntryDialog({ projects, onAdd }: EntryDialogProps) {
 
           {/* Billing Role */}
           <div className="space-y-2">
-            <Label htmlFor="billing-role">Billing Role (optional)</Label>
+            <Label htmlFor="billing-role">{t('entry.role_optional')}</Label>
             <Select
               value={billingRoleId}
               onValueChange={setBillingRoleId}
               disabled={availableBillingRoles.length === 0}
             >
               <SelectTrigger id="billing-role">
-                <SelectValue placeholder={availableBillingRoles.length === 0 ? "No roles available" : "Select a role"} />
+                <SelectValue placeholder={availableBillingRoles.length === 0 ? t('entry.no_roles') : t('entry.select_role')} />
               </SelectTrigger>
               <SelectContent>
                 {availableBillingRoles.map((role) => (
@@ -169,12 +172,12 @@ export function EntryDialog({ projects, onAdd }: EntryDialogProps) {
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description (optional)</Label>
+            <Label htmlFor="description">{t('entry.description_optional')}</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="What did you work on?"
+              placeholder={t('entry.description_placeholder')}
               rows={2}
             />
           </div>
@@ -187,25 +190,25 @@ export function EntryDialog({ projects, onAdd }: EntryDialogProps) {
               onCheckedChange={(checked) => setIsBillable(checked === true)}
             />
             <Label htmlFor="billable" className="text-sm">
-              Billable to client
+              {t('entry.billable_to_client')}
             </Label>
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={isLoading}>
-            Cancel
+            {tCommon('actions.cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={!projectId || isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Adding...
+                {t('entry.adding')}
               </>
             ) : (
               <>
                 <Plus className="mr-2 h-4 w-4" />
-                Add Entry
+                {t('entry.add_entry')}
               </>
             )}
           </Button>

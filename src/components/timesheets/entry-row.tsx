@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -32,6 +33,7 @@ interface EntryUpdate {
 }
 
 export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: EntryRowProps) {
+  const t = useTranslations('timesheets')
   const [projectId, setProjectId] = useState(entry.project_id)
   const [taskId, setTaskId] = useState(entry.task_id)
   const [billingRoleId, setBillingRoleId] = useState(entry.billing_role_id)
@@ -100,7 +102,7 @@ export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: En
         {/* Project Selector */}
         <Select value={projectId} onValueChange={handleProjectChange} disabled={!isEditable}>
           <SelectTrigger className="h-8 text-xs">
-            <SelectValue placeholder="Select project" />
+            <SelectValue placeholder={t('entry.select_project')} />
           </SelectTrigger>
           <SelectContent>
             {projects.map((project) => (
@@ -119,10 +121,10 @@ export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: En
           disabled={!isEditable || availableTasks.length === 0}
         >
           <SelectTrigger className="h-8 text-xs">
-            <SelectValue placeholder="Task (optional)" />
+            <SelectValue placeholder={t('entry.task_optional')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">No task</SelectItem>
+            <SelectItem value="none">{t('entry.no_task')}</SelectItem>
             {availableTasks.map((task) => (
               <SelectItem key={task.id} value={task.id}>
                 <span className="font-mono text-xs">{task.code}</span>
@@ -139,10 +141,10 @@ export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: En
           disabled={!isEditable || availableBillingRoles.length === 0}
         >
           <SelectTrigger className="h-8 text-xs">
-            <SelectValue placeholder="Billing role" />
+            <SelectValue placeholder={t('entry.role')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">No role</SelectItem>
+            <SelectItem value="none">{t('entry.no_role')}</SelectItem>
             {availableBillingRoles.map((role) => (
               <SelectItem key={role.id} value={role.id}>
                 {role.name}
@@ -164,7 +166,7 @@ export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: En
             htmlFor={`billable-${entry.id}`}
             className="text-xs text-muted-foreground"
           >
-            Billable
+            {t('entry.billable')}
           </label>
         </div>
       </div>
@@ -197,7 +199,7 @@ export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: En
             onClick={() => onDelete(entry.id)}
           >
             <Trash2 className="h-4 w-4" />
-            <span className="sr-only">Delete entry</span>
+            <span className="sr-only">{t('entry.delete_entry')}</span>
           </Button>
         )}
       </div>

@@ -2,6 +2,7 @@
 
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Clock } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { EntryRow } from './entry-row'
@@ -24,6 +25,7 @@ interface TimesheetGridProps {
 }
 
 export function TimesheetGrid({ timesheet, entries, projects, isEditable }: TimesheetGridProps) {
+  const t = useTranslations('timesheets')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const dayLabels = getWeekDayLabels()
@@ -68,7 +70,7 @@ export function TimesheetGrid({ timesheet, entries, projects, isEditable }: Time
         })
       }
     } catch {
-      toast.error('Failed to save changes')
+      toast.error(t('toast.save_failed'))
     }
   }
 
@@ -79,13 +81,13 @@ export function TimesheetGrid({ timesheet, entries, projects, isEditable }: Time
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success('Entry deleted')
+        toast.success(t('toast.entry_deleted'))
         startTransition(() => {
           router.refresh()
         })
       }
     } catch {
-      toast.error('Failed to delete entry')
+      toast.error(t('toast.delete_failed'))
     }
   }
 
@@ -110,13 +112,13 @@ export function TimesheetGrid({ timesheet, entries, projects, isEditable }: Time
       if (result.error) {
         toast.error(result.error)
       } else {
-        toast.success('Entry added')
+        toast.success(t('toast.entry_added'))
         startTransition(() => {
           router.refresh()
         })
       }
     } catch {
-      toast.error('Failed to add entry')
+      toast.error(t('toast.add_failed'))
     }
   }
 
@@ -125,7 +127,7 @@ export function TimesheetGrid({ timesheet, entries, projects, isEditable }: Time
       {/* Column Headers */}
       <div className="flex items-center gap-2 px-3">
         <div className="w-[200px] flex-shrink-0">
-          <span className="text-sm font-medium text-muted-foreground">Project / Task</span>
+          <span className="text-sm font-medium text-muted-foreground">{t('grid.project_task')}</span>
         </div>
         <div className="flex flex-1 items-center gap-1">
           {dayLabels.map((label, index) => (
@@ -135,7 +137,7 @@ export function TimesheetGrid({ timesheet, entries, projects, isEditable }: Time
           ))}
         </div>
         <div className="w-[60px] flex-shrink-0 text-center">
-          <span className="text-sm font-medium text-muted-foreground">Total</span>
+          <span className="text-sm font-medium text-muted-foreground">{t('grid.total')}</span>
         </div>
         <div className="w-[40px] flex-shrink-0" />
       </div>
@@ -145,11 +147,11 @@ export function TimesheetGrid({ timesheet, entries, projects, isEditable }: Time
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Clock className="h-12 w-12 text-muted-foreground/50" />
-            <h3 className="mt-4 text-lg font-semibold">No entries yet</h3>
+            <h3 className="mt-4 text-lg font-semibold">{t('grid.no_entries')}</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               {isEditable
-                ? 'Add an entry to start tracking your time'
-                : 'No time entries for this week'}
+                ? t('grid.add_entry_prompt')
+                : t('grid.no_entries_readonly')}
             </p>
             {isEditable && (
               <div className="mt-4">
@@ -184,7 +186,7 @@ export function TimesheetGrid({ timesheet, entries, projects, isEditable }: Time
       {entries.length > 0 && (
         <div className="flex items-center gap-2 rounded-lg border-2 border-dashed bg-muted/50 px-3 py-3">
           <div className="w-[200px] flex-shrink-0">
-            <span className="text-sm font-semibold">Day Totals</span>
+            <span className="text-sm font-semibold">{t('grid.day_totals')}</span>
           </div>
           <div className="flex flex-1 items-center gap-1">
             {dayTotals.map((total, index) => (
@@ -210,9 +212,9 @@ export function TimesheetGrid({ timesheet, entries, projects, isEditable }: Time
       {entries.length > 0 && (
         <div className="flex justify-end">
           <div className="rounded-lg bg-primary px-4 py-2 text-primary-foreground">
-            <span className="text-sm">Week Total: </span>
+            <span className="text-sm">{t('grid.week_total')} </span>
             <span className="font-mono text-lg font-bold">{weekTotal.toFixed(1)}</span>
-            <span className="text-sm"> hours</span>
+            <span className="text-sm"> {t('grid.hours')}</span>
           </div>
         </div>
       )}

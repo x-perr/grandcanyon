@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { getTimesheets, getPendingApprovals } from './actions'
 import { TimesheetList } from '@/components/timesheets/timesheet-list'
@@ -21,13 +22,14 @@ export default async function TimesheetsPage({ searchParams }: TimesheetsPagePro
   const page = Number(params.page) || 1
   const pageSize = 25
 
-  const [{ timesheets, count }, approvals, permissions] = await Promise.all([
+  const [{ timesheets, count }, approvals, permissions, t] = await Promise.all([
     getTimesheets({
       limit: pageSize,
       offset: (page - 1) * pageSize,
     }),
     getPendingApprovals(),
     getUserPermissions(),
+    getTranslations('timesheets'),
   ])
 
   const canApprove = hasPermission(permissions, 'timesheets.approve')
@@ -37,23 +39,23 @@ export default async function TimesheetsPage({ searchParams }: TimesheetsPagePro
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Timesheets</h1>
-          <p className="text-muted-foreground">Track your time and submit for approval</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Button asChild>
           <Link href={`/timesheets/${currentWeekStart}`}>
             <Plus className="mr-2 h-4 w-4" />
-            Current Week
+            {t('current_week')}
           </Link>
         </Button>
       </div>
 
       <Tabs defaultValue={tab} className="space-y-4">
         <TabsList>
-          <TabsTrigger value="my">My Timesheets</TabsTrigger>
+          <TabsTrigger value="my">{t('my_timesheets')}</TabsTrigger>
           {canApprove && (
             <TabsTrigger value="approvals">
-              Team Approvals
+              {t('team_approvals')}
               {approvals.count > 0 && (
                 <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
                   {approvals.count}
