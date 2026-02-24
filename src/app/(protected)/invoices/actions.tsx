@@ -3,9 +3,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { renderToBuffer } from '@react-pdf/renderer'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
-import { calculateTaxes } from '@/lib/tax'
+import { calculateTaxes, formatCurrency } from '@/lib/tax'
 import { createInvoiceSchema, type CreateInvoiceData, type InvoiceLineFormData } from '@/lib/validations/invoice'
+import { sendInvoiceEmail } from '@/lib/email'
+import { InvoicePDF, DEFAULT_COMPANY_INFO } from '@/components/invoices/invoice-pdf'
 import type { Enums, Tables } from '@/types/database'
 
 type InvoiceStatus = Enums<'invoice_status'>
@@ -885,4 +888,213 @@ export async function deleteInvoice(invoiceId: string) {
 
   revalidatePath('/invoices')
   redirect('/invoices')
+}
+
+// === EMAIL FUNCTIONS ===
+
+export type InvoiceEmail = {
+  id: string
+  sent_to: string
+  sent_at: string
+  status: string
+  error_message: string | null
+  sent_by_name: string
+}
+
+/**
+ * Get email history for an invoice
+ */
+export async function getInvoiceEmails(invoiceId: string): Promise<InvoiceEmail[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('invoice_emails')
+    .select(
+      `
+      id,
+      sent_to,
+      sent_at,
+      status,
+      error_message,
+      sent_by:profiles!invoice_emails_sent_by_fkey(first_name, last_name)
+    `
+    )
+    .eq('invoice_id', invoiceId)
+    .order('sent_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching invoice emails:', error)
+    return []
+  }
+
+  return (data ?? []).map((email) => {
+    const sentBy = Array.isArray(email.sent_by) ? email.sent_by[0] : email.sent_by
+    return {
+      id: email.id,
+      sent_to: email.sent_to,
+      sent_at: email.sent_at,
+      status: email.status,
+      error_message: email.error_message,
+      sent_by_name: sentBy ? `${sentBy.first_name} ${sentBy.last_name}` : 'Unknown',
+    }
+  })
+}
+
+/**
+ * Get client billing email for an invoice
+ */
+export async function getClientEmailForInvoice(invoiceId: string): Promise<string | null> {
+  const supabase = await createClient()
+
+  const { data } = await supabase
+    .from('invoices')
+    .select(
+      `
+      client:clients!invoices_client_id_fkey(
+        billing_email,
+        general_email
+      )
+    `
+    )
+    .eq('id', invoiceId)
+    .single()
+
+  if (!data?.client) return null
+
+  const client = Array.isArray(data.client) ? data.client[0] : data.client
+  // Prefer billing_email, fall back to general_email
+  return client?.billing_email || client?.general_email || null
+}
+
+/**
+ * Send invoice via email with PDF attachment
+ */
+export async function sendInvoiceWithEmail(
+  invoiceId: string,
+  toEmail: string,
+  customMessage?: string
+) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Verify permission
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'invoices.create')) {
+    return { error: 'You do not have permission to send invoices' }
+  }
+
+  // Get invoice with all relations
+  const invoice = await getInvoice(invoiceId)
+  if (!invoice) {
+    return { error: 'Invoice not found' }
+  }
+
+  if (invoice.status !== 'draft') {
+    return { error: 'Can only send draft invoices' }
+  }
+
+  // Generate PDF buffer
+  let pdfBuffer: Buffer
+  try {
+    pdfBuffer = await renderToBuffer(
+      <InvoicePDF invoice={invoice} companyInfo={DEFAULT_COMPANY_INFO} />
+    )
+  } catch (error) {
+    console.error('Error generating PDF:', error)
+    return { error: 'Failed to generate PDF' }
+  }
+
+  // Format for email
+  const dueDate = invoice.due_date
+    ? new Date(invoice.due_date).toLocaleDateString('en-CA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : 'Upon Receipt'
+
+  // Send email
+  const emailResult = await sendInvoiceEmail({
+    to: toEmail,
+    invoiceNumber: invoice.invoice_number,
+    clientName: invoice.client?.name ?? 'Client',
+    total: formatCurrency(invoice.total),
+    dueDate,
+    pdfBuffer,
+    customMessage,
+    companyName: DEFAULT_COMPANY_INFO.name,
+    companyEmail: DEFAULT_COMPANY_INFO.email,
+  })
+
+  // Log email attempt
+  await supabase.from('invoice_emails').insert({
+    invoice_id: invoiceId,
+    sent_to: toEmail,
+    sent_by: user.id,
+    subject: emailResult.subject,
+    body: emailResult.body,
+    resend_message_id: emailResult.messageId ?? null,
+    status: emailResult.success ? 'sent' : 'failed',
+    error_message: emailResult.error ?? null,
+  })
+
+  if (!emailResult.success) {
+    return { error: emailResult.error ?? 'Failed to send email' }
+  }
+
+  // Update invoice status
+  const { error: updateError } = await supabase
+    .from('invoices')
+    .update({
+      status: 'sent',
+      sent_at: new Date().toISOString(),
+    })
+    .eq('id', invoiceId)
+
+  if (updateError) {
+    console.error('Error updating invoice status:', updateError)
+    // Email sent but status not updated - log and continue
+  }
+
+  // Lock associated timesheets
+  const { data: invoiceLines } = await supabase
+    .from('invoice_lines')
+    .select('timesheet_entry_id')
+    .eq('invoice_id', invoiceId)
+    .not('timesheet_entry_id', 'is', null)
+
+  const entryIds = (invoiceLines ?? [])
+    .filter((l) => l.timesheet_entry_id)
+    .map((l) => l.timesheet_entry_id as string)
+
+  if (entryIds.length > 0) {
+    const { data: entries } = await supabase
+      .from('timesheet_entries')
+      .select('timesheet_id')
+      .in('id', entryIds)
+
+    const timesheetIds = [...new Set((entries ?? []).map((e) => e.timesheet_id))]
+
+    if (timesheetIds.length > 0) {
+      await supabase
+        .from('timesheets')
+        .update({
+          status: 'locked',
+          locked_at: new Date().toISOString(),
+        })
+        .in('id', timesheetIds)
+    }
+  }
+
+  revalidatePath(`/invoices/${invoiceId}`)
+  revalidatePath('/invoices')
+  revalidatePath('/timesheets')
+
+  return { success: true }
 }

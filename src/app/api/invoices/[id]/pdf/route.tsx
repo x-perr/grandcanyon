@@ -1,8 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { createClient } from '@/lib/supabase/server'
-import { InvoicePDF, DEFAULT_COMPANY_INFO } from '@/components/invoices/invoice-pdf'
+import { InvoicePDF, DEFAULT_COMPANY_INFO, type CompanyInfo } from '@/components/invoices/invoice-pdf'
 import type { InvoiceWithRelations } from '@/app/(protected)/invoices/actions'
+
+/**
+ * Get company settings from database
+ */
+async function getCompanySettings(): Promise<CompanyInfo> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('settings')
+    .select('value')
+    .eq('key', 'company_info')
+    .single()
+
+  if (error || !data) {
+    return DEFAULT_COMPANY_INFO
+  }
+
+  // Merge with defaults to ensure all fields exist
+  return { ...DEFAULT_COMPANY_INFO, ...(data.value as Partial<CompanyInfo>) }
+}
 
 export async function GET(
   request: NextRequest,
@@ -22,11 +42,12 @@ export async function GET(
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    // Fetch invoice with all related data
-    const { data: invoiceData, error } = await supabase
-      .from('invoices')
-      .select(
-        `
+    // Fetch invoice and company settings in parallel
+    const [invoiceResult, companyInfo] = await Promise.all([
+      supabase
+        .from('invoices')
+        .select(
+          `
         *,
         client:clients!invoices_client_id_fkey(
           id, code, name, short_name,
@@ -45,14 +66,18 @@ export async function GET(
           )
         )
       `
-      )
-      .eq('id', id)
-      .single()
+        )
+        .eq('id', id)
+        .single(),
+      getCompanySettings(),
+    ])
 
-    if (error) {
-      console.error('Error fetching invoice:', error)
+    if (invoiceResult.error) {
+      console.error('Error fetching invoice:', invoiceResult.error)
       return new NextResponse('Invoice not found', { status: 404 })
     }
+
+    const invoiceData = invoiceResult.data
 
     // Transform the data to match InvoiceWithRelations type
     const invoice: InvoiceWithRelations = {
@@ -66,9 +91,9 @@ export async function GET(
       lines: invoiceData.lines ?? [],
     }
 
-    // Generate PDF
+    // Generate PDF with dynamic company settings
     const pdfBuffer = await renderToBuffer(
-      <InvoicePDF invoice={invoice} companyInfo={DEFAULT_COMPANY_INFO} />
+      <InvoicePDF invoice={invoice} companyInfo={companyInfo} />
     )
 
     // Return PDF response

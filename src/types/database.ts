@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.1"
+  }
   public: {
     Tables: {
       audit_logs: {
@@ -338,11 +343,12 @@ export type Database = {
           approved_by: string | null
           created_at: string | null
           id: string
+          person_id: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["expense_status"] | null
           submitted_at: string | null
           updated_at: string | null
-          user_id: string
+          user_id: string | null
           week_end: string
           week_start: string
         }
@@ -351,11 +357,12 @@ export type Database = {
           approved_by?: string | null
           created_at?: string | null
           id?: string
+          person_id?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["expense_status"] | null
           submitted_at?: string | null
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
           week_end: string
           week_start: string
         }
@@ -364,11 +371,12 @@ export type Database = {
           approved_by?: string | null
           created_at?: string | null
           id?: string
+          person_id?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["expense_status"] | null
           submitted_at?: string | null
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
           week_end?: string
           week_start?: string
         }
@@ -381,8 +389,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "expenses_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "expenses_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_emails: {
+        Row: {
+          body: string
+          created_at: string | null
+          error_message: string | null
+          id: string
+          invoice_id: string
+          resend_message_id: string | null
+          sent_at: string
+          sent_by: string
+          sent_to: string
+          status: string
+          subject: string
+        }
+        Insert: {
+          body: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          invoice_id: string
+          resend_message_id?: string | null
+          sent_at?: string
+          sent_by: string
+          sent_to: string
+          status?: string
+          subject: string
+        }
+        Update: {
+          body?: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          invoice_id?: string
+          resend_message_id?: string | null
+          sent_at?: string
+          sent_by?: string
+          sent_to?: string
+          status?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_emails_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_emails_sent_by_fkey"
+            columns: ["sent_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -541,6 +613,45 @@ export type Database = {
           },
         ]
       }
+      people: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          first_name: string
+          id: string
+          is_active: boolean | null
+          last_name: string
+          legacy_user_id: number | null
+          notes: string | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string
+          id?: string
+          is_active?: boolean | null
+          last_name?: string
+          legacy_user_id?: number | null
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string
+          id?: string
+          is_active?: boolean | null
+          last_name?: string
+          legacy_user_id?: number | null
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       permissions: {
         Row: {
           category: string | null
@@ -574,6 +685,7 @@ export type Database = {
           is_active: boolean | null
           last_name: string
           manager_id: string | null
+          person_id: string | null
           phone: string | null
           role_id: string | null
           updated_at: string | null
@@ -586,6 +698,7 @@ export type Database = {
           is_active?: boolean | null
           last_name: string
           manager_id?: string | null
+          person_id?: string | null
           phone?: string | null
           role_id?: string | null
           updated_at?: string | null
@@ -598,6 +711,7 @@ export type Database = {
           is_active?: boolean | null
           last_name?: string
           manager_id?: string | null
+          person_id?: string | null
           phone?: string | null
           role_id?: string | null
           updated_at?: string | null
@@ -608,6 +722,13 @@ export type Database = {
             columns: ["manager_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
             referencedColumns: ["id"]
           },
           {
@@ -798,7 +919,9 @@ export type Database = {
       projects: {
         Row: {
           address: string | null
-          billing_type: Database["public"]["Enums"]["project_billing_type"] | null
+          billing_type:
+            | Database["public"]["Enums"]["project_billing_type"]
+            | null
           client_id: string
           code: string
           created_at: string | null
@@ -822,7 +945,9 @@ export type Database = {
         }
         Insert: {
           address?: string | null
-          billing_type?: Database["public"]["Enums"]["project_billing_type"] | null
+          billing_type?:
+            | Database["public"]["Enums"]["project_billing_type"]
+            | null
           client_id: string
           code: string
           created_at?: string | null
@@ -846,7 +971,9 @@ export type Database = {
         }
         Update: {
           address?: string | null
-          billing_type?: Database["public"]["Enums"]["project_billing_type"] | null
+          billing_type?:
+            | Database["public"]["Enums"]["project_billing_type"]
+            | null
           client_id?: string
           code?: string
           created_at?: string | null
@@ -1067,11 +1194,12 @@ export type Database = {
           id: string
           locked_at: string | null
           locked_by: string | null
+          person_id: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["timesheet_status"] | null
           submitted_at: string | null
           updated_at: string | null
-          user_id: string
+          user_id: string | null
           week_end: string
           week_start: string
         }
@@ -1082,11 +1210,12 @@ export type Database = {
           id?: string
           locked_at?: string | null
           locked_by?: string | null
+          person_id?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["timesheet_status"] | null
           submitted_at?: string | null
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
           week_end: string
           week_start: string
         }
@@ -1097,11 +1226,12 @@ export type Database = {
           id?: string
           locked_at?: string | null
           locked_by?: string | null
+          person_id?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["timesheet_status"] | null
           submitted_at?: string | null
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
           week_end?: string
           week_start?: string
         }
@@ -1118,6 +1248,13 @@ export type Database = {
             columns: ["locked_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timesheets_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
             referencedColumns: ["id"]
           },
           {
@@ -1145,7 +1282,12 @@ export type Database = {
       invoice_status: "draft" | "sent" | "paid" | "void"
       project_billing_type: "hourly" | "fixed" | "per_unit"
       project_status: "draft" | "active" | "on_hold" | "completed" | "cancelled"
-      timesheet_status: "draft" | "submitted" | "approved" | "rejected" | "locked"
+      timesheet_status:
+        | "draft"
+        | "submitted"
+        | "approved"
+        | "rejected"
+        | "locked"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1153,6 +1295,137 @@ export type Database = {
   }
 }
 
-// Helper types
-export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
-export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      expense_status: ["draft", "submitted", "approved", "rejected"],
+      invoice_status: ["draft", "sent", "paid", "void"],
+      project_billing_type: ["hourly", "fixed", "per_unit"],
+      project_status: ["draft", "active", "on_hold", "completed", "cancelled"],
+      timesheet_status: [
+        "draft",
+        "submitted",
+        "approved",
+        "rejected",
+        "locked",
+      ],
+    },
+  },
+} as const

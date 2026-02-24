@@ -27,10 +27,11 @@ import {
   TableRow,
   TableFooter,
 } from '@/components/ui/table'
-import { getInvoice } from '../actions'
+import { getInvoice, getInvoiceEmails, getClientEmailForInvoice } from '../actions'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { formatCurrency } from '@/lib/tax'
 import { InvoiceActions } from '@/components/invoices/invoice-actions'
+import { EmailHistory } from '@/components/invoices/email-history'
 
 interface InvoiceDetailPageProps {
   params: Promise<{ id: string }>
@@ -38,7 +39,12 @@ interface InvoiceDetailPageProps {
 
 export default async function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   const { id } = await params
-  const [invoice, permissions] = await Promise.all([getInvoice(id), getUserPermissions()])
+  const [invoice, permissions, emails, clientEmail] = await Promise.all([
+    getInvoice(id),
+    getUserPermissions(),
+    getInvoiceEmails(id),
+    getClientEmailForInvoice(id),
+  ])
 
   if (!invoice) {
     notFound()
@@ -83,6 +89,15 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
   const isSent = invoice.status === 'sent'
   const isPaid = invoice.status === 'paid'
   const isVoid = invoice.status === 'void'
+
+  // Format values for InvoiceActions props
+  const dueDateFormatted = invoice.due_date
+    ? new Date(invoice.due_date).toLocaleDateString('en-CA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : 'Upon Receipt'
 
   return (
     <div className="space-y-6">
@@ -147,6 +162,11 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
             <InvoiceActions
               invoiceId={invoice.id}
               status={invoice.status}
+              invoiceNumber={invoice.invoice_number}
+              clientName={invoice.client?.name ?? 'Client'}
+              clientEmail={clientEmail}
+              total={formatCurrency(invoice.total)}
+              dueDate={dueDateFormatted}
             />
           )}
         </div>
@@ -299,6 +319,9 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
               </CardContent>
             </Card>
           </div>
+
+          {/* Email History */}
+          <EmailHistory emails={emails} />
 
           {/* Notes */}
           {invoice.notes && (

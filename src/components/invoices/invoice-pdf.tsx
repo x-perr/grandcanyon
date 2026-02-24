@@ -1,20 +1,21 @@
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
 import type { InvoiceWithRelations } from '@/app/(protected)/invoices/actions'
 
-// Company info - hardcoded for now (will be moved to settings later)
+// Company info - loaded from database settings
 export interface CompanyInfo {
   name: string
-  address: string
-  city: string
-  province: string
-  postalCode: string
-  phone: string
+  address?: string
+  city?: string
+  province?: string
+  postalCode?: string
+  phone?: string
   email?: string
-  gstNumber: string
-  qstNumber: string
+  gstNumber?: string
+  qstNumber?: string
+  logoUrl?: string | null
 }
 
-// Default company info
+// Default company info (fallback if settings not found)
 export const DEFAULT_COMPANY_INFO: CompanyInfo = {
   name: 'Systèmes Intérieurs Grand Canyon',
   address: '123 Construction Blvd',
@@ -25,6 +26,7 @@ export const DEFAULT_COMPANY_INFO: CompanyInfo = {
   email: 'info@grandcanyon.ca',
   gstNumber: '123456789 RT0001',
   qstNumber: '1234567890 TQ0001',
+  logoUrl: null,
 }
 
 interface InvoicePDFProps {
@@ -46,6 +48,17 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   companyInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  companyLogo: {
+    width: 60,
+    height: 60,
+    marginRight: 12,
+    objectFit: 'contain',
+  },
+  companyText: {
     flex: 1,
   },
   companyName: {
@@ -271,15 +284,26 @@ export function InvoicePDF({ invoice, companyInfo = DEFAULT_COMPANY_INFO }: Invo
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.companyInfo}>
-            <Text style={styles.companyName}>{companyInfo.name}</Text>
-            <Text style={styles.companyDetails}>{companyInfo.address}</Text>
-            <Text style={styles.companyDetails}>
-              {companyInfo.city}, {companyInfo.province} {companyInfo.postalCode}
-            </Text>
-            <Text style={styles.companyDetails}>Tél: {companyInfo.phone}</Text>
-            {companyInfo.email && (
-              <Text style={styles.companyDetails}>{companyInfo.email}</Text>
+            {companyInfo.logoUrl && (
+              <Image src={companyInfo.logoUrl} style={styles.companyLogo} />
             )}
+            <View style={styles.companyText}>
+              <Text style={styles.companyName}>{companyInfo.name}</Text>
+              {companyInfo.address && (
+                <Text style={styles.companyDetails}>{companyInfo.address}</Text>
+              )}
+              {(companyInfo.city || companyInfo.province || companyInfo.postalCode) && (
+                <Text style={styles.companyDetails}>
+                  {[companyInfo.city, companyInfo.province, companyInfo.postalCode].filter(Boolean).join(', ')}
+                </Text>
+              )}
+              {companyInfo.phone && (
+                <Text style={styles.companyDetails}>Tél: {companyInfo.phone}</Text>
+              )}
+              {companyInfo.email && (
+                <Text style={styles.companyDetails}>{companyInfo.email}</Text>
+              )}
+            </View>
           </View>
           <View style={styles.invoiceHeader}>
             <Text style={styles.invoiceTitle}>FACTURE / INVOICE</Text>

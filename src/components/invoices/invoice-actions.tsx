@@ -22,19 +22,35 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
-import { sendInvoice, markInvoicePaid, cancelInvoice, deleteInvoice } from '@/app/(protected)/invoices/actions'
+import { markInvoicePaid, cancelInvoice, deleteInvoice } from '@/app/(protected)/invoices/actions'
+import { SendInvoiceDialog } from './send-invoice-dialog'
 
 interface InvoiceActionsProps {
   invoiceId: string
   status: string
+  // Props for send dialog
+  invoiceNumber?: string
+  clientName?: string
+  clientEmail?: string | null
+  total?: string
+  dueDate?: string
 }
 
-type ActionType = 'send' | 'pay' | 'cancel' | 'delete' | null
+type ActionType = 'pay' | 'cancel' | 'delete' | null
 
-export function InvoiceActions({ invoiceId, status }: InvoiceActionsProps) {
+export function InvoiceActions({
+  invoiceId,
+  status,
+  invoiceNumber = '',
+  clientName = '',
+  clientEmail = null,
+  total = '',
+  dueDate = '',
+}: InvoiceActionsProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [dialogAction, setDialogAction] = useState<ActionType>(null)
+  const [sendDialogOpen, setSendDialogOpen] = useState(false)
 
   const isDraft = status === 'draft'
   const isSent = status === 'sent'
@@ -47,12 +63,6 @@ export function InvoiceActions({ invoiceId, status }: InvoiceActionsProps) {
 
       try {
         switch (action) {
-          case 'send':
-            result = await sendInvoice(invoiceId)
-            if (result?.success) {
-              toast.success('Invoice sent successfully')
-            }
-            break
           case 'pay':
             result = await markInvoicePaid(invoiceId)
             if (result?.success) {
@@ -84,14 +94,6 @@ export function InvoiceActions({ invoiceId, status }: InvoiceActionsProps) {
 
   const getDialogConfig = () => {
     switch (dialogAction) {
-      case 'send':
-        return {
-          title: 'Send Invoice',
-          description:
-            'This will mark the invoice as sent and lock the associated timesheets. The client will be notified. Continue?',
-          actionLabel: 'Send Invoice',
-          variant: 'default' as const,
-        }
       case 'pay':
         return {
           title: 'Mark as Paid',
@@ -110,8 +112,7 @@ export function InvoiceActions({ invoiceId, status }: InvoiceActionsProps) {
       case 'delete':
         return {
           title: 'Delete Invoice',
-          description:
-            'This will permanently delete the invoice. This action cannot be undone.',
+          description: 'This will permanently delete the invoice. This action cannot be undone.',
           actionLabel: 'Delete Invoice',
           variant: 'destructive' as const,
         }
@@ -138,7 +139,7 @@ export function InvoiceActions({ invoiceId, status }: InvoiceActionsProps) {
         <DropdownMenuContent align="end">
           {/* Send - Draft only */}
           {isDraft && (
-            <DropdownMenuItem onClick={() => setDialogAction('send')}>
+            <DropdownMenuItem onClick={() => setSendDialogOpen(true)}>
               <Send className="mr-2 h-4 w-4" />
               Send Invoice
             </DropdownMenuItem>
@@ -179,8 +180,23 @@ export function InvoiceActions({ invoiceId, status }: InvoiceActionsProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Send Invoice Dialog */}
+      <SendInvoiceDialog
+        open={sendDialogOpen}
+        onOpenChange={setSendDialogOpen}
+        invoiceId={invoiceId}
+        invoiceNumber={invoiceNumber}
+        clientName={clientName}
+        clientEmail={clientEmail}
+        total={total}
+        dueDate={dueDate}
+      />
+
       {/* Confirmation Dialog */}
-      <AlertDialog open={dialogAction !== null} onOpenChange={(open) => !open && setDialogAction(null)}>
+      <AlertDialog
+        open={dialogAction !== null}
+        onOpenChange={(open) => !open && setDialogAction(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{dialogConfig?.title}</AlertDialogTitle>

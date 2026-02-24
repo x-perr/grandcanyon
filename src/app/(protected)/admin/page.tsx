@@ -1,33 +1,32 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { redirect } from 'next/navigation'
 import { Settings } from 'lucide-react'
+import { getUserPermissions, hasPermission } from '@/lib/auth'
+import { getCompanySettings } from './actions'
+import { CompanySettingsForm } from '@/components/admin/company-settings-form'
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  const permissions = await getUserPermissions()
+
+  // Check admin permission
+  if (!hasPermission(permissions, 'admin.manage')) {
+    redirect('/dashboard')
+  }
+
+  const settings = await getCompanySettings()
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Admin</h1>
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+          <Settings className="h-8 w-8" />
+          Admin Settings
+        </h1>
         <p className="text-muted-foreground">
-          System administration and settings
+          Manage company information and system settings
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5" />
-            Coming Soon
-          </CardTitle>
-          <CardDescription>
-            This feature is under development
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            The admin module will be available in the next release. You&apos;ll be able to
-            manage users, roles, permissions, and system settings.
-          </p>
-        </CardContent>
-      </Card>
+      <CompanySettingsForm settings={settings} />
     </div>
   )
 }
