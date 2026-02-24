@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Building2, MoreHorizontal, Pencil, Trash2, Plus, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SearchInput } from '@/components/ui/search-input'
@@ -52,6 +53,8 @@ export function ClientList({
 }: ClientListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('clients')
+  const tCommon = useTranslations('common')
   const [isPending, startTransition] = useTransition()
   const [search, setSearch] = useState(searchQuery)
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -110,7 +113,7 @@ export function ClientList({
       {/* Header with Search and Add Button */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <SearchInput
-          placeholder="Search by code, name..."
+          placeholder={t('search_placeholder')}
           value={search}
           onChange={updateSearch}
           className="w-full sm:max-w-sm"
@@ -119,7 +122,7 @@ export function ClientList({
           <Button asChild>
             <Link href="/clients/new">
               <Plus className="mr-2 h-4 w-4" />
-              New Client
+              {t('new_client')}
             </Link>
           </Button>
         )}
@@ -130,17 +133,17 @@ export function ClientList({
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Building2 className="h-12 w-12 text-muted-foreground/50" />
-            <h3 className="mt-4 text-lg font-semibold">No clients found</h3>
+            <h3 className="mt-4 text-lg font-semibold">{t('no_clients')}</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               {searchQuery
-                ? 'Try adjusting your search terms'
-                : 'Get started by adding your first client'}
+                ? t('list.search_empty')
+                : t('no_clients_message')}
             </p>
             {canEdit && !searchQuery && (
               <Button asChild className="mt-4">
                 <Link href="/clients/new">
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Client
+                  {tCommon('actions.add')}
                 </Link>
               </Button>
             )}
@@ -151,10 +154,10 @@ export function ClientList({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">Code</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead className="hidden md:table-cell">Email</TableHead>
-                <TableHead className="hidden sm:table-cell">Projects</TableHead>
+                <TableHead className="w-[100px]">{tCommon('labels.code')}</TableHead>
+                <TableHead>{tCommon('labels.name')}</TableHead>
+                <TableHead className="hidden md:table-cell">{tCommon('labels.email')}</TableHead>
+                <TableHead className="hidden sm:table-cell">{t('tabs.projects')}</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
@@ -185,14 +188,14 @@ export function ClientList({
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Actions</span>
+                          <span className="sr-only">{tCommon('labels.actions')}</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
                           <Link href={`/clients/${client.id}`}>
                             <ExternalLink className="mr-2 h-4 w-4" />
-                            View
+                            {tCommon('actions.view')}
                           </Link>
                         </DropdownMenuItem>
                         {canEdit && (
@@ -200,7 +203,7 @@ export function ClientList({
                             <DropdownMenuItem asChild>
                               <Link href={`/clients/${client.id}/edit`}>
                                 <Pencil className="mr-2 h-4 w-4" />
-                                Edit
+                                {tCommon('actions.edit')}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -209,7 +212,7 @@ export function ClientList({
                               onClick={() => setDeleteId(client.id)}
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
+                              {tCommon('actions.delete')}
                             </DropdownMenuItem>
                           </>
                         )}
@@ -227,8 +230,11 @@ export function ClientList({
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Showing {(currentPage - 1) * pageSize + 1}-
-            {Math.min(currentPage * pageSize, totalCount)} of {totalCount}
+            {tCommon('pagination.showing', {
+              start: (currentPage - 1) * pageSize + 1,
+              end: Math.min(currentPage * pageSize, totalCount),
+              total: totalCount,
+            })}
           </p>
           <div className="flex gap-2">
             <Button
@@ -237,7 +243,7 @@ export function ClientList({
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1 || isPending}
             >
-              Previous
+              {tCommon('actions.previous')}
             </Button>
             <Button
               variant="outline"
@@ -245,7 +251,7 @@ export function ClientList({
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages || isPending}
             >
-              Next
+              {tCommon('actions.next')}
             </Button>
           </div>
         </div>
@@ -255,18 +261,17 @@ export function ClientList({
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Client</DialogTitle>
+            <DialogTitle>{t('delete.title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {clientToDelete?.name}? This action can be undone by
-              an administrator.
+              {t('delete.message', { name: clientToDelete?.name ?? '' })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)} disabled={isDeleting}>
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              {isDeleting ? tCommon('actions.deleting') : tCommon('actions.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

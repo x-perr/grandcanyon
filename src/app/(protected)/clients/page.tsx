@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import { getTranslations } from 'next-intl/server'
 import { getClients } from './actions'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { ClientList } from '@/components/clients/client-list'
@@ -27,12 +28,13 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
   ])
 
   const canEdit = hasPermission(permissions, 'clients.edit')
+  const t = await getTranslations('clients')
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Clients</h1>
-        <p className="text-muted-foreground">Manage your client companies and contacts</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <Suspense fallback={<ClientListSkeleton />}>

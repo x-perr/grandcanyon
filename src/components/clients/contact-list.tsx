@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Mail, Phone, MoreHorizontal, Pencil, Trash2, Plus, Star, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -33,6 +34,8 @@ interface ContactListProps {
 }
 
 export function ContactList({ clientId, contacts, canEdit }: ContactListProps) {
+  const t = useTranslations('clients')
+  const tCommon = useTranslations('common')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -70,11 +73,11 @@ export function ContactList({ clientId, contacts, canEdit }: ContactListProps) {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">Contacts ({contacts.length})</h3>
+        <h3 className="text-lg font-medium">{t('contacts.title')} ({contacts.length})</h3>
         {canEdit && (
           <Button size="sm" onClick={handleAdd}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Contact
+            {t('contacts.add_contact')}
           </Button>
         )}
       </div>
@@ -84,11 +87,11 @@ export function ContactList({ clientId, contacts, canEdit }: ContactListProps) {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-8">
             <User className="h-10 w-10 text-muted-foreground/50" />
-            <p className="mt-2 text-sm text-muted-foreground">No contacts added yet</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t('contacts.no_contacts_message')}</p>
             {canEdit && (
               <Button size="sm" variant="outline" className="mt-4" onClick={handleAdd}>
                 <Plus className="mr-2 h-4 w-4" />
-                Add First Contact
+                {t('contacts.add_contact')}
               </Button>
             )}
           </CardContent>
@@ -110,7 +113,7 @@ export function ContactList({ clientId, contacts, canEdit }: ContactListProps) {
                       {contact.is_primary && (
                         <Badge variant="secondary" className="text-xs">
                           <Star className="mr-1 h-3 w-3" />
-                          Primary
+                          {t('contacts.is_primary')}
                         </Badge>
                       )}
                     </div>
@@ -144,13 +147,13 @@ export function ContactList({ clientId, contacts, canEdit }: ContactListProps) {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                         <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Actions</span>
+                        <span className="sr-only">{tCommon('labels.actions')}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => handleEdit(contact)}>
                         <Pencil className="mr-2 h-4 w-4" />
-                        Edit
+                        {tCommon('actions.edit')}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
@@ -158,7 +161,7 @@ export function ContactList({ clientId, contacts, canEdit }: ContactListProps) {
                         onClick={() => setDeleteId(contact.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                        {tCommon('actions.delete')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -181,18 +184,19 @@ export function ContactList({ clientId, contacts, canEdit }: ContactListProps) {
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Contact</DialogTitle>
+            <DialogTitle>{t('contacts.delete_title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {contactToDelete?.first_name}{' '}
-              {contactToDelete?.last_name}? This action cannot be undone.
+              {t('contacts.delete_message', {
+                name: `${contactToDelete?.first_name} ${contactToDelete?.last_name}`,
+              })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)} disabled={isDeleting}>
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              {isDeleting ? tCommon('actions.deleting') : tCommon('actions.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

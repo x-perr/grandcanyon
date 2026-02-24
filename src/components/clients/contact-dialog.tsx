@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,6 +39,8 @@ export function ContactDialog({
   onOpenChange,
   onSuccess,
 }: ContactDialogProps) {
+  const t = useTranslations('clients')
+  const tCommon = useTranslations('common')
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -62,7 +65,7 @@ export function ContactDialog({
         onSuccess?.()
       }
     } catch {
-      setError('An unexpected error occurred')
+      setError(tCommon('errors.generic'))
     } finally {
       setIsPending(false)
     }
@@ -73,11 +76,11 @@ export function ContactDialog({
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{isEdit ? 'Edit Contact' : 'Add Contact'}</DialogTitle>
+            <DialogTitle>{isEdit ? t('contacts.edit_contact') : t('contacts.add_contact')}</DialogTitle>
             <DialogDescription>
               {isEdit
-                ? 'Update the contact information.'
-                : 'Add a new contact for this client.'}
+                ? t('contacts.edit_desc')
+                : t('contacts.add_desc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -90,7 +93,7 @@ export function ContactDialog({
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="first_name">First Name *</Label>
+                <Label htmlFor="first_name">{t('contacts.first_name')} *</Label>
                 <Input
                   id="first_name"
                   name="first_name"
@@ -99,7 +102,7 @@ export function ContactDialog({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="last_name">Last Name *</Label>
+                <Label htmlFor="last_name">{t('contacts.last_name')} *</Label>
                 <Input
                   id="last_name"
                   name="last_name"
@@ -110,33 +113,33 @@ export function ContactDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">{t('contacts.title_field')}</Label>
               <Input
                 id="title"
                 name="title"
-                placeholder="Project Manager"
+                placeholder={t('contacts.title_placeholder')}
                 defaultValue={contact?.title ?? ''}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('contacts.email')}</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="john@example.com"
+                placeholder={t('contacts.email_placeholder')}
                 defaultValue={contact?.email ?? ''}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">{t('contacts.phone')}</Label>
               <Input
                 id="phone"
                 name="phone"
                 type="tel"
-                placeholder="514-555-1234"
+                placeholder={t('contacts.phone_placeholder')}
                 defaultValue={contact?.phone ?? ''}
               />
             </div>
@@ -148,7 +151,7 @@ export function ContactDialog({
                 defaultChecked={contact?.is_primary ?? false}
               />
               <Label htmlFor="is_primary" className="cursor-pointer">
-                Primary contact
+                {t('contacts.is_primary')}
               </Label>
             </div>
           </div>
@@ -160,11 +163,11 @@ export function ContactDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isEdit ? 'Save Changes' : 'Add Contact'}
+              {isEdit ? tCommon('actions.save') : t('contacts.add_contact')}
             </Button>
           </DialogFooter>
         </form>

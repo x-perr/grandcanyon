@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,6 +32,9 @@ interface ClientFormProps {
 type FormState = { error?: string } | void
 
 export function ClientForm({ client, mode }: ClientFormProps) {
+  const t = useTranslations('clients')
+  const tCommon = useTranslations('common')
+
   const action = mode === 'create'
     ? createClientAction
     : updateClientAction.bind(null, client?.id ?? '')
@@ -50,7 +54,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
         <Button variant="ghost" size="sm" asChild>
           <Link href={client ? `/clients/${client.id}` : '/clients'}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to {client ? 'Client' : 'Clients'}
+            {tCommon('actions.back')}
           </Link>
         </Button>
       </div>
@@ -65,30 +69,30 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       {/* Basic Info */}
       <Card>
         <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
-          <CardDescription>Client identification and contact details</CardDescription>
+          <CardTitle>{t('form.basic_info')}</CardTitle>
+          <CardDescription>{t('form.basic_info_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="code">Client Code *</Label>
+            <Label htmlFor="code">{t('form.client_code')} *</Label>
             <Input
               id="code"
               name="code"
-              placeholder="ACME"
+              placeholder={t('form.client_code_placeholder')}
               defaultValue={client?.code ?? ''}
               className="uppercase"
               required
               maxLength={10}
             />
-            <p className="text-xs text-muted-foreground">2-10 uppercase letters/numbers</p>
+            <p className="text-xs text-muted-foreground">{t('form.client_code_help')}</p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="short_name">Short Name *</Label>
+            <Label htmlFor="short_name">{t('form.short_name')} *</Label>
             <Input
               id="short_name"
               name="short_name"
-              placeholder="Acme"
+              placeholder={t('form.short_name_placeholder')}
               defaultValue={client?.short_name ?? ''}
               required
               maxLength={50}
@@ -96,11 +100,11 @@ export function ClientForm({ client, mode }: ClientFormProps) {
           </div>
 
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="name">Full Name *</Label>
+            <Label htmlFor="name">{t('form.full_name')} *</Label>
             <Input
               id="name"
               name="name"
-              placeholder="Acme Corporation Inc."
+              placeholder={t('form.full_name_placeholder')}
               defaultValue={client?.name ?? ''}
               required
               maxLength={100}
@@ -108,34 +112,34 @@ export function ClientForm({ client, mode }: ClientFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="general_email">Email</Label>
+            <Label htmlFor="general_email">{t('form.email')}</Label>
             <Input
               id="general_email"
               name="general_email"
               type="email"
-              placeholder="contact@acme.com"
+              placeholder={t('form.email_placeholder')}
               defaultValue={client?.general_email ?? ''}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone">{t('form.phone')}</Label>
             <Input
               id="phone"
               name="phone"
               type="tel"
-              placeholder="514-555-1234"
+              placeholder={t('form.phone_placeholder')}
               defaultValue={client?.phone ?? ''}
             />
           </div>
 
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="website">Website</Label>
+            <Label htmlFor="website">{t('form.website')}</Label>
             <Input
               id="website"
               name="website"
               type="url"
-              placeholder="https://www.acme.com"
+              placeholder={t('form.website_placeholder')}
               defaultValue={client?.website ?? ''}
             />
           </div>
@@ -145,8 +149,8 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       {/* Tax Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Tax Settings</CardTitle>
-          <CardDescription>Configure tax charging for this client</CardDescription>
+          <CardTitle>{t('form.tax_settings')}</CardTitle>
+          <CardDescription>{t('form.tax_settings_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-2">
@@ -156,7 +160,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
               defaultChecked={client?.charges_gst ?? true}
             />
             <Label htmlFor="charges_gst" className="cursor-pointer">
-              Charge GST (5%)
+              {t('form.charge_gst')}
             </Label>
           </div>
           <div className="flex items-center space-x-2">
@@ -166,11 +170,11 @@ export function ClientForm({ client, mode }: ClientFormProps) {
               defaultChecked={client?.charges_qst ?? true}
             />
             <Label htmlFor="charges_qst" className="cursor-pointer">
-              Charge QST (9.975%)
+              {t('form.charge_qst')}
             </Label>
           </div>
           <div className="space-y-2 max-w-xs">
-            <Label htmlFor="next_project_number">Next Project Number</Label>
+            <Label htmlFor="next_project_number">{t('detail.next_project_number')}</Label>
             <Input
               id="next_project_number"
               name="next_project_number"
@@ -185,42 +189,42 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       {/* Postal Address */}
       <Card>
         <CardHeader>
-          <CardTitle>Postal Address</CardTitle>
-          <CardDescription>Main mailing address</CardDescription>
+          <CardTitle>{t('form.postal_address')}</CardTitle>
+          <CardDescription>{t('form.postal_address_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="postal_address_line1">Address Line 1</Label>
+            <Label htmlFor="postal_address_line1">{t('form.address_line1')}</Label>
             <Input
               id="postal_address_line1"
               name="postal_address_line1"
-              placeholder="123 Main Street"
+              placeholder={t('form.address_line1_placeholder')}
               defaultValue={client?.postal_address_line1 ?? ''}
             />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="postal_address_line2">Address Line 2</Label>
+            <Label htmlFor="postal_address_line2">{t('form.address_line2')}</Label>
             <Input
               id="postal_address_line2"
               name="postal_address_line2"
-              placeholder="Suite 100"
+              placeholder={t('form.address_line2_placeholder')}
               defaultValue={client?.postal_address_line2 ?? ''}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="postal_city">City</Label>
+            <Label htmlFor="postal_city">{t('form.city')}</Label>
             <Input
               id="postal_city"
               name="postal_city"
-              placeholder="Montreal"
+              placeholder={t('form.city_placeholder')}
               defaultValue={client?.postal_city ?? ''}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="postal_province">Province</Label>
+            <Label htmlFor="postal_province">{t('form.province')}</Label>
             <Select name="postal_province" defaultValue={client?.postal_province ?? ''}>
               <SelectTrigger>
-                <SelectValue placeholder="Select province" />
+                <SelectValue placeholder={t('form.select_province')} />
               </SelectTrigger>
               <SelectContent>
                 {provinces.map((p) => (
@@ -232,17 +236,17 @@ export function ClientForm({ client, mode }: ClientFormProps) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="postal_code">Postal Code</Label>
+            <Label htmlFor="postal_code">{t('form.postal_code')}</Label>
             <Input
               id="postal_code"
               name="postal_code"
-              placeholder="H2X 1Y1"
+              placeholder={t('form.postal_code_placeholder')}
               defaultValue={client?.postal_code ?? ''}
               className="uppercase"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="postal_country">Country</Label>
+            <Label htmlFor="postal_country">{tCommon('labels.country')}</Label>
             <Input
               id="postal_country"
               name="postal_country"
@@ -255,21 +259,21 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       {/* Billing Address */}
       <Card>
         <CardHeader>
-          <CardTitle>Billing Address</CardTitle>
-          <CardDescription>Address for invoices (leave empty to use postal address)</CardDescription>
+          <CardTitle>{t('form.billing_address')}</CardTitle>
+          <CardDescription>{t('form.billing_address_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="billing_address_line1">Address Line 1</Label>
+            <Label htmlFor="billing_address_line1">{t('form.address_line1')}</Label>
             <Input
               id="billing_address_line1"
               name="billing_address_line1"
-              placeholder="Same as postal if empty"
+              placeholder={t('form.same_as_postal')}
               defaultValue={client?.billing_address_line1 ?? ''}
             />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="billing_address_line2">Address Line 2</Label>
+            <Label htmlFor="billing_address_line2">{t('form.address_line2')}</Label>
             <Input
               id="billing_address_line2"
               name="billing_address_line2"
@@ -277,7 +281,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="billing_city">City</Label>
+            <Label htmlFor="billing_city">{t('form.city')}</Label>
             <Input
               id="billing_city"
               name="billing_city"
@@ -285,10 +289,10 @@ export function ClientForm({ client, mode }: ClientFormProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="billing_province">Province</Label>
+            <Label htmlFor="billing_province">{t('form.province')}</Label>
             <Select name="billing_province" defaultValue={client?.billing_province ?? ''}>
               <SelectTrigger>
-                <SelectValue placeholder="Select province" />
+                <SelectValue placeholder={t('form.select_province')} />
               </SelectTrigger>
               <SelectContent>
                 {provinces.map((p) => (
@@ -300,7 +304,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="billing_postal_code">Postal Code</Label>
+            <Label htmlFor="billing_postal_code">{t('form.postal_code')}</Label>
             <Input
               id="billing_postal_code"
               name="billing_postal_code"
@@ -309,12 +313,12 @@ export function ClientForm({ client, mode }: ClientFormProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="billing_email">Billing Email</Label>
+            <Label htmlFor="billing_email">{t('form.billing_email')}</Label>
             <Input
               id="billing_email"
               name="billing_email"
               type="email"
-              placeholder="billing@acme.com"
+              placeholder={t('form.billing_email_placeholder')}
               defaultValue={client?.billing_email ?? ''}
             />
           </div>
@@ -324,15 +328,15 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       {/* Notes */}
       <Card>
         <CardHeader>
-          <CardTitle>Notes</CardTitle>
-          <CardDescription>Internal notes about this client</CardDescription>
+          <CardTitle>{tCommon('labels.notes')}</CardTitle>
+          <CardDescription>{t('form.notes_desc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Textarea
             id="notes"
             name="notes"
             rows={4}
-            placeholder="Any special instructions or notes..."
+            placeholder={t('form.notes_placeholder')}
             defaultValue={client?.notes ?? ''}
           />
         </CardContent>
@@ -341,11 +345,11 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       {/* Submit */}
       <div className="flex justify-end gap-4">
         <Button type="button" variant="outline" asChild>
-          <Link href={client ? `/clients/${client.id}` : '/clients'}>Cancel</Link>
+          <Link href={client ? `/clients/${client.id}` : '/clients'}>{tCommon('actions.cancel')}</Link>
         </Button>
         <Button type="submit" disabled={isPending}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {mode === 'create' ? 'Create Client' : 'Save Changes'}
+          {mode === 'create' ? tCommon('actions.create') : tCommon('actions.save')}
         </Button>
       </div>
     </form>

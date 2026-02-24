@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import {
   ArrowLeft,
   Building2,
@@ -36,7 +37,13 @@ interface ClientDetailPageProps {
 
 export default async function ClientDetailPage({ params }: ClientDetailPageProps) {
   const { id } = await params
-  const [client, permissions] = await Promise.all([getClient(id), getUserPermissions()])
+  const [client, permissions, t, tCommon, tProjects] = await Promise.all([
+    getClient(id),
+    getUserPermissions(),
+    getTranslations('clients'),
+    getTranslations('common'),
+    getTranslations('projects'),
+  ])
 
   if (!client) {
     notFound()
@@ -72,7 +79,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
         <Button variant="ghost" size="sm" asChild>
           <Link href="/clients">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Clients
+            {tCommon('actions.back')}
           </Link>
         </Button>
       </div>
@@ -99,7 +106,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
           <Button asChild>
             <Link href={`/clients/${client.id}/edit`}>
               <Pencil className="mr-2 h-4 w-4" />
-              Edit Client
+              {t('edit_client')}
             </Link>
           </Button>
         )}
@@ -108,12 +115,12 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
       {/* Tabs */}
       <Tabs defaultValue="details">
         <TabsList>
-          <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="details">{t('tabs.details')}</TabsTrigger>
           <TabsTrigger value="contacts">
-            Contacts ({client.contacts?.length ?? 0})
+            {t('tabs.contacts')} ({client.contacts?.length ?? 0})
           </TabsTrigger>
           <TabsTrigger value="projects">
-            Projects ({client.projects?.length ?? 0})
+            {t('tabs.projects')} ({client.projects?.length ?? 0})
           </TabsTrigger>
         </TabsList>
 
@@ -123,7 +130,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
             {/* Contact Info */}
             <Card>
               <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
+                <CardTitle>{t('detail.contact_info')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {client.general_email && (
@@ -159,7 +166,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
                   </div>
                 )}
                 {!client.general_email && !client.phone && !client.website && (
-                  <p className="text-sm text-muted-foreground">No contact information</p>
+                  <p className="text-sm text-muted-foreground">{t('detail.no_contact_info')}</p>
                 )}
               </CardContent>
             </Card>
@@ -167,23 +174,23 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
             {/* Tax Settings */}
             <Card>
               <CardHeader>
-                <CardTitle>Tax Settings</CardTitle>
+                <CardTitle>{t('form.tax_settings')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span>GST (5%)</span>
+                  <span>{t('detail.gst_label')}</span>
                   <Badge variant={client.charges_gst ? 'default' : 'secondary'}>
-                    {client.charges_gst ? 'Charged' : 'Not Charged'}
+                    {client.charges_gst ? t('detail.charged') : t('detail.not_charged')}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>QST (9.975%)</span>
+                  <span>{t('detail.qst_label')}</span>
                   <Badge variant={client.charges_qst ? 'default' : 'secondary'}>
-                    {client.charges_qst ? 'Charged' : 'Not Charged'}
+                    {client.charges_qst ? t('detail.charged') : t('detail.not_charged')}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t">
-                  <span className="text-muted-foreground">Next Project #</span>
+                  <span className="text-muted-foreground">{t('detail.next_project_number')}</span>
                   <span className="font-mono">{client.next_project_number ?? 1}</span>
                 </div>
               </CardContent>
@@ -192,7 +199,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
             {/* Postal Address */}
             <Card>
               <CardHeader>
-                <CardTitle>Postal Address</CardTitle>
+                <CardTitle>{t('form.postal_address')}</CardTitle>
               </CardHeader>
               <CardContent>
                 {formatAddress('postal') ? (
@@ -203,7 +210,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
                     </address>
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">No address</p>
+                  <p className="text-sm text-muted-foreground">{t('detail.no_address')}</p>
                 )}
               </CardContent>
             </Card>
@@ -211,7 +218,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
             {/* Billing Address */}
             <Card>
               <CardHeader>
-                <CardTitle>Billing Address</CardTitle>
+                <CardTitle>{t('form.billing_address')}</CardTitle>
                 {client.billing_email && (
                   <CardDescription>
                     <a
@@ -232,7 +239,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
                     </address>
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Same as postal address</p>
+                  <p className="text-sm text-muted-foreground">{t('form.same_as_postal')}</p>
                 )}
               </CardContent>
             </Card>
@@ -242,7 +249,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
           {client.notes && (
             <Card>
               <CardHeader>
-                <CardTitle>Notes</CardTitle>
+                <CardTitle>{tCommon('labels.notes')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="whitespace-pre-wrap">{client.notes}</p>
@@ -264,12 +271,12 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
         <TabsContent value="projects">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Projects ({client.projects?.length ?? 0})</h3>
+              <h3 className="text-lg font-medium">{t('tabs.projects')} ({client.projects?.length ?? 0})</h3>
               {canEdit && (
                 <Button size="sm" asChild>
                   <Link href={`/projects/new?client=${client.id}`}>
                     <FolderOpen className="mr-2 h-4 w-4" />
-                    New Project
+                    {tProjects('new_project')}
                   </Link>
                 </Button>
               )}
@@ -279,7 +286,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-8">
                   <FolderOpen className="h-10 w-10 text-muted-foreground/50" />
-                  <p className="mt-2 text-sm text-muted-foreground">No projects yet</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{t('detail.no_projects')}</p>
                 </CardContent>
               </Card>
             ) : (
@@ -295,7 +302,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
                         <p className="text-sm text-muted-foreground">{project.name}</p>
                       </div>
                       <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/projects/${project.id}`}>View</Link>
+                        <Link href={`/projects/${project.id}`}>{tCommon('actions.view')}</Link>
                       </Button>
                     </CardContent>
                   </Card>

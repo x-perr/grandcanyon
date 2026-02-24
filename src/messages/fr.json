@@ -223,6 +223,9 @@
     "no_clients": "Aucun client",
     "no_clients_message": "Commencez par créer votre premier client.",
     "search_placeholder": "Rechercher des clients...",
+    "list": {
+      "search_empty": "Essayez d'ajuster vos termes de recherche"
+    },
     "form": {
       "basic_info": "Informations de base",
       "basic_info_desc": "Identification et coordonnées du client",
@@ -259,7 +262,9 @@
       "charge_gst": "Facturer la TPS (5%)",
       "charge_qst": "Facturer la TVQ (9,975%)",
       "billing_email": "Courriel de facturation",
-      "billing_email_placeholder": "comptabilite@client.ca"
+      "billing_email_placeholder": "comptabilite@client.ca",
+      "notes_desc": "Notes internes sur ce client",
+      "notes_placeholder": "Instructions spéciales ou notes..."
     },
     "tabs": {
       "details": "Détails",
@@ -270,18 +275,27 @@
       "title": "Contacts",
       "add_contact": "Ajouter un contact",
       "edit_contact": "Modifier le contact",
+      "add_desc": "Ajouter un nouveau contact pour ce client.",
+      "edit_desc": "Modifier les informations du contact.",
       "no_contacts": "Aucun contact",
       "no_contacts_message": "Ajoutez des contacts pour ce client.",
+      "first_name": "Prénom",
+      "last_name": "Nom",
       "name": "Nom",
       "title_field": "Titre",
+      "title_placeholder": "Chargé de projet",
       "email": "Courriel",
+      "email_placeholder": "jean@exemple.ca",
       "phone": "Téléphone",
+      "phone_placeholder": "514-555-1234",
       "is_primary": "Contact principal",
+      "delete_title": "Supprimer le contact",
+      "delete_message": "Êtes-vous sûr de vouloir supprimer {name}? Cette action est irréversible.",
       "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce contact?"
     },
     "delete": {
       "title": "Supprimer le client",
-      "message": "Êtes-vous sûr de vouloir supprimer ce client? Cette action est irréversible et supprimera toutes les données associées.",
+      "message": "Êtes-vous sûr de vouloir supprimer {name}? Cette action peut être annulée par un administrateur.",
       "has_projects": "Ce client a des projets associés. Veuillez d'abord supprimer ou réassigner les projets."
     },
     "toast": {
@@ -291,6 +305,18 @@
       "error_create": "Erreur lors de la création du client",
       "error_update": "Erreur lors de la mise à jour du client",
       "error_delete": "Erreur lors de la suppression du client"
+    },
+    "detail": {
+      "contact_info": "Coordonnées",
+      "no_contact_info": "Aucune coordonnée",
+      "gst_label": "TPS (5%)",
+      "qst_label": "TVQ (9,975%)",
+      "charged": "Facturée",
+      "not_charged": "Non facturée",
+      "next_project_number": "Prochain no. projet",
+      "no_address": "Aucune adresse",
+      "no_projects": "Aucun projet",
+      "editing_client": "Modifier les informations pour {name}"
     }
   },
   "projects": {
