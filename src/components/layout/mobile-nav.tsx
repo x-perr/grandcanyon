@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { NAV_ITEMS, filterNavByPermissions } from '@/lib/navigation'
@@ -14,6 +15,7 @@ interface MobileNavProps {
 
 export function MobileNav({ open, onOpenChange, permissions }: MobileNavProps) {
   const pathname = usePathname()
+  const t = useTranslations('nav')
   const filteredItems = filterNavByPermissions(NAV_ITEMS, permissions)
 
   return (
@@ -45,7 +47,7 @@ export function MobileNav({ open, onOpenChange, permissions }: MobileNavProps) {
                 )}
               >
                 <Icon className="h-4 w-4" />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             )
           })}

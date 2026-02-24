@@ -1,0 +1,744 @@
+{
+  "common": {
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "create": "Create",
+      "add": "Add",
+      "remove": "Remove",
+      "search": "Search",
+      "filter": "Filter",
+      "export": "Export",
+      "submit": "Submit",
+      "approve": "Approve",
+      "reject": "Reject",
+      "next": "Next",
+      "previous": "Previous",
+      "back": "Back",
+      "view": "View",
+      "send": "Send",
+      "download": "Download",
+      "upload": "Upload",
+      "close": "Close",
+      "confirm": "Confirm",
+      "copy": "Copy",
+      "refresh": "Refresh",
+      "loading": "Loading...",
+      "saving": "Saving...",
+      "deleting": "Deleting...",
+      "select": "Select"
+    },
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "inactive": "Inactive",
+      "on_hold": "On Hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "submitted": "Submitted",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "sent": "Sent",
+      "paid": "Paid",
+      "void": "Void",
+      "locked": "Locked",
+      "pending": "Pending",
+      "delivered": "Delivered",
+      "bounced": "Bounced",
+      "failed": "Failed"
+    },
+    "labels": {
+      "from": "From",
+      "to": "To",
+      "date": "Date",
+      "status": "Status",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "notes": "Notes",
+      "description": "Description",
+      "amount": "Amount",
+      "quantity": "Quantity",
+      "rate": "Rate",
+      "hours": "Hours",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "city": "City",
+      "province": "Province",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "website": "Website",
+      "code": "Code",
+      "type": "Type",
+      "actions": "Actions",
+      "details": "Details",
+      "summary": "Summary",
+      "period": "Period",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year",
+      "all": "All",
+      "none": "None",
+      "yes": "Yes",
+      "no": "No",
+      "or": "or",
+      "and": "and"
+    },
+    "time": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "this_week": "This Week",
+      "last_week": "Last Week",
+      "this_month": "This Month",
+      "last_month": "Last Month",
+      "this_quarter": "This Quarter",
+      "last_quarter": "Last Quarter",
+      "this_year": "This Year",
+      "last_year": "Last Year",
+      "custom": "Custom"
+    },
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "pagination": {
+      "showing": "Showing {start} to {end} of {total}",
+      "page_of": "Page {current} of {total}",
+      "per_page": "per page",
+      "no_results": "No results"
+    },
+    "validation": {
+      "required": "This field is required",
+      "invalid_email": "Invalid email",
+      "min_length": "Minimum {min} characters",
+      "max_length": "Maximum {max} characters"
+    },
+    "errors": {
+      "generic": "An error occurred",
+      "not_found": "Not found",
+      "unauthorized": "Unauthorized",
+      "forbidden": "Access denied"
+    },
+    "confirm_delete": {
+      "title": "Confirm Deletion",
+      "message": "Are you sure you want to delete this item? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "clients": "Clients",
+    "projects": "Projects",
+    "timesheets": "Timesheets",
+    "expenses": "Expenses",
+    "invoices": "Invoices",
+    "reports": "Reports",
+    "admin": "Admin"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign In",
+      "subtitle": "Enter your credentials to access your account",
+      "email": "Email",
+      "email_placeholder": "name@company.ca",
+      "password": "Password",
+      "password_placeholder": "Enter your password",
+      "submit": "Sign In",
+      "error": "Invalid email or password",
+      "logging_in": "Signing in..."
+    },
+    "logout": "Sign Out",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "language": {
+    "title": "Language",
+    "french": "Français",
+    "english": "English",
+    "change_to": "Change to {lang}"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, {name}",
+    "subtitle": "Here's what's happening with your projects today.",
+    "cards": {
+      "open_timesheets": "Open Timesheets",
+      "awaiting_submission": "Awaiting submission",
+      "hours_this_week": "Hours This Week",
+      "your_hours": "your hours",
+      "pending_approvals": "{count} pending approval",
+      "all_caught_up": "All caught up",
+      "draft_invoices": "Draft Invoices",
+      "ready_to_send": "Ready to send",
+      "outstanding": "Outstanding",
+      "across_invoices": "across {count} invoices",
+      "active_projects": "Active Projects",
+      "your_projects": "your projects"
+    },
+    "quick_actions": {
+      "title": "Quick Actions",
+      "subtitle": "Common tasks and shortcuts",
+      "new_timesheet": "New Timesheet",
+      "enter_hours": "Enter this week's hours",
+      "new_project": "New Project",
+      "create_project": "Create a new project",
+      "new_expense": "New Expense",
+      "log_expense": "Log an expense",
+      "view_reports": "View Reports",
+      "reports_insights": "Analytics and insights"
+    },
+    "recent_activity": {
+      "title": "Recent Activity",
+      "subtitle": "Latest updates from your team",
+      "no_activity": "No recent activity",
+      "submitted_timesheet": "{name} submitted a timesheet",
+      "approved_timesheet": "{name} approved a timesheet",
+      "submitted_expense": "{name} submitted expenses",
+      "created_invoice": "Invoice #{number} created",
+      "sent_invoice": "Invoice #{number} sent",
+      "paid_invoice": "Invoice #{number} paid"
+    }
+  },
+  "clients": {
+    "title": "Clients",
+    "subtitle": "Manage your client companies and contacts",
+    "new_client": "New Client",
+    "edit_client": "Edit Client",
+    "no_clients": "No clients",
+    "no_clients_message": "Get started by creating your first client.",
+    "search_placeholder": "Search clients...",
+    "form": {
+      "basic_info": "Basic Information",
+      "basic_info_desc": "Client identification and contact details",
+      "client_code": "Client Code",
+      "client_code_placeholder": "e.g., ABC",
+      "client_code_help": "Short unique code to identify this client",
+      "short_name": "Short Name",
+      "short_name_placeholder": "Abbreviated name",
+      "full_name": "Full Name",
+      "full_name_placeholder": "Full legal name",
+      "email": "Email",
+      "email_placeholder": "contact@client.ca",
+      "phone": "Phone",
+      "phone_placeholder": "514-555-1234",
+      "website": "Website",
+      "website_placeholder": "https://www.client.ca",
+      "postal_address": "Postal Address",
+      "postal_address_desc": "Primary address for this client",
+      "address_line1": "Address",
+      "address_line1_placeholder": "123 Main Street",
+      "address_line2": "Address (suite)",
+      "address_line2_placeholder": "Suite 100",
+      "city": "City",
+      "city_placeholder": "Montreal",
+      "province": "Province",
+      "select_province": "Select province",
+      "postal_code": "Postal Code",
+      "postal_code_placeholder": "H2X 1Y1",
+      "billing_address": "Billing Address",
+      "billing_address_desc": "Address for invoices (leave empty to use postal address)",
+      "same_as_postal": "Same as postal address",
+      "tax_settings": "Tax Settings",
+      "tax_settings_desc": "Configure tax billing for this client",
+      "charge_gst": "Charge GST (5%)",
+      "charge_qst": "Charge QST (9.975%)",
+      "billing_email": "Billing Email",
+      "billing_email_placeholder": "accounting@client.ca"
+    },
+    "tabs": {
+      "details": "Details",
+      "contacts": "Contacts",
+      "projects": "Projects"
+    },
+    "contacts": {
+      "title": "Contacts",
+      "add_contact": "Add Contact",
+      "edit_contact": "Edit Contact",
+      "no_contacts": "No contacts",
+      "no_contacts_message": "Add contacts for this client.",
+      "name": "Name",
+      "title_field": "Title",
+      "email": "Email",
+      "phone": "Phone",
+      "is_primary": "Primary Contact",
+      "delete_confirm": "Are you sure you want to delete this contact?"
+    },
+    "delete": {
+      "title": "Delete Client",
+      "message": "Are you sure you want to delete this client? This action cannot be undone and will delete all associated data.",
+      "has_projects": "This client has associated projects. Please delete or reassign the projects first."
+    },
+    "toast": {
+      "created": "Client created successfully",
+      "updated": "Client updated successfully",
+      "deleted": "Client deleted successfully",
+      "error_create": "Error creating client",
+      "error_update": "Error updating client",
+      "error_delete": "Error deleting client"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Manage your construction projects",
+    "new_project": "New Project",
+    "edit_project": "Edit Project",
+    "no_projects": "No projects",
+    "no_projects_message": "Get started by creating your first project.",
+    "search_placeholder": "Search projects...",
+    "filter_status": "Filter by status",
+    "all_statuses": "All statuses",
+    "form": {
+      "basic_info": "Basic Information",
+      "basic_info_desc": "Project identification and settings",
+      "project_code": "Project Code",
+      "project_code_help": "Auto-generated from client code",
+      "name": "Project Name",
+      "name_placeholder": "Descriptive project name",
+      "client": "Client",
+      "select_client": "Select a client",
+      "status": "Status",
+      "select_status": "Select status",
+      "billing_info": "Billing",
+      "billing_info_desc": "Project billing settings",
+      "billing_type": "Billing Type",
+      "select_billing_type": "Select type",
+      "billing_types": {
+        "hourly": "Hourly",
+        "fixed": "Fixed",
+        "per_unit": "Per Unit"
+      },
+      "hourly_rate": "Hourly Rate",
+      "fixed_amount": "Fixed Amount",
+      "unit_price": "Unit Price",
+      "budget_hours": "Budget Hours",
+      "budget_amount": "Budget Amount"
+    },
+    "tabs": {
+      "details": "Details",
+      "team": "Team",
+      "tasks": "Tasks",
+      "billing_roles": "Billing Roles"
+    },
+    "team": {
+      "title": "Project Team",
+      "add_member": "Add Member",
+      "edit_member": "Edit Member",
+      "no_members": "No members",
+      "no_members_message": "Add team members to this project.",
+      "member": "Member",
+      "select_member": "Select member",
+      "billing_role": "Billing Role",
+      "select_role": "Select role",
+      "remove_confirm": "Remove this member from the team?"
+    },
+    "tasks": {
+      "title": "Tasks",
+      "add_task": "Add Task",
+      "edit_task": "Edit Task",
+      "no_tasks": "No tasks",
+      "no_tasks_message": "Add tasks for this project.",
+      "task_code": "Code",
+      "task_name": "Task Name",
+      "task_name_placeholder": "Task description",
+      "billable": "Billable",
+      "delete_confirm": "Delete this task?"
+    },
+    "billing_roles": {
+      "title": "Billing Roles",
+      "add_role": "Add Role",
+      "edit_role": "Edit Role",
+      "no_roles": "No roles",
+      "no_roles_message": "Add billing roles for this project.",
+      "role_name": "Role Name",
+      "role_name_placeholder": "e.g., Project Manager",
+      "hourly_rate": "Hourly Rate",
+      "delete_confirm": "Delete this role?"
+    },
+    "delete": {
+      "title": "Delete Project",
+      "message": "Are you sure you want to delete this project? This action cannot be undone."
+    },
+    "toast": {
+      "created": "Project created successfully",
+      "updated": "Project updated successfully",
+      "deleted": "Project deleted successfully"
+    }
+  },
+  "timesheets": {
+    "title": "Timesheets",
+    "my_timesheets": "My Timesheets",
+    "team_approvals": "Team Approvals",
+    "no_timesheets": "No timesheets",
+    "no_timesheets_message": "Start tracking your time by entering hours for the current week.",
+    "enter_current_week": "Enter Current Week",
+    "current_week": "(Current Week)",
+    "week_of": "Week of {date}",
+    "search_placeholder": "Search...",
+    "filter_status": "Filter by status",
+    "all_statuses": "All statuses",
+    "entry": {
+      "title": "Time Entry",
+      "add_entry": "Add Entry",
+      "project": "Project",
+      "select_project": "Select project",
+      "task": "Task",
+      "select_task": "Select task",
+      "role": "Role",
+      "select_role": "Select role",
+      "no_projects": "No projects available",
+      "delete_confirm": "Delete this entry?"
+    },
+    "table": {
+      "project": "Project",
+      "task": "Task",
+      "role": "Role",
+      "total": "Total",
+      "grand_total": "Grand Total"
+    },
+    "actions": {
+      "submit": "Submit",
+      "submit_confirm": "Submit this timesheet for approval?",
+      "copy_previous": "Copy Previous Week",
+      "copy_confirm": "Copy entries from previous week? This will replace current entries.",
+      "save_draft": "Save Draft"
+    },
+    "approval": {
+      "title": "Approval",
+      "no_pending": "No pending approvals",
+      "no_pending_message": "There are no timesheets waiting for approval.",
+      "submitted_by": "Submitted by",
+      "submitted_on": "Submitted on",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approve_confirm": "Approve this timesheet?",
+      "reject_confirm": "Reject this timesheet?",
+      "rejection_reason": "Rejection reason",
+      "rejection_reason_placeholder": "Explain why this timesheet is being rejected..."
+    },
+    "toast": {
+      "saved": "Timesheet saved",
+      "submitted": "Timesheet submitted",
+      "approved": "Timesheet approved",
+      "rejected": "Timesheet rejected",
+      "copied": "Entries copied from previous week"
+    }
+  },
+  "expenses": {
+    "title": "Expenses",
+    "my_expenses": "My Expenses",
+    "team_approvals": "Team Approvals",
+    "no_expenses": "No expenses",
+    "no_expenses_message": "Start logging your expenses for the week.",
+    "enter_current_week": "Enter Current Week",
+    "week_of": "Week of {date}",
+    "entry": {
+      "title": "Expense",
+      "add_expense": "Add Expense",
+      "edit_expense": "Edit Expense",
+      "expense_type": "Expense Type",
+      "select_type": "Select type",
+      "project": "Project",
+      "select_project": "Select project",
+      "date": "Date",
+      "amount": "Amount",
+      "amount_before_tax": "Amount before taxes",
+      "gst": "GST",
+      "qst": "QST",
+      "total": "Total",
+      "description": "Description",
+      "description_placeholder": "Expense description...",
+      "billable": "Billable to client",
+      "receipt_number": "Receipt No.",
+      "receipt_number_placeholder": "Optional receipt number",
+      "delete_confirm": "Delete this expense?"
+    },
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "project": "Project",
+      "description": "Description",
+      "amount": "Amount",
+      "taxes": "Taxes",
+      "total": "Total",
+      "billable": "Bill."
+    },
+    "summary": {
+      "total_expenses": "Total Expenses",
+      "total_gst": "Total GST",
+      "total_qst": "Total QST",
+      "grand_total": "Grand Total"
+    },
+    "actions": {
+      "submit": "Submit",
+      "submit_confirm": "Submit these expenses for approval?",
+      "copy_previous": "Copy Previous Week"
+    },
+    "approval": {
+      "title": "Approval",
+      "no_pending": "No pending approvals",
+      "no_pending_message": "There are no expenses waiting for approval.",
+      "submitted_by": "Submitted by",
+      "submitted_on": "Submitted on",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "toast": {
+      "saved": "Expense saved",
+      "deleted": "Expense deleted",
+      "submitted": "Expenses submitted",
+      "approved": "Expenses approved",
+      "rejected": "Expenses rejected"
+    }
+  },
+  "invoices": {
+    "title": "Invoices",
+    "subtitle": "Create and manage client invoices",
+    "new_invoice": "New Invoice",
+    "no_invoices": "No invoices",
+    "no_invoices_message": "Get started by creating your first invoice.",
+    "search_placeholder": "Search invoices...",
+    "filter_status": "Status",
+    "filter_client": "Client",
+    "filter_year": "Year",
+    "all_statuses": "All statuses",
+    "all_clients": "All clients",
+    "all_years": "All years",
+    "summary": {
+      "draft": "Draft",
+      "outstanding": "Outstanding",
+      "paid_ytd": "Paid (YTD)"
+    },
+    "list": {
+      "invoice_number": "Invoice #",
+      "client": "Client",
+      "project": "Project",
+      "date": "Date",
+      "due_date": "Due Date",
+      "total": "Total",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "wizard": {
+      "title": "New Invoice",
+      "step1_title": "Select Project",
+      "step1_desc": "Choose the client and project to invoice",
+      "step2_title": "Select Entries",
+      "step2_desc": "Select time entries to include",
+      "step3_title": "Review & Create",
+      "step3_desc": "Review details and create the invoice",
+      "select_client": "Select a client",
+      "select_project": "Select a project",
+      "no_entries": "No entries available",
+      "no_entries_message": "There are no approved, unbilled time entries for this project.",
+      "select_all": "Select All",
+      "deselect_all": "Deselect All",
+      "selected_entries": "{count} entries selected",
+      "total_hours": "Total Hours",
+      "total_amount": "Total Amount",
+      "invoice_date": "Invoice Date",
+      "due_date": "Due Date",
+      "period_start": "Period Start",
+      "period_end": "Period End",
+      "notes": "Notes",
+      "notes_placeholder": "Additional notes for the invoice...",
+      "create_invoice": "Create Invoice"
+    },
+    "detail": {
+      "invoice_info": "Information",
+      "line_items": "Line Items",
+      "invoice_number": "Invoice Number",
+      "client": "Client",
+      "project": "Project",
+      "invoice_date": "Invoice Date",
+      "due_date": "Due Date",
+      "period": "Period",
+      "status": "Status",
+      "subtotal": "Subtotal",
+      "gst": "GST (5%)",
+      "qst": "QST (9.975%)",
+      "total": "Total",
+      "notes": "Notes",
+      "email_history": "Email History"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "download_pdf": "Download PDF",
+      "send": "Send",
+      "mark_paid": "Mark Paid",
+      "cancel": "Cancel",
+      "mark_paid_confirm": "Mark this invoice as paid?",
+      "cancel_confirm": "Cancel this invoice? This action cannot be undone."
+    },
+    "send": {
+      "title": "Send Invoice",
+      "to": "To",
+      "to_placeholder": "email@address.ca",
+      "no_email_warning": "This client does not have a billing email address.",
+      "subject": "Subject",
+      "message": "Custom Message",
+      "message_placeholder": "Add a custom message (optional)...",
+      "preview": "Preview",
+      "send_invoice": "Send Invoice",
+      "sending": "Sending..."
+    },
+    "email_history": {
+      "title": "Email History",
+      "no_emails": "No emails sent",
+      "sent_to": "Sent to",
+      "sent_by": "By",
+      "sent_at": "On",
+      "status": "Status"
+    },
+    "edit": {
+      "title": "Edit Invoice",
+      "dates": "Dates",
+      "invoice_date": "Invoice Date",
+      "due_date": "Due Date",
+      "notes": "Notes"
+    },
+    "toast": {
+      "created": "Invoice created successfully",
+      "updated": "Invoice updated",
+      "sent": "Invoice sent successfully",
+      "marked_paid": "Invoice marked as paid",
+      "cancelled": "Invoice cancelled",
+      "error_send": "Error sending invoice"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Analytics and insights for your business",
+    "filters": {
+      "date_range": "Date Range",
+      "project": "Project",
+      "client": "Client",
+      "user": "User",
+      "all_projects": "All projects",
+      "all_clients": "All clients",
+      "all_users": "All users",
+      "apply": "Apply",
+      "reset": "Reset"
+    },
+    "export": {
+      "csv": "Export CSV",
+      "pdf": "Export PDF"
+    },
+    "timesheets": {
+      "title": "Timesheet Report",
+      "subtitle": "Hours by user and project",
+      "description": "Analyze hours worked by employee, project, and period.",
+      "columns": {
+        "user": "User",
+        "project": "Project",
+        "task": "Task",
+        "hours": "Hours",
+        "billable_hours": "Billable Hours",
+        "non_billable_hours": "Non-Billable Hours"
+      },
+      "summary": {
+        "total_hours": "Total Hours",
+        "billable": "Billable",
+        "non_billable": "Non-Billable"
+      }
+    },
+    "invoices": {
+      "title": "Invoice Report",
+      "subtitle": "Accounts receivable aging analysis",
+      "description": "Track your unpaid invoices and accounts receivable aging.",
+      "aging": {
+        "current": "Current (0-30 days)",
+        "days_31_60": "31-60 days",
+        "days_61_90": "61-90 days",
+        "over_90": "Over 90 days",
+        "total": "Total Outstanding"
+      },
+      "columns": {
+        "invoice": "Invoice",
+        "client": "Client",
+        "date": "Date",
+        "due_date": "Due Date",
+        "amount": "Amount",
+        "age": "Age (days)"
+      }
+    },
+    "profitability": {
+      "title": "Profitability Report",
+      "subtitle": "Labor costs vs invoiced amounts",
+      "description": "Compare labor costs to invoiced amounts by project.",
+      "columns": {
+        "project": "Project",
+        "client": "Client",
+        "hours": "Hours",
+        "labor_cost": "Labor Cost",
+        "invoiced": "Invoiced",
+        "margin": "Margin",
+        "margin_percent": "Margin %"
+      },
+      "summary": {
+        "total_labor": "Total Costs",
+        "total_invoiced": "Total Invoiced",
+        "total_margin": "Total Margin"
+      }
+    }
+  },
+  "admin": {
+    "title": "Admin",
+    "subtitle": "Manage company and system settings",
+    "company_settings": {
+      "title": "Company Settings",
+      "subtitle": "This information appears on invoices and other documents",
+      "company_name": "Company Name",
+      "company_name_placeholder": "Your company name",
+      "address": "Address",
+      "address_placeholder": "123 Main Street",
+      "city": "City",
+      "city_placeholder": "Montreal",
+      "province": "Province",
+      "postal_code": "Postal Code",
+      "postal_code_placeholder": "H2X 1Y1",
+      "phone": "Phone",
+      "phone_placeholder": "514-555-1234",
+      "email": "Email",
+      "email_placeholder": "info@company.ca"
+    },
+    "tax_numbers": {
+      "title": "Tax Numbers",
+      "subtitle": "These numbers appear in the invoice footer",
+      "gst_number": "GST/TPS Number",
+      "gst_number_placeholder": "123456789 RT0001",
+      "qst_number": "QST/TVQ Number",
+      "qst_number_placeholder": "1234567890 TQ0001"
+    },
+    "logo": {
+      "title": "Company Logo",
+      "subtitle": "Logo appears on invoice PDFs. Accepted formats: PNG, JPG, SVG (max 2MB)",
+      "upload": "Upload",
+      "replace": "Replace",
+      "remove": "Remove",
+      "recommended": "Recommended: Square logo, minimum 200x200 pixels"
+    },
+    "toast": {
+      "saved": "Settings saved successfully",
+      "logo_uploaded": "Logo uploaded successfully",
+      "logo_removed": "Logo removed",
+      "error": "Error saving settings"
+    }
+  }
+}

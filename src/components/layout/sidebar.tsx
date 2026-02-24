@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { NAV_ITEMS, filterNavByPermissions } from '@/lib/navigation'
 
@@ -11,6 +12,7 @@ interface SidebarProps {
 
 export function Sidebar({ permissions }: SidebarProps) {
   const pathname = usePathname()
+  const t = useTranslations('nav')
   const filteredItems = filterNavByPermissions(NAV_ITEMS, permissions)
 
   return (
@@ -32,7 +34,7 @@ export function Sidebar({ permissions }: SidebarProps) {
               )}
             >
               <Icon className="h-4 w-4" />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           )
         })}

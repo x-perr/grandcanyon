@@ -1,0 +1,744 @@
+{
+  "common": {
+    "actions": {
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "create": "Créer",
+      "add": "Ajouter",
+      "remove": "Retirer",
+      "search": "Rechercher",
+      "filter": "Filtrer",
+      "export": "Exporter",
+      "submit": "Soumettre",
+      "approve": "Approuver",
+      "reject": "Refuser",
+      "next": "Suivant",
+      "previous": "Précédent",
+      "back": "Retour",
+      "view": "Voir",
+      "send": "Envoyer",
+      "download": "Télécharger",
+      "upload": "Téléverser",
+      "close": "Fermer",
+      "confirm": "Confirmer",
+      "copy": "Copier",
+      "refresh": "Actualiser",
+      "loading": "Chargement...",
+      "saving": "Enregistrement...",
+      "deleting": "Suppression...",
+      "select": "Sélectionner"
+    },
+    "status": {
+      "draft": "Brouillon",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "on_hold": "En attente",
+      "completed": "Terminé",
+      "cancelled": "Annulé",
+      "submitted": "Soumis",
+      "approved": "Approuvé",
+      "rejected": "Refusé",
+      "sent": "Envoyé",
+      "paid": "Payé",
+      "void": "Annulé",
+      "locked": "Verrouillé",
+      "pending": "En attente",
+      "delivered": "Livré",
+      "bounced": "Rebondi",
+      "failed": "Échoué"
+    },
+    "labels": {
+      "from": "De",
+      "to": "À",
+      "date": "Date",
+      "status": "Statut",
+      "total": "Total",
+      "subtotal": "Sous-total",
+      "notes": "Notes",
+      "description": "Description",
+      "amount": "Montant",
+      "quantity": "Quantité",
+      "rate": "Taux",
+      "hours": "Heures",
+      "name": "Nom",
+      "email": "Courriel",
+      "phone": "Téléphone",
+      "address": "Adresse",
+      "city": "Ville",
+      "province": "Province",
+      "postalCode": "Code postal",
+      "country": "Pays",
+      "website": "Site web",
+      "code": "Code",
+      "type": "Type",
+      "actions": "Actions",
+      "details": "Détails",
+      "summary": "Sommaire",
+      "period": "Période",
+      "week": "Semaine",
+      "month": "Mois",
+      "year": "Année",
+      "all": "Tous",
+      "none": "Aucun",
+      "yes": "Oui",
+      "no": "Non",
+      "or": "ou",
+      "and": "et"
+    },
+    "time": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "this_week": "Cette semaine",
+      "last_week": "Semaine dernière",
+      "this_month": "Ce mois",
+      "last_month": "Mois dernier",
+      "this_quarter": "Ce trimestre",
+      "last_quarter": "Trimestre dernier",
+      "this_year": "Cette année",
+      "last_year": "Année dernière",
+      "custom": "Personnalisé"
+    },
+    "days": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mer",
+      "thu": "Jeu",
+      "fri": "Ven",
+      "sat": "Sam",
+      "sun": "Dim",
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche"
+    },
+    "pagination": {
+      "showing": "Affichage de {start} à {end} sur {total}",
+      "page_of": "Page {current} de {total}",
+      "per_page": "par page",
+      "no_results": "Aucun résultat"
+    },
+    "validation": {
+      "required": "Ce champ est requis",
+      "invalid_email": "Courriel invalide",
+      "min_length": "Minimum {min} caractères",
+      "max_length": "Maximum {max} caractères"
+    },
+    "errors": {
+      "generic": "Une erreur s'est produite",
+      "not_found": "Non trouvé",
+      "unauthorized": "Non autorisé",
+      "forbidden": "Accès refusé"
+    },
+    "confirm_delete": {
+      "title": "Confirmer la suppression",
+      "message": "Êtes-vous sûr de vouloir supprimer cet élément? Cette action est irréversible.",
+      "confirm": "Supprimer",
+      "cancel": "Annuler"
+    }
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "clients": "Clients",
+    "projects": "Projets",
+    "timesheets": "Feuilles de temps",
+    "expenses": "Dépenses",
+    "invoices": "Factures",
+    "reports": "Rapports",
+    "admin": "Administration"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Entrez vos identifiants pour accéder à votre compte",
+      "email": "Courriel",
+      "email_placeholder": "nom@entreprise.ca",
+      "password": "Mot de passe",
+      "password_placeholder": "Entrez votre mot de passe",
+      "submit": "Se connecter",
+      "error": "Courriel ou mot de passe invalide",
+      "logging_in": "Connexion en cours..."
+    },
+    "logout": "Déconnexion",
+    "profile": "Profil",
+    "settings": "Paramètres"
+  },
+  "language": {
+    "title": "Langue",
+    "french": "Français",
+    "english": "English",
+    "change_to": "Changer pour {lang}"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "welcome": "Bon retour, {name}",
+    "subtitle": "Voici ce qui se passe avec vos projets aujourd'hui.",
+    "cards": {
+      "open_timesheets": "Feuilles de temps ouvertes",
+      "awaiting_submission": "En attente de soumission",
+      "hours_this_week": "Heures cette semaine",
+      "your_hours": "vos heures",
+      "pending_approvals": "{count} en attente d'approbation",
+      "all_caught_up": "Tout est à jour",
+      "draft_invoices": "Factures brouillon",
+      "ready_to_send": "Prêtes à envoyer",
+      "outstanding": "À recevoir",
+      "across_invoices": "sur {count} factures",
+      "active_projects": "Projets actifs",
+      "your_projects": "vos projets"
+    },
+    "quick_actions": {
+      "title": "Actions rapides",
+      "subtitle": "Tâches courantes et raccourcis",
+      "new_timesheet": "Nouvelle feuille de temps",
+      "enter_hours": "Entrer les heures de la semaine",
+      "new_project": "Nouveau projet",
+      "create_project": "Créer un nouveau projet",
+      "new_expense": "Nouvelle dépense",
+      "log_expense": "Enregistrer une dépense",
+      "view_reports": "Voir les rapports",
+      "reports_insights": "Analyses et statistiques"
+    },
+    "recent_activity": {
+      "title": "Activité récente",
+      "subtitle": "Dernières mises à jour de votre équipe",
+      "no_activity": "Aucune activité récente",
+      "submitted_timesheet": "{name} a soumis une feuille de temps",
+      "approved_timesheet": "{name} a approuvé une feuille de temps",
+      "submitted_expense": "{name} a soumis des dépenses",
+      "created_invoice": "Facture #{number} créée",
+      "sent_invoice": "Facture #{number} envoyée",
+      "paid_invoice": "Facture #{number} payée"
+    }
+  },
+  "clients": {
+    "title": "Clients",
+    "subtitle": "Gérez vos entreprises clientes et contacts",
+    "new_client": "Nouveau client",
+    "edit_client": "Modifier le client",
+    "no_clients": "Aucun client",
+    "no_clients_message": "Commencez par créer votre premier client.",
+    "search_placeholder": "Rechercher des clients...",
+    "form": {
+      "basic_info": "Informations de base",
+      "basic_info_desc": "Identification et coordonnées du client",
+      "client_code": "Code client",
+      "client_code_placeholder": "Ex: ABC",
+      "client_code_help": "Code court unique pour identifier ce client",
+      "short_name": "Nom court",
+      "short_name_placeholder": "Nom abrégé",
+      "full_name": "Nom complet",
+      "full_name_placeholder": "Nom légal complet",
+      "email": "Courriel",
+      "email_placeholder": "contact@client.ca",
+      "phone": "Téléphone",
+      "phone_placeholder": "514-555-1234",
+      "website": "Site web",
+      "website_placeholder": "https://www.client.ca",
+      "postal_address": "Adresse postale",
+      "postal_address_desc": "Adresse principale du client",
+      "address_line1": "Adresse",
+      "address_line1_placeholder": "123 rue Principale",
+      "address_line2": "Adresse (suite)",
+      "address_line2_placeholder": "Bureau 100",
+      "city": "Ville",
+      "city_placeholder": "Montréal",
+      "province": "Province",
+      "select_province": "Sélectionner une province",
+      "postal_code": "Code postal",
+      "postal_code_placeholder": "H2X 1Y1",
+      "billing_address": "Adresse de facturation",
+      "billing_address_desc": "Adresse pour les factures (laisser vide pour utiliser l'adresse postale)",
+      "same_as_postal": "Identique à l'adresse postale",
+      "tax_settings": "Paramètres de taxes",
+      "tax_settings_desc": "Configurer la facturation des taxes pour ce client",
+      "charge_gst": "Facturer la TPS (5%)",
+      "charge_qst": "Facturer la TVQ (9,975%)",
+      "billing_email": "Courriel de facturation",
+      "billing_email_placeholder": "comptabilite@client.ca"
+    },
+    "tabs": {
+      "details": "Détails",
+      "contacts": "Contacts",
+      "projects": "Projets"
+    },
+    "contacts": {
+      "title": "Contacts",
+      "add_contact": "Ajouter un contact",
+      "edit_contact": "Modifier le contact",
+      "no_contacts": "Aucun contact",
+      "no_contacts_message": "Ajoutez des contacts pour ce client.",
+      "name": "Nom",
+      "title_field": "Titre",
+      "email": "Courriel",
+      "phone": "Téléphone",
+      "is_primary": "Contact principal",
+      "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce contact?"
+    },
+    "delete": {
+      "title": "Supprimer le client",
+      "message": "Êtes-vous sûr de vouloir supprimer ce client? Cette action est irréversible et supprimera toutes les données associées.",
+      "has_projects": "Ce client a des projets associés. Veuillez d'abord supprimer ou réassigner les projets."
+    },
+    "toast": {
+      "created": "Client créé avec succès",
+      "updated": "Client mis à jour avec succès",
+      "deleted": "Client supprimé avec succès",
+      "error_create": "Erreur lors de la création du client",
+      "error_update": "Erreur lors de la mise à jour du client",
+      "error_delete": "Erreur lors de la suppression du client"
+    }
+  },
+  "projects": {
+    "title": "Projets",
+    "subtitle": "Gérez vos projets de construction",
+    "new_project": "Nouveau projet",
+    "edit_project": "Modifier le projet",
+    "no_projects": "Aucun projet",
+    "no_projects_message": "Commencez par créer votre premier projet.",
+    "search_placeholder": "Rechercher des projets...",
+    "filter_status": "Filtrer par statut",
+    "all_statuses": "Tous les statuts",
+    "form": {
+      "basic_info": "Informations de base",
+      "basic_info_desc": "Identification et paramètres du projet",
+      "project_code": "Code projet",
+      "project_code_help": "Généré automatiquement à partir du code client",
+      "name": "Nom du projet",
+      "name_placeholder": "Nom descriptif du projet",
+      "client": "Client",
+      "select_client": "Sélectionner un client",
+      "status": "Statut",
+      "select_status": "Sélectionner un statut",
+      "billing_info": "Facturation",
+      "billing_info_desc": "Paramètres de facturation du projet",
+      "billing_type": "Type de facturation",
+      "select_billing_type": "Sélectionner le type",
+      "billing_types": {
+        "hourly": "À l'heure",
+        "fixed": "Forfait",
+        "per_unit": "Par unité"
+      },
+      "hourly_rate": "Taux horaire",
+      "fixed_amount": "Montant forfaitaire",
+      "unit_price": "Prix unitaire",
+      "budget_hours": "Budget heures",
+      "budget_amount": "Budget montant"
+    },
+    "tabs": {
+      "details": "Détails",
+      "team": "Équipe",
+      "tasks": "Tâches",
+      "billing_roles": "Rôles de facturation"
+    },
+    "team": {
+      "title": "Équipe du projet",
+      "add_member": "Ajouter un membre",
+      "edit_member": "Modifier le membre",
+      "no_members": "Aucun membre",
+      "no_members_message": "Ajoutez des membres à l'équipe de ce projet.",
+      "member": "Membre",
+      "select_member": "Sélectionner un membre",
+      "billing_role": "Rôle de facturation",
+      "select_role": "Sélectionner un rôle",
+      "remove_confirm": "Retirer ce membre de l'équipe?"
+    },
+    "tasks": {
+      "title": "Tâches",
+      "add_task": "Ajouter une tâche",
+      "edit_task": "Modifier la tâche",
+      "no_tasks": "Aucune tâche",
+      "no_tasks_message": "Ajoutez des tâches pour ce projet.",
+      "task_code": "Code",
+      "task_name": "Nom de la tâche",
+      "task_name_placeholder": "Description de la tâche",
+      "billable": "Facturable",
+      "delete_confirm": "Supprimer cette tâche?"
+    },
+    "billing_roles": {
+      "title": "Rôles de facturation",
+      "add_role": "Ajouter un rôle",
+      "edit_role": "Modifier le rôle",
+      "no_roles": "Aucun rôle",
+      "no_roles_message": "Ajoutez des rôles de facturation pour ce projet.",
+      "role_name": "Nom du rôle",
+      "role_name_placeholder": "Ex: Chargé de projet",
+      "hourly_rate": "Taux horaire",
+      "delete_confirm": "Supprimer ce rôle?"
+    },
+    "delete": {
+      "title": "Supprimer le projet",
+      "message": "Êtes-vous sûr de vouloir supprimer ce projet? Cette action est irréversible."
+    },
+    "toast": {
+      "created": "Projet créé avec succès",
+      "updated": "Projet mis à jour avec succès",
+      "deleted": "Projet supprimé avec succès"
+    }
+  },
+  "timesheets": {
+    "title": "Feuilles de temps",
+    "my_timesheets": "Mes feuilles de temps",
+    "team_approvals": "Approbations d'équipe",
+    "no_timesheets": "Aucune feuille de temps",
+    "no_timesheets_message": "Commencez à suivre votre temps en entrant les heures de la semaine en cours.",
+    "enter_current_week": "Entrer la semaine en cours",
+    "current_week": "(Semaine en cours)",
+    "week_of": "Semaine du {date}",
+    "search_placeholder": "Rechercher...",
+    "filter_status": "Filtrer par statut",
+    "all_statuses": "Tous les statuts",
+    "entry": {
+      "title": "Entrée de temps",
+      "add_entry": "Ajouter une entrée",
+      "project": "Projet",
+      "select_project": "Sélectionner un projet",
+      "task": "Tâche",
+      "select_task": "Sélectionner une tâche",
+      "role": "Rôle",
+      "select_role": "Sélectionner un rôle",
+      "no_projects": "Aucun projet disponible",
+      "delete_confirm": "Supprimer cette entrée?"
+    },
+    "table": {
+      "project": "Projet",
+      "task": "Tâche",
+      "role": "Rôle",
+      "total": "Total",
+      "grand_total": "Grand total"
+    },
+    "actions": {
+      "submit": "Soumettre",
+      "submit_confirm": "Soumettre cette feuille de temps pour approbation?",
+      "copy_previous": "Copier la semaine précédente",
+      "copy_confirm": "Copier les entrées de la semaine précédente? Cela remplacera les entrées actuelles.",
+      "save_draft": "Enregistrer le brouillon"
+    },
+    "approval": {
+      "title": "Approbation",
+      "no_pending": "Aucune approbation en attente",
+      "no_pending_message": "Il n'y a pas de feuilles de temps en attente d'approbation.",
+      "submitted_by": "Soumis par",
+      "submitted_on": "Soumis le",
+      "approve": "Approuver",
+      "reject": "Refuser",
+      "approve_confirm": "Approuver cette feuille de temps?",
+      "reject_confirm": "Refuser cette feuille de temps?",
+      "rejection_reason": "Raison du refus",
+      "rejection_reason_placeholder": "Expliquez pourquoi cette feuille de temps est refusée..."
+    },
+    "toast": {
+      "saved": "Feuille de temps enregistrée",
+      "submitted": "Feuille de temps soumise",
+      "approved": "Feuille de temps approuvée",
+      "rejected": "Feuille de temps refusée",
+      "copied": "Entrées copiées de la semaine précédente"
+    }
+  },
+  "expenses": {
+    "title": "Dépenses",
+    "my_expenses": "Mes dépenses",
+    "team_approvals": "Approbations d'équipe",
+    "no_expenses": "Aucune dépense",
+    "no_expenses_message": "Commencez à enregistrer vos dépenses de la semaine.",
+    "enter_current_week": "Entrer la semaine en cours",
+    "week_of": "Semaine du {date}",
+    "entry": {
+      "title": "Dépense",
+      "add_expense": "Ajouter une dépense",
+      "edit_expense": "Modifier la dépense",
+      "expense_type": "Type de dépense",
+      "select_type": "Sélectionner le type",
+      "project": "Projet",
+      "select_project": "Sélectionner un projet",
+      "date": "Date",
+      "amount": "Montant",
+      "amount_before_tax": "Montant avant taxes",
+      "gst": "TPS",
+      "qst": "TVQ",
+      "total": "Total",
+      "description": "Description",
+      "description_placeholder": "Description de la dépense...",
+      "billable": "Facturable au client",
+      "receipt_number": "No. reçu",
+      "receipt_number_placeholder": "Numéro de reçu optionnel",
+      "delete_confirm": "Supprimer cette dépense?"
+    },
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "project": "Projet",
+      "description": "Description",
+      "amount": "Montant",
+      "taxes": "Taxes",
+      "total": "Total",
+      "billable": "Fact."
+    },
+    "summary": {
+      "total_expenses": "Total des dépenses",
+      "total_gst": "Total TPS",
+      "total_qst": "Total TVQ",
+      "grand_total": "Grand total"
+    },
+    "actions": {
+      "submit": "Soumettre",
+      "submit_confirm": "Soumettre ces dépenses pour approbation?",
+      "copy_previous": "Copier la semaine précédente"
+    },
+    "approval": {
+      "title": "Approbation",
+      "no_pending": "Aucune approbation en attente",
+      "no_pending_message": "Il n'y a pas de dépenses en attente d'approbation.",
+      "submitted_by": "Soumis par",
+      "submitted_on": "Soumis le",
+      "approve": "Approuver",
+      "reject": "Refuser"
+    },
+    "toast": {
+      "saved": "Dépense enregistrée",
+      "deleted": "Dépense supprimée",
+      "submitted": "Dépenses soumises",
+      "approved": "Dépenses approuvées",
+      "rejected": "Dépenses refusées"
+    }
+  },
+  "invoices": {
+    "title": "Factures",
+    "subtitle": "Créez et gérez les factures clients",
+    "new_invoice": "Nouvelle facture",
+    "no_invoices": "Aucune facture",
+    "no_invoices_message": "Commencez par créer votre première facture.",
+    "search_placeholder": "Rechercher des factures...",
+    "filter_status": "Statut",
+    "filter_client": "Client",
+    "filter_year": "Année",
+    "all_statuses": "Tous les statuts",
+    "all_clients": "Tous les clients",
+    "all_years": "Toutes les années",
+    "summary": {
+      "draft": "Brouillon",
+      "outstanding": "À recevoir",
+      "paid_ytd": "Payé (année)"
+    },
+    "list": {
+      "invoice_number": "Facture #",
+      "client": "Client",
+      "project": "Projet",
+      "date": "Date",
+      "due_date": "Échéance",
+      "total": "Total",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "wizard": {
+      "title": "Nouvelle facture",
+      "step1_title": "Sélectionner le projet",
+      "step1_desc": "Choisissez le client et le projet à facturer",
+      "step2_title": "Sélectionner les entrées",
+      "step2_desc": "Sélectionnez les entrées de temps à inclure",
+      "step3_title": "Réviser et créer",
+      "step3_desc": "Vérifiez les détails et créez la facture",
+      "select_client": "Sélectionner un client",
+      "select_project": "Sélectionner un projet",
+      "no_entries": "Aucune entrée disponible",
+      "no_entries_message": "Il n'y a pas d'entrées de temps approuvées et non facturées pour ce projet.",
+      "select_all": "Tout sélectionner",
+      "deselect_all": "Tout désélectionner",
+      "selected_entries": "{count} entrées sélectionnées",
+      "total_hours": "Total heures",
+      "total_amount": "Montant total",
+      "invoice_date": "Date de facture",
+      "due_date": "Date d'échéance",
+      "period_start": "Début de période",
+      "period_end": "Fin de période",
+      "notes": "Notes",
+      "notes_placeholder": "Notes additionnelles pour la facture...",
+      "create_invoice": "Créer la facture"
+    },
+    "detail": {
+      "invoice_info": "Informations",
+      "line_items": "Lignes de facture",
+      "invoice_number": "Numéro de facture",
+      "client": "Client",
+      "project": "Projet",
+      "invoice_date": "Date de facture",
+      "due_date": "Date d'échéance",
+      "period": "Période",
+      "status": "Statut",
+      "subtotal": "Sous-total",
+      "gst": "TPS (5%)",
+      "qst": "TVQ (9,975%)",
+      "total": "Total",
+      "notes": "Notes",
+      "email_history": "Historique des courriels"
+    },
+    "actions": {
+      "view": "Voir",
+      "edit": "Modifier",
+      "download_pdf": "Télécharger PDF",
+      "send": "Envoyer",
+      "mark_paid": "Marquer payé",
+      "cancel": "Annuler",
+      "mark_paid_confirm": "Marquer cette facture comme payée?",
+      "cancel_confirm": "Annuler cette facture? Cette action est irréversible."
+    },
+    "send": {
+      "title": "Envoyer la facture",
+      "to": "À",
+      "to_placeholder": "adresse@courriel.ca",
+      "no_email_warning": "Ce client n'a pas d'adresse courriel de facturation.",
+      "subject": "Objet",
+      "message": "Message personnalisé",
+      "message_placeholder": "Ajoutez un message personnalisé (optionnel)...",
+      "preview": "Aperçu",
+      "send_invoice": "Envoyer la facture",
+      "sending": "Envoi en cours..."
+    },
+    "email_history": {
+      "title": "Historique des courriels",
+      "no_emails": "Aucun courriel envoyé",
+      "sent_to": "Envoyé à",
+      "sent_by": "Par",
+      "sent_at": "Le",
+      "status": "Statut"
+    },
+    "edit": {
+      "title": "Modifier la facture",
+      "dates": "Dates",
+      "invoice_date": "Date de facture",
+      "due_date": "Date d'échéance",
+      "notes": "Notes"
+    },
+    "toast": {
+      "created": "Facture créée avec succès",
+      "updated": "Facture mise à jour",
+      "sent": "Facture envoyée avec succès",
+      "marked_paid": "Facture marquée comme payée",
+      "cancelled": "Facture annulée",
+      "error_send": "Erreur lors de l'envoi de la facture"
+    }
+  },
+  "reports": {
+    "title": "Rapports",
+    "subtitle": "Analyses et statistiques de votre entreprise",
+    "filters": {
+      "date_range": "Période",
+      "project": "Projet",
+      "client": "Client",
+      "user": "Utilisateur",
+      "all_projects": "Tous les projets",
+      "all_clients": "Tous les clients",
+      "all_users": "Tous les utilisateurs",
+      "apply": "Appliquer",
+      "reset": "Réinitialiser"
+    },
+    "export": {
+      "csv": "Exporter CSV",
+      "pdf": "Exporter PDF"
+    },
+    "timesheets": {
+      "title": "Rapport des feuilles de temps",
+      "subtitle": "Heures par utilisateur et projet",
+      "description": "Analysez les heures travaillées par employé, projet et période.",
+      "columns": {
+        "user": "Utilisateur",
+        "project": "Projet",
+        "task": "Tâche",
+        "hours": "Heures",
+        "billable_hours": "Heures facturables",
+        "non_billable_hours": "Heures non facturables"
+      },
+      "summary": {
+        "total_hours": "Total heures",
+        "billable": "Facturables",
+        "non_billable": "Non facturables"
+      }
+    },
+    "invoices": {
+      "title": "Rapport des factures",
+      "subtitle": "Analyse du vieillissement des comptes clients",
+      "description": "Suivez vos factures impayées et l'âge des comptes à recevoir.",
+      "aging": {
+        "current": "Courant (0-30 jours)",
+        "days_31_60": "31-60 jours",
+        "days_61_90": "61-90 jours",
+        "over_90": "Plus de 90 jours",
+        "total": "Total à recevoir"
+      },
+      "columns": {
+        "invoice": "Facture",
+        "client": "Client",
+        "date": "Date",
+        "due_date": "Échéance",
+        "amount": "Montant",
+        "age": "Âge (jours)"
+      }
+    },
+    "profitability": {
+      "title": "Rapport de rentabilité",
+      "subtitle": "Coûts de main-d'œuvre vs montants facturés",
+      "description": "Comparez les coûts de main-d'œuvre aux montants facturés par projet.",
+      "columns": {
+        "project": "Projet",
+        "client": "Client",
+        "hours": "Heures",
+        "labor_cost": "Coût main-d'œuvre",
+        "invoiced": "Facturé",
+        "margin": "Marge",
+        "margin_percent": "Marge %"
+      },
+      "summary": {
+        "total_labor": "Total coûts",
+        "total_invoiced": "Total facturé",
+        "total_margin": "Marge totale"
+      }
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "subtitle": "Gérez les paramètres de l'entreprise et du système",
+    "company_settings": {
+      "title": "Paramètres de l'entreprise",
+      "subtitle": "Ces informations apparaissent sur les factures et autres documents",
+      "company_name": "Nom de l'entreprise",
+      "company_name_placeholder": "Nom de votre entreprise",
+      "address": "Adresse",
+      "address_placeholder": "123 rue Principale",
+      "city": "Ville",
+      "city_placeholder": "Montréal",
+      "province": "Province",
+      "postal_code": "Code postal",
+      "postal_code_placeholder": "H2X 1Y1",
+      "phone": "Téléphone",
+      "phone_placeholder": "514-555-1234",
+      "email": "Courriel",
+      "email_placeholder": "info@entreprise.ca"
+    },
+    "tax_numbers": {
+      "title": "Numéros de taxes",
+      "subtitle": "Ces numéros apparaissent dans le pied de page des factures",
+      "gst_number": "Numéro TPS/GST",
+      "gst_number_placeholder": "123456789 RT0001",
+      "qst_number": "Numéro TVQ/QST",
+      "qst_number_placeholder": "1234567890 TQ0001"
+    },
+    "logo": {
+      "title": "Logo de l'entreprise",
+      "subtitle": "Le logo apparaît sur les factures PDF. Formats acceptés: PNG, JPG, SVG (max 2 Mo)",
+      "upload": "Téléverser",
+      "replace": "Remplacer",
+      "remove": "Retirer",
+      "recommended": "Recommandé: Logo carré, minimum 200x200 pixels"
+    },
+    "toast": {
+      "saved": "Paramètres enregistrés avec succès",
+      "logo_uploaded": "Logo téléversé avec succès",
+      "logo_removed": "Logo retiré",
+      "error": "Erreur lors de l'enregistrement"
+    }
+  }
+}

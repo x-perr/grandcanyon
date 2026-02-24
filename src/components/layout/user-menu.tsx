@@ -1,26 +1,38 @@
 'use client'
 
-import { LogOut, User } from 'lucide-react'
+import { LogOut, User, Globe } from 'lucide-react'
+import { useTranslations, useLocale } from 'next-intl'
 import { logout } from '@/app/(auth)/login/actions'
+import { setLocale } from '@/lib/locale'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import type { ProfileWithRole } from '@/lib/auth'
+import type { Locale } from '@/i18n/config'
 
 interface UserMenuProps {
   profile: ProfileWithRole
 }
 
 export function UserMenu({ profile }: UserMenuProps) {
+  const t = useTranslations()
+  const locale = useLocale()
   const initials = `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase()
   const fullName = `${profile.first_name} ${profile.last_name}`
+
+  const handleLocaleChange = async (newLocale: Locale) => {
+    await setLocale(newLocale)
+  }
 
   return (
     <DropdownMenu>
@@ -49,15 +61,37 @@ export function UserMenu({ profile }: UserMenuProps) {
         <DropdownMenuItem asChild>
           <a href="/profile" className="cursor-pointer">
             <User className="mr-2 h-4 w-4" />
-            My Profile
+            {t('auth.profile')}
           </a>
         </DropdownMenuItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Globe className="mr-2 h-4 w-4" />
+            {t('language.title')}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem
+              onClick={() => handleLocaleChange('fr')}
+              className={locale === 'fr' ? 'bg-accent' : ''}
+            >
+              {t('language.french')}
+              {locale === 'fr' && ' ✓'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleLocaleChange('en')}
+              className={locale === 'en' ? 'bg-accent' : ''}
+            >
+              {t('language.english')}
+              {locale === 'en' && ' ✓'}
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <form action={logout} className="w-full">
             <button type="submit" className="flex w-full items-center">
               <LogOut className="mr-2 h-4 w-4" />
-              Sign out
+              {t('auth.logout')}
             </button>
           </form>
         </DropdownMenuItem>
