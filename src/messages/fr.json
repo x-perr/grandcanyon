@@ -1076,6 +1076,8 @@
       "users_description": "Gérer les comptes et rôles",
       "roles": "Rôles",
       "roles_description": "Voir les permissions des rôles",
+      "logs": "Journal d'audit",
+      "logs_description": "Voir l'activité du système",
       "company": "Entreprise",
       "company_description": "Paramètres de l'entreprise"
     },
@@ -1138,6 +1140,43 @@
       "category_permissions": "{count} permissions dans cette catégorie",
       "summary": "Résumé des rôles",
       "summary_description": "Aperçu de tous les rôles et leur nombre de permissions"
+    },
+    "logs": {
+      "title": "Journal d'audit",
+      "subtitle": "Historique des activités et modifications du système",
+      "search_placeholder": "Rechercher par ID d'entité...",
+      "filter_action": "Toutes les actions",
+      "filter_entity": "Toutes les entités",
+      "filter_user": "Tous les utilisateurs",
+      "system_user": "Système",
+      "empty": "Aucun journal d'audit trouvé",
+      "table": {
+        "time": "Date/Heure",
+        "action": "Action",
+        "entity": "Entité",
+        "user": "Utilisateur",
+        "ip": "Adresse IP"
+      },
+      "actions": {
+        "create": "Créer",
+        "update": "Modifier",
+        "delete": "Supprimer",
+        "send": "Envoyer",
+        "upload": "Téléverser"
+      },
+      "entities": {
+        "user": "Utilisateur",
+        "settings": "Paramètres",
+        "logo": "Logo",
+        "password_reset": "Réinitialisation mot de passe"
+      },
+      "detail": {
+        "title": "Détails du journal d'audit",
+        "metadata": "Métadonnées",
+        "changes": "Modifications",
+        "previous": "Avant",
+        "new": "Après"
+      }
     },
     "company_settings": {
       "title": "Paramètres de l'entreprise",

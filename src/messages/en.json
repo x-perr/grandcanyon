@@ -1076,6 +1076,8 @@
       "users_description": "Manage user accounts and roles",
       "roles": "Roles",
       "roles_description": "View role permissions",
+      "logs": "Audit Logs",
+      "logs_description": "View system activity",
       "company": "Company",
       "company_description": "Company settings"
     },
@@ -1138,6 +1140,43 @@
       "category_permissions": "{count} permissions in this category",
       "summary": "Role Summary",
       "summary_description": "Overview of all roles and their permission counts"
+    },
+    "logs": {
+      "title": "Audit Logs",
+      "subtitle": "System activity and change history",
+      "search_placeholder": "Search by entity ID...",
+      "filter_action": "All actions",
+      "filter_entity": "All entities",
+      "filter_user": "All users",
+      "system_user": "System",
+      "empty": "No audit logs found",
+      "table": {
+        "time": "Time",
+        "action": "Action",
+        "entity": "Entity",
+        "user": "User",
+        "ip": "IP Address"
+      },
+      "actions": {
+        "create": "Create",
+        "update": "Update",
+        "delete": "Delete",
+        "send": "Send",
+        "upload": "Upload"
+      },
+      "entities": {
+        "user": "User",
+        "settings": "Settings",
+        "logo": "Logo",
+        "password_reset": "Password Reset"
+      },
+      "detail": {
+        "title": "Audit Log Details",
+        "metadata": "Metadata",
+        "changes": "Changes",
+        "previous": "Previous",
+        "new": "New"
+      }
     },
     "company_settings": {
       "title": "Company Settings",
