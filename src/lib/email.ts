@@ -1,6 +1,17 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy initialization to avoid crashing when API key is not set
+let resend: Resend | null = null
+
+function getResend(): Resend {
+  if (!resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY environment variable is not set')
+    }
+    resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return resend
+}
 
 export interface SendInvoiceEmailParams {
   to: string
@@ -50,7 +61,7 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams): Promise<
   })
 
   try {
-    const result = await resend.emails.send({
+    const result = await getResend().emails.send({
       from: `${companyName} <invoices@grandcanyon.ca>`,
       to,
       replyTo: companyEmail,
