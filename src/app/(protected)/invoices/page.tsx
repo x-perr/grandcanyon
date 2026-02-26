@@ -8,7 +8,7 @@ import {
 import { InvoiceList } from '@/components/invoices/invoice-list'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Plus, Layers } from 'lucide-react'
 import type { Enums } from '@/types/database'
 import { getTranslations } from 'next-intl/server'
 
@@ -54,12 +54,20 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         {canCreate && (
-          <Button asChild>
-            <Link href="/invoices/new">
-              <Plus className="mr-2 h-4 w-4" />
-              {t('new_invoice')}
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link href="/invoices/batch">
+                <Layers className="mr-2 h-4 w-4" />
+                {t('batch.title')}
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link href="/invoices/new">
+                <Plus className="mr-2 h-4 w-4" />
+                {t('new_invoice')}
+              </Link>
+            </Button>
+          </div>
         )}
       </div>
 
