@@ -36,9 +36,9 @@ test.describe('i18n / Language Support', () => {
     await userMenu.click();
     await page.waitForTimeout(500);
 
-    // Look for language options
+    // Look for language options - menu should be open
     const langOption = page.locator('button:has-text("English"), button:has-text("Français"), button:has-text("FR"), button:has-text("EN")').first();
-    await expect(page.locator('[role="menu"]').or(page.locator('main'))).toBeVisible();
+    await expect(page.getByRole('menu')).toBeVisible();
   });
 
   test('I18N-03: Switch to English', async ({ page }) => {
@@ -110,12 +110,12 @@ test.describe('i18n / Language Support', () => {
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
 
-    // Login page should be visible
-    const heading = page.getByRole('heading');
-    await expect(heading).toBeVisible({ timeout: 10000 });
+    // Login page should show email field and submit button
+    const emailInput = page.getByRole('textbox', { name: /email/i });
+    await expect(emailInput).toBeVisible({ timeout: 10000 });
 
-    // Should see "Sign In" or "Connexion" text
-    const signInText = page.locator('text=/Sign In|Connexion|Se connecter/i').first();
-    await expect(signInText.or(page.locator('button[type="submit"]'))).toBeVisible();
+    // Should see "Sign In" or "Connexion" submit button
+    const submitBtn = page.getByRole('button', { name: /sign in|connexion/i });
+    await expect(submitBtn).toBeVisible();
   });
 });

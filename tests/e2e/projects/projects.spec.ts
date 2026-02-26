@@ -27,9 +27,9 @@ test.describe('Projects', () => {
     const heading = page.getByRole('heading', { level: 1 });
     await expect(heading).toBeVisible({ timeout: 15000 });
 
-    // Should see table or project list
-    const table = page.locator('table, [role="grid"]');
-    await expect(table.or(page.locator('main'))).toBeVisible();
+    // Should see projects table
+    const table = page.locator('table');
+    await expect(table).toBeVisible();
   });
 
   test('PRJ-02: Search projects', async ({ page }) => {

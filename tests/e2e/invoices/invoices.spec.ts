@@ -74,9 +74,9 @@ test.describe('Invoices', () => {
       // Should be on invoice detail page
       await expect(page).toHaveURL(/\/invoices\/[a-z0-9-]+/);
 
-      // Look for PDF download button
-      const pdfBtn = page.locator('button:has-text("PDF"), a:has-text("PDF"), button:has(svg)').first();
-      await expect(pdfBtn.or(page.locator('main'))).toBeVisible({ timeout: 10000 });
+      // Look for PDF download button or main content - just verify page loaded
+      const mainContent = page.locator('main');
+      await expect(mainContent).toBeVisible({ timeout: 10000 });
     }
   });
 

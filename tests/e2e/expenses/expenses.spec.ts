@@ -36,8 +36,8 @@ test.describe('Expenses', () => {
     await expect(heading).toBeVisible({ timeout: 15000 });
 
     // Should see "My Expenses" tab
-    const tab = page.locator('button:has-text("My Expenses"), button:has-text("Mes dépenses")').first();
-    await expect(tab.or(page.locator('main'))).toBeVisible();
+    const tab = page.getByRole('tab', { name: /my expenses|mes dépenses/i });
+    await expect(tab).toBeVisible();
   });
 
   test('EXP-02: Navigate to week entry', async ({ page }) => {
@@ -89,9 +89,9 @@ test.describe('Expenses', () => {
       await addBtn.click();
       await page.waitForTimeout(500);
 
-      // Should see expense type dropdown
+      // Should see expense type dropdown in dialog
       const typeSelect = page.locator('#expense_type_id, [name="expense_type_id"], select').first();
-      await expect(page.locator('[role="dialog"]').or(page.locator('main'))).toBeVisible();
+      await expect(page.getByRole('dialog')).toBeVisible();
     }
   });
 
@@ -105,9 +105,9 @@ test.describe('Expenses', () => {
       await addBtn.click();
       await page.waitForTimeout(500);
 
-      // Should have project select
+      // Should have project select in dialog
       const projectSelect = page.locator('#project_id, [name="project_id"]').first();
-      await expect(page.locator('[role="dialog"]').or(page.locator('main'))).toBeVisible();
+      await expect(page.getByRole('dialog')).toBeVisible();
     }
   });
 
@@ -121,8 +121,8 @@ test.describe('Expenses', () => {
       await addBtn.click();
       await page.waitForTimeout(500);
 
-      // Should see quantity/unit_price fields or amount field
-      await expect(page.locator('[role="dialog"]').or(page.locator('main'))).toBeVisible();
+      // Should see quantity/unit_price fields or amount field in dialog
+      await expect(page.getByRole('dialog')).toBeVisible();
     }
   });
 
@@ -136,9 +136,9 @@ test.describe('Expenses', () => {
       await addBtn.click();
       await page.waitForTimeout(500);
 
-      // Should see billable checkbox
+      // Should see billable checkbox in dialog
       const billableCheckbox = page.locator('#is_billable, [name="is_billable"]');
-      await expect(page.locator('[role="dialog"]').or(page.locator('main'))).toBeVisible();
+      await expect(page.getByRole('dialog')).toBeVisible();
     }
   });
 
