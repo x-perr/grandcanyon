@@ -1,9 +1,9 @@
 'use client'
 
-import { useTransition, useCallback, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Clock, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/ui/status-badge'
@@ -16,7 +16,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Card, CardContent } from '@/components/ui/card'
-import { formatWeekRange, formatDateISO, getCurrentWeekStart, parseDateISO } from '@/lib/date'
+import { formatWeekRangeLocale, formatDateISO, getCurrentWeekStart, parseDateISO } from '@/lib/date'
+import { usePagination } from '@/hooks'
 import type { TimesheetWithUser } from '@/app/(protected)/timesheets/actions'
 
 interface TimesheetListProps {
@@ -35,20 +36,25 @@ export function TimesheetList({
   const t = useTranslations('timesheets')
   const tCommon = useTranslations('common')
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const [isPending, startTransition] = useTransition()
+  const locale = useLocale() as 'en' | 'fr'
 
-  // Memoize derived calculations
-  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize), [totalCount, pageSize])
+  // Use custom hook for pagination
+  const {
+    totalPages,
+    goToPage,
+    isPending,
+    hasPrevious,
+    hasNext,
+    startIndex,
+    endIndex,
+  } = usePagination({
+    totalCount,
+    pageSize,
+    currentPage,
+    basePath: '/timesheets',
+  })
+
   const currentWeekStart = useMemo(() => formatDateISO(getCurrentWeekStart()), [])
-
-  const goToPage = useCallback((page: number) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('page', String(page))
-    startTransition(() => {
-      router.push(`/timesheets?${params.toString()}`)
-    })
-  }, [searchParams, router])
 
   const formatHours = useCallback((hours: number) => {
     return hours.toFixed(1)
@@ -83,7 +89,7 @@ export function TimesheetList({
             <TableBody>
               {timesheets.map((timesheet) => {
                 const weekStart = parseDateISO(timesheet.week_start)
-                const weekRange = formatWeekRange(weekStart)
+                const weekRange = formatWeekRangeLocale(weekStart, locale)
                 const isCurrentWeek = timesheet.week_start === currentWeekStart
 
                 return (
@@ -132,8 +138,8 @@ export function TimesheetList({
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             {tCommon('pagination.showing', {
-              start: (currentPage - 1) * pageSize + 1,
-              end: Math.min(currentPage * pageSize, totalCount),
+              start: startIndex,
+              end: endIndex,
               total: totalCount,
             })}
           </p>
@@ -142,7 +148,7 @@ export function TimesheetList({
               variant="outline"
               size="sm"
               onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1 || isPending}
+              disabled={!hasPrevious || isPending}
             >
               {tCommon('actions.previous')}
             </Button>
@@ -150,7 +156,7 @@ export function TimesheetList({
               variant="outline"
               size="sm"
               onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages || isPending}
+              disabled={!hasNext || isPending}
             >
               {tCommon('actions.next')}
             </Button>

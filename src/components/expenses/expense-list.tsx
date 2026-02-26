@@ -1,7 +1,7 @@
 'use client'
 
-import { useTransition, useCallback, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Receipt, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,10 +15,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Card, CardContent } from '@/components/ui/card'
-import { formatWeekRange, formatDateISO, getCurrentWeekStart, parseDateISO } from '@/lib/date'
+import { formatWeekRangeLocale, formatDateISO, getCurrentWeekStart, parseDateISO } from '@/lib/date'
 import { formatCurrency } from '@/lib/validations/expense'
+import { usePagination } from '@/hooks'
 import type { ExpenseWithUser } from '@/app/(protected)/expenses/actions'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface ExpenseListProps {
   expenses: ExpenseWithUser[]
@@ -34,21 +35,26 @@ export function ExpenseList({
   pageSize,
 }: ExpenseListProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const [isPending, startTransition] = useTransition()
   const t = useTranslations('expenses')
+  const locale = useLocale() as 'en' | 'fr'
 
-  // Memoize derived calculations
-  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize), [totalCount, pageSize])
+  // Use custom hook for pagination
+  const {
+    totalPages,
+    goToPage,
+    isPending,
+    hasPrevious,
+    hasNext,
+    startIndex,
+    endIndex,
+  } = usePagination({
+    totalCount,
+    pageSize,
+    currentPage,
+    basePath: '/expenses',
+  })
+
   const currentWeekStart = useMemo(() => formatDateISO(getCurrentWeekStart()), [])
-
-  const goToPage = useCallback((page: number) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('page', String(page))
-    startTransition(() => {
-      router.push(`/expenses?${params.toString()}`)
-    })
-  }, [searchParams, router])
 
   return (
     <div className="space-y-4">
@@ -80,7 +86,7 @@ export function ExpenseList({
             <TableBody>
               {expenses.map((expense) => {
                 const weekStart = parseDateISO(expense.week_start)
-                const weekRange = formatWeekRange(weekStart)
+                const weekRange = formatWeekRangeLocale(weekStart, locale)
                 const isCurrentWeek = expense.week_start === currentWeekStart
 
                 return (
@@ -132,8 +138,8 @@ export function ExpenseList({
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             {t('pagination.showing', {
-              start: (currentPage - 1) * pageSize + 1,
-              end: Math.min(currentPage * pageSize, totalCount),
+              start: startIndex,
+              end: endIndex,
               total: totalCount,
             })}
           </p>
@@ -142,7 +148,7 @@ export function ExpenseList({
               variant="outline"
               size="sm"
               onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1 || isPending}
+              disabled={!hasPrevious || isPending}
             >
               {t('pagination.previous')}
             </Button>
@@ -150,7 +156,7 @@ export function ExpenseList({
               variant="outline"
               size="sm"
               onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages || isPending}
+              disabled={!hasNext || isPending}
             >
               {t('pagination.next')}
             </Button>

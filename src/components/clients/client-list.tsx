@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useTransition, useRef, useEffect, useCallback, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Building2, MoreHorizontal, Pencil, Trash2, Plus, ExternalLink } from 'lucide-react'
@@ -32,6 +32,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Card, CardContent } from '@/components/ui/card'
+import { useDebounceSearch, usePagination } from '@/hooks'
 import type { ClientWithProjects } from '@/app/(protected)/clients/actions'
 import { deleteClientAction } from '@/app/(protected)/clients/actions'
 
@@ -53,58 +54,34 @@ export function ClientList({
   searchQuery,
 }: ClientListProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const t = useTranslations('clients')
   const tCommon = useTranslations('common')
-  const [isPending, startTransition] = useTransition()
-  const [search, setSearch] = useState(searchQuery)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Memoize derived calculations
-  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize), [totalCount, pageSize])
+  // Use custom hooks for debounced search and pagination
+  const { search, setSearch, isPending: isSearchPending } = useDebounceSearch({
+    initialValue: searchQuery,
+    basePath: '/clients',
+  })
+
+  const {
+    totalPages,
+    goToPage,
+    isPending: isPagePending,
+    hasPrevious,
+    hasNext,
+    startIndex,
+    endIndex,
+  } = usePagination({
+    totalCount,
+    pageSize,
+    currentPage,
+    basePath: '/clients',
+  })
+
+  const isPending = isSearchPending || isPagePending
   const clientToDelete = useMemo(() => clients.find((c) => c.id === deleteId), [clients, deleteId])
-
-  // Cleanup debounce timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current)
-      }
-    }
-  }, [])
-
-  const updateSearch = useCallback((value: string) => {
-    setSearch(value)
-
-    // Clear previous timeout
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current)
-    }
-
-    // Debounce search
-    debounceRef.current = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (value) {
-        params.set('search', value)
-      } else {
-        params.delete('search')
-      }
-      params.delete('page') // Reset to first page on search
-      startTransition(() => {
-        router.push(`/clients?${params.toString()}`)
-      })
-    }, 300)
-  }, [searchParams, router])
-
-  const goToPage = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('page', String(page))
-    startTransition(() => {
-      router.push(`/clients?${params.toString()}`)
-    })
-  }
 
   const handleDelete = async () => {
     if (!deleteId) return
@@ -132,7 +109,7 @@ export function ClientList({
         <SearchInput
           placeholder={t('search_placeholder')}
           value={search}
-          onChange={updateSearch}
+          onChange={setSearch}
           className="w-full sm:max-w-sm"
         />
         {canEdit && (
@@ -248,8 +225,8 @@ export function ClientList({
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             {tCommon('pagination.showing', {
-              start: (currentPage - 1) * pageSize + 1,
-              end: Math.min(currentPage * pageSize, totalCount),
+              start: startIndex,
+              end: endIndex,
               total: totalCount,
             })}
           </p>
@@ -258,7 +235,7 @@ export function ClientList({
               variant="outline"
               size="sm"
               onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1 || isPending}
+              disabled={!hasPrevious || isPending}
             >
               {tCommon('actions.previous')}
             </Button>
@@ -266,7 +243,7 @@ export function ClientList({
               variant="outline"
               size="sm"
               onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages || isPending}
+              disabled={!hasNext || isPending}
             >
               {tCommon('actions.next')}
             </Button>

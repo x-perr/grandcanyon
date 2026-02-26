@@ -1,6 +1,6 @@
 'use client'
 
-import { useTransition, useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { useTransition, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { FileText, ExternalLink, Download, MoreHorizontal, Check } from 'lucide-react'
@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/tax'
+import { useDebounceSearch, usePagination } from '@/hooks'
 import { markInvoicePaid } from '@/app/(protected)/invoices/actions'
 import type { InvoiceWithRelations, ClientForSelect } from '@/app/(protected)/invoices/actions'
 import type { InvoiceStatus } from '@/lib/validations/invoice'
@@ -64,24 +65,33 @@ export function InvoiceList({
 }: InvoiceListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [isPending, startTransition] = useTransition()
-  const [search, setSearch] = useState(filters.search ?? '')
+  const [isFilterPending, startTransition] = useTransition()
   const t = useTranslations('invoices')
   const tc = useTranslations('common')
   const locale = useLocale()
-  const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Memoize derived calculations
-  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize), [totalCount, pageSize])
+  // Use custom hooks for debounced search and pagination
+  const { search, setSearch, isPending: isSearchPending } = useDebounceSearch({
+    initialValue: filters.search ?? '',
+    basePath: '/invoices',
+  })
 
-  // Cleanup debounce timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current)
-      }
-    }
-  }, [])
+  const {
+    totalPages,
+    goToPage,
+    isPending: isPagePending,
+    hasPrevious,
+    hasNext,
+    startIndex,
+    endIndex,
+  } = usePagination({
+    totalCount,
+    pageSize,
+    currentPage,
+    basePath: '/invoices',
+  })
+
+  const isPending = isSearchPending || isPagePending || isFilterPending
 
   const updateFilters = useCallback((updates: Record<string, string | undefined>) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -97,37 +107,6 @@ export function InvoiceList({
       }
     })
 
-    startTransition(() => {
-      router.push(`/invoices?${params.toString()}`)
-    })
-  }, [searchParams, router])
-
-  const handleSearch = useCallback((value: string) => {
-    setSearch(value)
-
-    // Clear previous timeout
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current)
-    }
-
-    // Debounce search
-    debounceRef.current = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString())
-      params.delete('page')
-      if (value) {
-        params.set('search', value)
-      } else {
-        params.delete('search')
-      }
-      startTransition(() => {
-        router.push(`/invoices?${params.toString()}`)
-      })
-    }, 300)
-  }, [searchParams, router])
-
-  const goToPage = useCallback((page: number) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('page', String(page))
     startTransition(() => {
       router.push(`/invoices?${params.toString()}`)
     })
@@ -185,7 +164,7 @@ export function InvoiceList({
           <SearchInput
             placeholder={t('search_placeholder')}
             value={search}
-            onChange={handleSearch}
+            onChange={setSearch}
           />
         </div>
         <Select
@@ -338,8 +317,8 @@ export function InvoiceList({
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             {tc('pagination.showing', {
-              start: (currentPage - 1) * pageSize + 1,
-              end: Math.min(currentPage * pageSize, totalCount),
+              start: startIndex,
+              end: endIndex,
               total: totalCount,
             })}
           </p>
@@ -348,7 +327,7 @@ export function InvoiceList({
               variant="outline"
               size="sm"
               onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1 || isPending}
+              disabled={!hasPrevious || isPending}
             >
               {tc('actions.previous')}
             </Button>
@@ -356,7 +335,7 @@ export function InvoiceList({
               variant="outline"
               size="sm"
               onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages || isPending}
+              disabled={!hasNext || isPending}
             >
               {tc('actions.next')}
             </Button>

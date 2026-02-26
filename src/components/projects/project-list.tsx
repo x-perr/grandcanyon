@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useRef, useEffect, useCallback, useMemo } from 'react'
+import { useState, useTransition, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
@@ -40,6 +40,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Card, CardContent } from '@/components/ui/card'
+import { useDebounceSearch, usePagination } from '@/hooks'
 import type { ProjectWithClient } from '@/app/(protected)/projects/actions'
 import { deleteProjectAction } from '@/app/(protected)/projects/actions'
 import { projectStatuses } from '@/lib/validations/project'
@@ -67,49 +68,35 @@ export function ProjectList({
   const searchParams = useSearchParams()
   const t = useTranslations('projects')
   const tCommon = useTranslations('common')
-  const [isPending, startTransition] = useTransition()
-  const [search, setSearch] = useState(searchQuery)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const debounceRef = useRef<NodeJS.Timeout | null>(null)
+  const [isStatusPending, startTransition] = useTransition()
 
-  // Memoize derived calculations
-  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize), [totalCount, pageSize])
+  // Use custom hooks for debounced search and pagination
+  const { search, setSearch, isPending: isSearchPending } = useDebounceSearch({
+    initialValue: searchQuery,
+    basePath: '/projects',
+  })
+
+  const {
+    totalPages,
+    goToPage,
+    isPending: isPagePending,
+    hasPrevious,
+    hasNext,
+    startIndex,
+    endIndex,
+  } = usePagination({
+    totalCount,
+    pageSize,
+    currentPage,
+    basePath: '/projects',
+  })
+
+  const isPending = isSearchPending || isPagePending || isStatusPending
   const projectToDelete = useMemo(() => projects.find((p) => p.id === deleteId), [projects, deleteId])
 
-  // Cleanup debounce timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current)
-      }
-    }
-  }, [])
-
-  const updateSearch = useCallback((value: string) => {
-    setSearch(value)
-
-    // Clear previous timeout
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current)
-    }
-
-    // Debounce search
-    debounceRef.current = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (value) {
-        params.set('search', value)
-      } else {
-        params.delete('search')
-      }
-      params.delete('page') // Reset to first page on search
-      startTransition(() => {
-        router.push(`/projects?${params.toString()}`)
-      })
-    }, 300)
-  }, [searchParams, router])
-
-  const updateStatus = (value: string) => {
+  const updateStatus = useCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString())
     if (value && value !== 'all') {
       params.set('status', value)
@@ -120,15 +107,7 @@ export function ProjectList({
     startTransition(() => {
       router.push(`/projects?${params.toString()}`)
     })
-  }
-
-  const goToPage = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('page', String(page))
-    startTransition(() => {
-      router.push(`/projects?${params.toString()}`)
-    })
-  }
+  }, [searchParams, router])
 
   const handleDelete = async () => {
     if (!deleteId) return
@@ -162,7 +141,7 @@ export function ProjectList({
           <SearchInput
             placeholder={t('search_placeholder')}
             value={search}
-            onChange={updateSearch}
+            onChange={setSearch}
             className="flex-1 sm:max-w-sm"
           />
           <Select value={statusFilter || 'all'} onValueChange={updateStatus}>
@@ -296,8 +275,8 @@ export function ProjectList({
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             {tCommon('pagination.showing', {
-              start: (currentPage - 1) * pageSize + 1,
-              end: Math.min(currentPage * pageSize, totalCount),
+              start: startIndex,
+              end: endIndex,
               total: totalCount,
             })}
           </p>
@@ -306,7 +285,7 @@ export function ProjectList({
               variant="outline"
               size="sm"
               onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1 || isPending}
+              disabled={!hasPrevious || isPending}
             >
               {tCommon('actions.previous')}
             </Button>
@@ -314,7 +293,7 @@ export function ProjectList({
               variant="outline"
               size="sm"
               onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages || isPending}
+              disabled={!hasNext || isPending}
             >
               {tCommon('actions.next')}
             </Button>
