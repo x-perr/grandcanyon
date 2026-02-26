@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Mail, Phone, MoreHorizontal, Pencil, Trash2, Plus, Star, User } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -59,13 +60,16 @@ export function ContactList({ clientId, contacts, canEdit }: ContactListProps) {
     try {
       const result = await deleteContactAction(clientId, deleteId)
       if (result?.error) {
-        console.error(result.error)
+        toast.error(result.error)
+        setIsDeleting(false)
+        return
       }
+      toast.success(t('contacts.delete_success'))
+      setDeleteId(null)
     } catch {
-      console.error('Failed to delete contact')
+      toast.error(t('contacts.delete_error'))
     } finally {
       setIsDeleting(false)
-      setDeleteId(null)
     }
   }
 

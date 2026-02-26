@@ -294,7 +294,9 @@
       "is_primary": "Primary Contact",
       "delete_title": "Delete Contact",
       "delete_message": "Are you sure you want to delete {name}? This action cannot be undone.",
-      "delete_confirm": "Are you sure you want to delete this contact?"
+      "delete_confirm": "Are you sure you want to delete this contact?",
+      "delete_success": "Contact deleted successfully",
+      "delete_error": "Failed to delete contact"
     },
     "delete": {
       "title": "Delete Client",
@@ -440,7 +442,9 @@
       "add_dialog_desc": "Assign a team member to this project.",
       "edit_dialog_title": "Edit Team Member",
       "edit_dialog_desc": "Update the billing role for this member.",
-      "removing": "Removing..."
+      "removing": "Removing...",
+      "remove_success": "Team member removed successfully",
+      "remove_error": "Failed to remove team member"
     },
     "tasks": {
       "title": "Tasks",
@@ -460,7 +464,9 @@
       "add_dialog_title": "Add Task",
       "add_dialog_desc": "Create a new task for this project.",
       "edit_dialog_title": "Edit Task",
-      "edit_dialog_desc": "Update the task details."
+      "edit_dialog_desc": "Update the task details.",
+      "delete_success": "Task deleted successfully",
+      "delete_error": "Failed to delete task"
     },
     "billing_roles": {
       "title": "Billing Roles",
@@ -490,7 +496,8 @@
     "toast": {
       "created": "Project created successfully",
       "updated": "Project updated successfully",
-      "deleted": "Project deleted successfully"
+      "deleted": "Project deleted successfully",
+      "error_delete": "Error deleting project"
     }
   },
   "timesheets": {
@@ -1176,6 +1183,10 @@
         "changes": "Changes",
         "previous": "Previous",
         "new": "New"
+      },
+      "pagination": {
+        "previous": "Previous page",
+        "next": "Next page"
       }
     },
     "company_settings": {

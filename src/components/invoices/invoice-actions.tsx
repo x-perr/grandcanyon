@@ -85,9 +85,8 @@ export function InvoiceActions({
         if (result?.error) {
           toast.error(result.error)
         }
-      } catch (error) {
+      } catch {
         toast.error(t('actions.error_occurred'))
-        console.error('Invoice action error:', error)
       }
 
       setDialogAction(null)

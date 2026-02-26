@@ -71,6 +71,14 @@ export async function getTimesheets(options?: {
     return { timesheets: [], count: 0 }
   }
 
+  // Security check: if querying another user's timesheets, verify permission
+  if (userId && userId !== user?.id) {
+    const permissions = await getUserPermissions()
+    if (!hasPermission(permissions, 'timesheets.view_all') && !hasPermission(permissions, 'admin.manage')) {
+      return { timesheets: [], count: 0 }
+    }
+  }
+
   let query = supabase
     .from('timesheets')
     .select(

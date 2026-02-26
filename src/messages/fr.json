@@ -294,7 +294,9 @@
       "is_primary": "Contact principal",
       "delete_title": "Supprimer le contact",
       "delete_message": "Êtes-vous sûr de vouloir supprimer {name}? Cette action est irréversible.",
-      "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce contact?"
+      "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce contact?",
+      "delete_success": "Contact supprimé avec succès",
+      "delete_error": "Erreur lors de la suppression du contact"
     },
     "delete": {
       "title": "Supprimer le client",
@@ -440,7 +442,9 @@
       "add_dialog_desc": "Assignez un membre de l'équipe à ce projet.",
       "edit_dialog_title": "Modifier le membre de l'équipe",
       "edit_dialog_desc": "Modifiez le rôle de facturation de ce membre.",
-      "removing": "Retrait en cours..."
+      "removing": "Retrait en cours...",
+      "remove_success": "Membre retiré de l'équipe avec succès",
+      "remove_error": "Erreur lors du retrait du membre"
     },
     "tasks": {
       "title": "Tâches",
@@ -460,7 +464,9 @@
       "add_dialog_title": "Ajouter une tâche",
       "add_dialog_desc": "Créez une nouvelle tâche pour ce projet.",
       "edit_dialog_title": "Modifier la tâche",
-      "edit_dialog_desc": "Modifiez les détails de cette tâche."
+      "edit_dialog_desc": "Modifiez les détails de cette tâche.",
+      "delete_success": "Tâche supprimée avec succès",
+      "delete_error": "Erreur lors de la suppression de la tâche"
     },
     "billing_roles": {
       "title": "Rôles de facturation",
@@ -490,7 +496,8 @@
     "toast": {
       "created": "Projet créé avec succès",
       "updated": "Projet mis à jour avec succès",
-      "deleted": "Projet supprimé avec succès"
+      "deleted": "Projet supprimé avec succès",
+      "error_delete": "Erreur lors de la suppression du projet"
     }
   },
   "timesheets": {
@@ -1176,6 +1183,10 @@
         "changes": "Modifications",
         "previous": "Avant",
         "new": "Après"
+      },
+      "pagination": {
+        "previous": "Page précédente",
+        "next": "Page suivante"
       }
     },
     "company_settings": {

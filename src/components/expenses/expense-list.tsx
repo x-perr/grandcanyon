@@ -1,6 +1,6 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useTransition, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Receipt, ExternalLink } from 'lucide-react'
@@ -38,22 +38,23 @@ export function ExpenseList({
   const [isPending, startTransition] = useTransition()
   const t = useTranslations('expenses')
 
-  const totalPages = Math.ceil(totalCount / pageSize)
-  const currentWeekStart = formatDateISO(getCurrentWeekStart())
+  // Memoize derived calculations
+  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize), [totalCount, pageSize])
+  const currentWeekStart = useMemo(() => formatDateISO(getCurrentWeekStart()), [])
 
-  const goToPage = (page: number) => {
+  const goToPage = useCallback((page: number) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('page', String(page))
     startTransition(() => {
       router.push(`/expenses?${params.toString()}`)
     })
-  }
+  }, [searchParams, router])
 
   return (
     <div className="space-y-4">
       {expenses.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
+          <CardContent className="flex flex-col items-center justify-center py-12 animate-in fade-in duration-300">
             <Receipt className="h-12 w-12 text-muted-foreground/50" />
             <h3 className="mt-4 text-lg font-semibold">{t('list.no_reports')}</h3>
             <p className="mt-2 text-sm text-muted-foreground">

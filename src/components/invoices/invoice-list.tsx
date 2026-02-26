@@ -1,6 +1,6 @@
 'use client'
 
-import { useTransition, useState } from 'react'
+import { useTransition, useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { FileText, ExternalLink, Download, MoreHorizontal, Check } from 'lucide-react'
@@ -69,10 +69,21 @@ export function InvoiceList({
   const t = useTranslations('invoices')
   const tc = useTranslations('common')
   const locale = useLocale()
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
-  const totalPages = Math.ceil(totalCount / pageSize)
+  // Memoize derived calculations
+  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize), [totalCount, pageSize])
 
-  const updateFilters = (updates: Record<string, string | undefined>) => {
+  // Cleanup debounce timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
+      }
+    }
+  }, [])
+
+  const updateFilters = useCallback((updates: Record<string, string | undefined>) => {
     const params = new URLSearchParams(searchParams.toString())
 
     // Reset to page 1 when filters change
@@ -89,26 +100,40 @@ export function InvoiceList({
     startTransition(() => {
       router.push(`/invoices?${params.toString()}`)
     })
-  }
+  }, [searchParams, router])
 
-  const handleSearch = (value: string) => {
+  const handleSearch = useCallback((value: string) => {
     setSearch(value)
-    // Debounce search
-    const timeoutId = setTimeout(() => {
-      updateFilters({ search: value || undefined })
-    }, 300)
-    return () => clearTimeout(timeoutId)
-  }
 
-  const goToPage = (page: number) => {
+    // Clear previous timeout
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current)
+    }
+
+    // Debounce search
+    debounceRef.current = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('page')
+      if (value) {
+        params.set('search', value)
+      } else {
+        params.delete('search')
+      }
+      startTransition(() => {
+        router.push(`/invoices?${params.toString()}`)
+      })
+    }, 300)
+  }, [searchParams, router])
+
+  const goToPage = useCallback((page: number) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('page', String(page))
     startTransition(() => {
       router.push(`/invoices?${params.toString()}`)
     })
-  }
+  }, [searchParams, router])
 
-  const handleMarkPaid = async (invoiceId: string, e: React.MouseEvent) => {
+  const handleMarkPaid = useCallback(async (invoiceId: string, e: React.MouseEvent) => {
     e.stopPropagation()
     const result = await markInvoicePaid(invoiceId)
     if (result.error) {
@@ -119,16 +144,16 @@ export function InvoiceList({
         router.refresh()
       })
     }
-  }
+  }, [t, router])
 
-  const formatDate = (dateStr: string | null) => {
+  const formatDate = useCallback((dateStr: string | null) => {
     if (!dateStr) return '-'
     return new Date(dateStr).toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-CA', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
     })
-  }
+  }, [locale])
 
   return (
     <div className="space-y-4">
@@ -214,7 +239,7 @@ export function InvoiceList({
       {/* Table */}
       {invoices.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
+          <CardContent className="flex flex-col items-center justify-center py-12 animate-in fade-in duration-300">
             <FileText className="h-12 w-12 text-muted-foreground/50" />
             <h3 className="mt-4 text-lg font-semibold">{t('no_invoices')}</h3>
             <p className="mt-2 text-sm text-muted-foreground">

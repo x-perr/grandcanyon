@@ -302,6 +302,7 @@ export function AuditLogList({
               size="icon"
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage <= 1 || isPending}
+              aria-label={t('logs.pagination.previous')}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -313,6 +314,7 @@ export function AuditLogList({
               size="icon"
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage >= totalPages || isPending}
+              aria-label={t('logs.pagination.next')}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

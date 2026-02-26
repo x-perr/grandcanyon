@@ -62,8 +62,9 @@ export function SendInvoiceDialog({
       return
     }
 
-    // Basic email validation
-    if (!email.includes('@') || !email.includes('.')) {
+    // Email validation with proper regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
       toast.error(t('send.validation_email_invalid'))
       return
     }

@@ -53,8 +53,11 @@ export function StepSelectEntries({
     })
   }, [entries, periodStart, periodEnd])
 
+  // Convert selectedEntryIds to Set for O(1) lookups
+  const selectedIdSet = useMemo(() => new Set(selectedEntryIds), [selectedEntryIds])
+
   // Calculate totals
-  const selectedEntries = filteredEntries.filter((e) => selectedEntryIds.includes(e.id))
+  const selectedEntries = filteredEntries.filter((e) => selectedIdSet.has(e.id))
   const totalHours = selectedEntries.reduce(
     (sum, e) => sum + (e.hours?.reduce((s, h) => s + (h ?? 0), 0) ?? 0),
     0
@@ -75,7 +78,7 @@ export function StepSelectEntries({
   }
 
   const handleToggleEntry = (entryId: string) => {
-    if (selectedEntryIds.includes(entryId)) {
+    if (selectedIdSet.has(entryId)) {
       onSelectionChange(selectedEntryIds.filter((id) => id !== entryId))
     } else {
       onSelectionChange([...selectedEntryIds, entryId])
@@ -181,7 +184,7 @@ export function StepSelectEntries({
                   const hours = entry.hours?.reduce((s, h) => s + (h ?? 0), 0) ?? 0
                   const rate = entry.billing_role?.rate ?? 0
                   const amount = calculateLineAmount(hours, rate)
-                  const isSelected = selectedEntryIds.includes(entry.id)
+                  const isSelected = selectedIdSet.has(entry.id)
 
                   return (
                     <TableRow

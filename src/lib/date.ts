@@ -144,3 +144,101 @@ export function isFutureWeek(weekStart: Date): boolean {
 export function sumHours(hours: (number | null)[]): number {
   return hours.reduce((sum: number, h: number | null) => sum + (h ?? 0), 0)
 }
+
+// ============================================
+// Locale-aware formatting functions
+// ============================================
+
+type SupportedLocale = 'en' | 'fr'
+
+/**
+ * Get the locale string for Intl APIs
+ */
+function getLocaleCode(locale: SupportedLocale): string {
+  return locale === 'fr' ? 'fr-CA' : 'en-CA'
+}
+
+/**
+ * Format a date with locale support
+ * @example formatDate(date, 'en') => "Feb 10, 2024"
+ * @example formatDate(date, 'fr') => "10 févr. 2024"
+ */
+export function formatDate(date: Date, locale: SupportedLocale): string {
+  return date.toLocaleDateString(getLocaleCode(locale), {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+/**
+ * Format a date in short format with locale support
+ * @example formatDateShort(date, 'en') => "Feb 10"
+ * @example formatDateShort(date, 'fr') => "10 févr."
+ */
+export function formatDateShort(date: Date, locale: SupportedLocale): string {
+  return date.toLocaleDateString(getLocaleCode(locale), {
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
+/**
+ * Format a week range with locale support
+ * @example formatWeekRangeLocale(weekStart, 'en') => "Feb 10-16, 2024"
+ * @example formatWeekRangeLocale(weekStart, 'fr') => "10-16 févr. 2024"
+ */
+export function formatWeekRangeLocale(weekStart: Date, locale: SupportedLocale): string {
+  const weekEnd = getSunday(weekStart)
+  const localeCode = getLocaleCode(locale)
+
+  const startMonth = weekStart.toLocaleDateString(localeCode, { month: 'short' })
+  const startDay = weekStart.getDate()
+  const endMonth = weekEnd.toLocaleDateString(localeCode, { month: 'short' })
+  const endDay = weekEnd.getDate()
+  const year = weekStart.getFullYear()
+
+  if (locale === 'fr') {
+    // French format: "10-16 févr. 2024" or "26 févr. - 4 mars 2024"
+    if (startMonth === endMonth) {
+      return `${startDay}-${endDay} ${startMonth} ${year}`
+    } else {
+      return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${year}`
+    }
+  } else {
+    // English format: "Feb 10-16, 2024" or "Feb 26 - Mar 4, 2024"
+    if (startMonth === endMonth) {
+      return `${startMonth} ${startDay}-${endDay}, ${year}`
+    } else {
+      return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`
+    }
+  }
+}
+
+/**
+ * Format a single day with locale support
+ * @example formatDayShortLocale(date, 'en') => "Mon 10"
+ * @example formatDayShortLocale(date, 'fr') => "lun. 10"
+ */
+export function formatDayShortLocale(date: Date, locale: SupportedLocale, includeDay = true): string {
+  const localeCode = getLocaleCode(locale)
+  const dayLabel = date.toLocaleDateString(localeCode, { weekday: 'short' })
+  const dayNum = date.getDate()
+  return includeDay ? `${dayLabel} ${dayNum}` : `${dayNum}`
+}
+
+/**
+ * Get localized day labels
+ * @example getWeekDayLabelsLocale('en') => ['Mon', 'Tue', ...]
+ * @example getWeekDayLabelsLocale('fr') => ['lun.', 'mar.', ...]
+ */
+export function getWeekDayLabelsLocale(locale: SupportedLocale): string[] {
+  const localeCode = getLocaleCode(locale)
+  const baseDate = new Date(2024, 0, 1) // A Monday
+
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(baseDate)
+    d.setDate(d.getDate() + i)
+    return d.toLocaleDateString(localeCode, { weekday: 'short' })
+  })
+}

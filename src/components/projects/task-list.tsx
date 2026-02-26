@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ListTodo, MoreHorizontal, Pencil, Trash2, Plus } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -68,13 +69,16 @@ export function TaskList({ projectId, tasks, canEdit }: TaskListProps) {
     try {
       const result = await deleteTaskAction(projectId, deleteId)
       if (result?.error) {
-        console.error(result.error)
+        toast.error(result.error)
+        setIsDeleting(false)
+        return
       }
+      toast.success(t('tasks.delete_success'))
+      setDeleteId(null)
     } catch {
-      console.error('Failed to delete task')
+      toast.error(t('tasks.delete_error'))
     } finally {
       setIsDeleting(false)
-      setDeleteId(null)
     }
   }
 

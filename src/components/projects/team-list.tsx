@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { User, MoreHorizontal, Pencil, Trash2, Plus, DollarSign } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -98,13 +99,16 @@ export function TeamList({
     try {
       const result = await removeTeamMemberAction(projectId, deleteId)
       if (result?.error) {
-        console.error(result.error)
+        toast.error(result.error)
+        setIsDeleting(false)
+        return
       }
+      toast.success(t('team.remove_success'))
+      setDeleteId(null)
     } catch {
-      console.error('Failed to remove team member')
+      toast.error(t('team.remove_error'))
     } finally {
       setIsDeleting(false)
-      setDeleteId(null)
     }
   }
 

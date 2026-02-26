@@ -240,8 +240,6 @@ export function InvoiceWizard({
         lines: linesWithEntries,
       })
 
-      console.log('createInvoice result:', result)
-
       if ('error' in result && result.error) {
         toast.error(result.error)
         setIsSubmitting(false)
@@ -253,12 +251,10 @@ export function InvoiceWizard({
         toast.success(t('toast.created'))
         router.push(`/invoices/${result.invoiceId}`)
       } else {
-        console.error('No invoiceId in result:', result)
         toast.error(t('toast.error_send'))
         setIsSubmitting(false)
       }
-    } catch (error) {
-      console.error('Error creating invoice:', error)
+    } catch {
       toast.error(t('toast.error_send'))
       setIsSubmitting(false)
     }

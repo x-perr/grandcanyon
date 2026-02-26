@@ -106,7 +106,7 @@ export async function GET(
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="${filename}"`,
+        'Content-Disposition': `attachment; filename="${filename}"`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
     })

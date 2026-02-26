@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Building2, MoreHorizontal, Pencil, Trash2, Plus, ExternalLink } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { SearchInput } from '@/components/ui/search-input'
 import {
@@ -59,14 +60,31 @@ export function ClientList({
   const [search, setSearch] = useState(searchQuery)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
-  const totalPages = Math.ceil(totalCount / pageSize)
+  // Memoize derived calculations
+  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize), [totalCount, pageSize])
+  const clientToDelete = useMemo(() => clients.find((c) => c.id === deleteId), [clients, deleteId])
 
-  const updateSearch = (value: string) => {
+  // Cleanup debounce timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
+      }
+    }
+  }, [])
+
+  const updateSearch = useCallback((value: string) => {
     setSearch(value)
 
+    // Clear previous timeout
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current)
+    }
+
     // Debounce search
-    const timeout = setTimeout(() => {
+    debounceRef.current = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString())
       if (value) {
         params.set('search', value)
@@ -78,9 +96,7 @@ export function ClientList({
         router.push(`/clients?${params.toString()}`)
       })
     }, 300)
-
-    return () => clearTimeout(timeout)
-  }
+  }, [searchParams, router])
 
   const goToPage = (page: number) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -96,17 +112,18 @@ export function ClientList({
     try {
       const result = await deleteClientAction(deleteId)
       if (result?.error) {
-        console.error(result.error)
+        toast.error(result.error)
+        setIsDeleting(false)
+        return
       }
+      toast.success(t('toast.deleted'))
+      setDeleteId(null)
     } catch {
-      console.error('Failed to delete client')
+      toast.error(t('toast.error_delete'))
     } finally {
       setIsDeleting(false)
-      setDeleteId(null)
     }
   }
-
-  const clientToDelete = clients.find((c) => c.id === deleteId)
 
   return (
     <div className="space-y-4">
@@ -131,7 +148,7 @@ export function ClientList({
       {/* Table */}
       {clients.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
+          <CardContent className="flex flex-col items-center justify-center py-12 animate-in fade-in duration-300">
             <Building2 className="h-12 w-12 text-muted-foreground/50" />
             <h3 className="mt-4 text-lg font-semibold">{t('no_clients')}</h3>
             <p className="mt-2 text-sm text-muted-foreground">
