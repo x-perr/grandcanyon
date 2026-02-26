@@ -147,14 +147,14 @@ test.describe('Admin', () => {
     await page.goto('/admin');
     await page.waitForLoadState('networkidle');
 
-    // Click Roles link
-    const rolesLink = page.locator('a:has-text("Roles"), a:has-text("Rôles")').first();
+    // Click Roles link (target main content area by href to avoid wrong matches)
+    const rolesLink = page.locator('main a[href="/admin/roles"]').first();
 
-    if (await rolesLink.isVisible()) {
-      await rolesLink.click();
-      await page.waitForLoadState('networkidle');
-      await expect(page).toHaveURL(/\/admin\/roles/);
-    }
+    // Wait for link to be visible and click
+    await expect(rolesLink).toBeVisible({ timeout: 10000 });
+    await rolesLink.click();
+    await page.waitForLoadState('networkidle');
+    await expect(page).toHaveURL(/\/admin\/roles/);
   });
 
   test('ADM-10: View permissions matrix', async ({ page }) => {

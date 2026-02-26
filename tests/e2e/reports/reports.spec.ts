@@ -32,14 +32,14 @@ test.describe('Reports', () => {
     await page.goto('/reports');
     await page.waitForLoadState('networkidle');
 
-    // Click Timesheets report link
-    const timesheetLink = page.locator('a:has-text("Timesheets"), a:has-text("Feuilles de temps")').first();
+    // Click Timesheets report link (target main content area, not sidebar)
+    const timesheetLink = page.locator('main a[href="/reports/timesheets"]').first();
 
-    if (await timesheetLink.isVisible()) {
-      await timesheetLink.click();
-      await page.waitForLoadState('networkidle');
-      await expect(page).toHaveURL(/\/reports\/timesheets/);
-    }
+    // Wait for link to be visible, scroll into view, and click
+    await expect(timesheetLink).toBeVisible({ timeout: 10000 });
+    await timesheetLink.scrollIntoViewIfNeeded();
+    await timesheetLink.click({ force: true });
+    await page.waitForURL(/\/reports\/timesheets/, { timeout: 15000 });
   });
 
   test('RPT-03: Timesheet report has filters', async ({ page }) => {
@@ -64,14 +64,14 @@ test.describe('Reports', () => {
     await page.goto('/reports');
     await page.waitForLoadState('networkidle');
 
-    // Click Invoice report link
-    const invoiceLink = page.locator('a:has-text("Invoice"), a:has-text("Factures")').first();
+    // Click Invoice report link (target main content area, not sidebar)
+    const invoiceLink = page.locator('main a[href="/reports/invoices"]').first();
 
-    if (await invoiceLink.isVisible()) {
-      await invoiceLink.click();
-      await page.waitForLoadState('networkidle');
-      await expect(page).toHaveURL(/\/reports\/invoices/);
-    }
+    // Wait for link to be visible, scroll into view, and click
+    await expect(invoiceLink).toBeVisible({ timeout: 10000 });
+    await invoiceLink.scrollIntoViewIfNeeded();
+    await invoiceLink.click({ force: true });
+    await page.waitForURL(/\/reports\/invoices/, { timeout: 15000 });
   });
 
   test('RPT-06: Invoice report shows aging buckets', async ({ page }) => {
