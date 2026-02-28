@@ -8,6 +8,8 @@ import { Building2, MoreHorizontal, Pencil, Trash2, Plus, ExternalLink } from 'l
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { SearchInput } from '@/components/ui/search-input'
+import { SortableHeader } from '@/components/ui/sortable-header'
+import { PaginationBar } from '@/components/ui/pagination-bar'
 import {
   Table,
   TableBody,
@@ -32,8 +34,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Card, CardContent } from '@/components/ui/card'
-import { useDebounceSearch, usePagination } from '@/hooks'
-import type { ClientWithProjects } from '@/app/(protected)/clients/actions'
+import { useDebounceSearch, usePagination, useSort } from '@/hooks'
+import type { ClientWithProjects, SortDirection } from '@/app/(protected)/clients/actions'
 import { deleteClientAction } from '@/app/(protected)/clients/actions'
 
 interface ClientListProps {
@@ -43,6 +45,8 @@ interface ClientListProps {
   currentPage: number
   pageSize: number
   searchQuery: string
+  sortColumn: string
+  sortDirection: SortDirection
 }
 
 export function ClientList({
@@ -52,6 +56,8 @@ export function ClientList({
   currentPage,
   pageSize,
   searchQuery,
+  sortColumn,
+  sortDirection,
 }: ClientListProps) {
   const router = useRouter()
   const t = useTranslations('clients')
@@ -68,11 +74,8 @@ export function ClientList({
   const {
     totalPages,
     goToPage,
+    setPageSize,
     isPending: isPagePending,
-    hasPrevious,
-    hasNext,
-    startIndex,
-    endIndex,
   } = usePagination({
     totalCount,
     pageSize,
@@ -80,7 +83,18 @@ export function ClientList({
     basePath: '/clients',
   })
 
-  const isPending = isSearchPending || isPagePending
+  const {
+    handleSort,
+    isSorted,
+    getSortDirection,
+    isPending: isSortPending,
+  } = useSort({
+    basePath: '/clients',
+    defaultColumn: sortColumn,
+    defaultDirection: sortDirection,
+  })
+
+  const isPending = isSearchPending || isPagePending || isSortPending
   const clientToDelete = useMemo(() => clients.find((c) => c.id === deleteId), [clients, deleteId])
 
   const handleDelete = async () => {
@@ -148,9 +162,29 @@ export function ClientList({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">{tCommon('labels.code')}</TableHead>
-                <TableHead>{tCommon('labels.name')}</TableHead>
-                <TableHead className="hidden md:table-cell">{tCommon('labels.email')}</TableHead>
+                <SortableHeader
+                  column="code"
+                  label={tCommon('labels.code')}
+                  isSorted={isSorted('code')}
+                  direction={getSortDirection('code')}
+                  onClick={() => handleSort('code')}
+                  className="w-[100px]"
+                />
+                <SortableHeader
+                  column="name"
+                  label={tCommon('labels.name')}
+                  isSorted={isSorted('name')}
+                  direction={getSortDirection('name')}
+                  onClick={() => handleSort('name')}
+                />
+                <SortableHeader
+                  column="general_email"
+                  label={tCommon('labels.email')}
+                  isSorted={isSorted('general_email')}
+                  direction={getSortDirection('general_email')}
+                  onClick={() => handleSort('general_email')}
+                  className="hidden md:table-cell"
+                />
                 <TableHead className="hidden sm:table-cell">{t('tabs.projects')}</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
@@ -222,33 +256,16 @@ export function ClientList({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            {tCommon('pagination.showing', {
-              start: startIndex,
-              end: endIndex,
-              total: totalCount,
-            })}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={!hasPrevious || isPending}
-            >
-              {tCommon('actions.previous')}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={!hasNext || isPending}
-            >
-              {tCommon('actions.next')}
-            </Button>
-          </div>
-        </div>
+        <PaginationBar
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          pageSize={pageSize}
+          pageSizeOptions={[20, 50, 100]}
+          onPageChange={goToPage}
+          onPageSizeChange={setPageSize}
+          isPending={isPending}
+        />
       )}
 
       {/* Delete Confirmation Dialog */}

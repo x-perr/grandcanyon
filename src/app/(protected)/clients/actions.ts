@@ -20,14 +20,26 @@ export type ClientWithProjects = {
   projects: { count: number }[]
 }
 
+export type SortColumn = 'code' | 'name' | 'general_email' | 'created_at'
+export type SortDirection = 'asc' | 'desc'
+
 export async function getClients(options?: {
   search?: string
   showDeleted?: boolean
   limit?: number
   offset?: number
+  sortColumn?: SortColumn
+  sortDirection?: SortDirection
 }): Promise<{ clients: ClientWithProjects[]; count: number }> {
   const supabase = await createClient()
-  const { search, showDeleted = false, limit = 25, offset = 0 } = options ?? {}
+  const {
+    search,
+    showDeleted = false,
+    limit = 25,
+    offset = 0,
+    sortColumn = 'name',
+    sortDirection = 'asc',
+  } = options ?? {}
 
   let query = supabase
     .from('clients')
@@ -58,8 +70,10 @@ export async function getClients(options?: {
     query = query.or(`code.ilike.%${search}%,name.ilike.%${search}%,short_name.ilike.%${search}%`)
   }
 
-  // Pagination & order
-  query = query.order('name').range(offset, offset + limit - 1)
+  // Sorting & pagination
+  query = query
+    .order(sortColumn, { ascending: sortDirection === 'asc' })
+    .range(offset, offset + limit - 1)
 
   const { data, count, error } = await query
 

@@ -15,6 +15,8 @@ interface UsePaginationOptions {
   basePath: string
   /** Enable keyboard navigation (arrow keys) */
   enableKeyboardNav?: boolean
+  /** Default page size (for localStorage persistence) */
+  defaultPageSize?: number
 }
 
 interface UsePaginationReturn {
@@ -26,6 +28,8 @@ interface UsePaginationReturn {
   goToPrevious: () => void
   /** Navigate to next page */
   goToNext: () => void
+  /** Change the page size */
+  setPageSize: (size: number) => void
   /** Whether a page transition is pending */
   isPending: boolean
   /** Whether there's a previous page */
@@ -94,6 +98,16 @@ export function usePagination({
     })
   }, [searchParams, router, basePath, totalPages])
 
+  const setPageSize = useCallback((size: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('pageSize', String(size))
+    params.set('page', '1') // Reset to first page when changing page size
+
+    startTransition(() => {
+      router.push(`${basePath}?${params.toString()}`)
+    })
+  }, [searchParams, router, basePath])
+
   const goToPrevious = useCallback(() => {
     if (hasPrevious) goToPage(currentPage - 1)
   }, [hasPrevious, currentPage, goToPage])
@@ -134,6 +148,7 @@ export function usePagination({
     goToPage,
     goToPrevious,
     goToNext,
+    setPageSize,
     isPending,
     hasPrevious,
     hasNext,
