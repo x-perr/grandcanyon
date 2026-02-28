@@ -123,6 +123,15 @@ export function getNextWeekStart(weekStart: Date): Date {
 }
 
 /**
+ * Add days to a date
+ */
+export function addDays(date: Date, days: number): Date {
+  const d = new Date(date)
+  d.setDate(d.getDate() + days)
+  return d
+}
+
+/**
  * Check if a week start date is the current week
  */
 export function isCurrentWeek(weekStart: Date): boolean {

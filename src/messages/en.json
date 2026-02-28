@@ -48,7 +48,8 @@
       "pending": "Pending",
       "delivered": "Delivered",
       "bounced": "Bounced",
-      "failed": "Failed"
+      "failed": "Failed",
+      "not_started": "Not Started"
     },
     "labels": {
       "from": "From",
@@ -657,6 +658,23 @@
     "team": {
       "title": "Team Timesheets",
       "subtitle": "View and manage team timesheet submissions",
+      "today": "Today",
+      "selected": "{count} selected",
+      "approve_selected": "Approve Selected",
+      "bulk_approved": "Approved {count} timesheets",
+      "total_employees": "Total Employees",
+      "total_hours": "Total Hours",
+      "pending_approval": "Pending Approval",
+      "approved": "Approved",
+      "select_all": "Select all",
+      "select_employee": "Select {name}",
+      "employee": "Employee",
+      "submitted": "Submitted",
+      "no_employees": "No employees found",
+      "detail_title": "Timesheet Details",
+      "reject_reason": "Please provide a reason for rejection (optional):",
+      "no_timesheet": "Employee has not started their timesheet for this week",
+      "no_data": "No timesheet data available",
       "summary": {
         "total": "Team Members",
         "submitted": "Pending Review",
@@ -684,13 +702,16 @@
       },
       "search_placeholder": "Search by name or email...",
       "select_all_submitted": "Select All Submitted",
-      "deselect_all": "Deselect All",
-      "approve_selected": "Approve Selected ({count})",
-      "approved_success": "Timesheet approved",
-      "rejected_success": "Timesheet rejected",
-      "bulk_approved_success": "Approved {count} timesheets",
-      "no_results": "No team members match your filters",
-      "footer_stats": "Showing {showing} of {total} team members | {pendingCount} pending review"
+      "deselect_all": "Deselect All"
+    },
+    "detail": {
+      "hours_by_project": "Hours by Project",
+      "project": "Project",
+      "total": "Total",
+      "daily_total": "Daily Total",
+      "no_entries": "No time entries",
+      "approved_on": "Approved on {date}",
+      "rejection_reason": "Rejection reason"
     }
   },
   "expenses": {

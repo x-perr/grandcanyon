@@ -14,6 +14,7 @@ const statusColors = {
   draft: 'bg-status-neutral-muted text-status-neutral-foreground border-status-neutral-muted',
   inactive: 'bg-status-neutral-muted text-status-neutral-foreground border-status-neutral-muted',
   void: 'bg-status-neutral-muted text-status-neutral-foreground border-status-neutral-muted',
+  not_started: 'bg-status-neutral-muted text-status-neutral-foreground border-status-neutral-muted',
 
   // Success states (green)
   active: 'bg-status-success-muted text-status-success-foreground border-status-success-muted',
