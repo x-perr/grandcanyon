@@ -653,6 +653,44 @@
       "copy_failed": "Failed to copy entries",
       "approve_failed": "Failed to approve timesheet",
       "reject_failed": "Failed to reject timesheet"
+    },
+    "team": {
+      "title": "Team Timesheets",
+      "subtitle": "View and manage team timesheet submissions",
+      "summary": {
+        "total": "Team Members",
+        "submitted": "Pending Review",
+        "approved": "Approved",
+        "draft": "In Progress",
+        "total_hours": "Total Hours"
+      },
+      "status": {
+        "not_started": "Not Started",
+        "draft": "Draft",
+        "submitted": "Submitted",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "locked": "Locked"
+      },
+      "columns": {
+        "employee": "Employee",
+        "status": "Status",
+        "hours": "Hours",
+        "submitted": "Submitted",
+        "actions": "Actions"
+      },
+      "filter": {
+        "all": "All Statuses"
+      },
+      "search_placeholder": "Search by name or email...",
+      "select_all_submitted": "Select All Submitted",
+      "deselect_all": "Deselect All",
+      "approve_selected": "Approve Selected ({count})",
+      "approved_success": "Timesheet approved",
+      "rejected_success": "Timesheet rejected",
+      "bulk_approved_success": "Approved {count} timesheets",
+      "no_results": "No team members match your filters",
+      "footer_stats": "Showing {showing} of {total} team members | {pendingCount} pending review"
     }
   },
   "expenses": {

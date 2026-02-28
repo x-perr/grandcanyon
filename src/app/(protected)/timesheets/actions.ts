@@ -777,3 +777,171 @@ export async function copyPreviousWeek(timesheetId: string) {
   revalidatePath('/timesheets')
   return { success: true, entriesCopied: newEntries.length }
 }
+
+// === TEAM TIMESHEETS (ADMIN VIEW) ===
+
+export type TeamTimesheetRow = {
+  userId: string
+  firstName: string
+  lastName: string
+  email: string
+  timesheetId: string | null
+  status: 'not_started' | 'draft' | 'submitted' | 'approved' | 'rejected' | 'locked'
+  totalHours: number
+  submittedAt: string | null
+  approvedAt: string | null
+}
+
+export type TeamTimesheetSummary = {
+  total: number
+  notStarted: number
+  draft: number
+  submitted: number
+  approved: number
+  totalHours: number
+}
+
+/**
+ * Get all team members with their timesheet status for a specific week
+ * Requires timesheets.view_all permission (admin)
+ */
+export async function getTeamTimesheetsByWeek(
+  weekStart: string
+): Promise<{ rows: TeamTimesheetRow[]; summary: TeamTimesheetSummary }> {
+  const supabase = await createClient()
+  const permissions = await getUserPermissions()
+
+  // Check permission
+  if (!hasPermission(permissions, 'timesheets.view_all') && !hasPermission(permissions, 'admin.manage')) {
+    return {
+      rows: [],
+      summary: { total: 0, notStarted: 0, draft: 0, submitted: 0, approved: 0, totalHours: 0 },
+    }
+  }
+
+  // Normalize to Monday
+  const monday = getMonday(new Date(weekStart))
+  const weekStartISO = formatDateISO(monday)
+
+  // Get all active users
+  const { data: users, error: usersError } = await supabase
+    .from('profiles')
+    .select('id, first_name, last_name, email')
+    .eq('is_active', true)
+    .is('deleted_at', null)
+    .order('last_name')
+    .order('first_name')
+
+  if (usersError || !users) {
+    console.error('Error fetching users:', usersError)
+    return {
+      rows: [],
+      summary: { total: 0, notStarted: 0, draft: 0, submitted: 0, approved: 0, totalHours: 0 },
+    }
+  }
+
+  // Get all timesheets for this week
+  const { data: timesheets, error: tsError } = await supabase
+    .from('timesheets')
+    .select('id, user_id, status, submitted_at, approved_at')
+    .eq('week_start', weekStartISO)
+
+  if (tsError) {
+    console.error('Error fetching timesheets:', tsError)
+  }
+
+  // Get hours for each timesheet
+  const timesheetIds = (timesheets ?? []).map((ts) => ts.id)
+  let hoursByTimesheet = new Map<string, number>()
+
+  if (timesheetIds.length > 0) {
+    const { data: entries } = await supabase
+      .from('timesheet_entries')
+      .select('timesheet_id, hours')
+      .in('timesheet_id', timesheetIds)
+
+    entries?.forEach((entry) => {
+      const total = entry.hours?.reduce((sum: number, h: number | null) => sum + (h ?? 0), 0) ?? 0
+      hoursByTimesheet.set(entry.timesheet_id, (hoursByTimesheet.get(entry.timesheet_id) ?? 0) + total)
+    })
+  }
+
+  // Build lookup map
+  const timesheetByUser = new Map(timesheets?.map((ts) => [ts.user_id, ts]) ?? [])
+
+  // Build rows
+  const rows: TeamTimesheetRow[] = users.map((user) => {
+    const ts = timesheetByUser.get(user.id)
+    const hours = ts ? hoursByTimesheet.get(ts.id) ?? 0 : 0
+
+    return {
+      userId: user.id,
+      firstName: user.first_name ?? '',
+      lastName: user.last_name ?? '',
+      email: user.email ?? '',
+      timesheetId: ts?.id ?? null,
+      status: ts?.status ?? 'not_started',
+      totalHours: hours,
+      submittedAt: ts?.submitted_at ?? null,
+      approvedAt: ts?.approved_at ?? null,
+    }
+  })
+
+  // Calculate summary
+  const summary: TeamTimesheetSummary = {
+    total: rows.length,
+    notStarted: rows.filter((r) => r.status === 'not_started').length,
+    draft: rows.filter((r) => r.status === 'draft').length,
+    submitted: rows.filter((r) => r.status === 'submitted').length,
+    approved: rows.filter((r) => r.status === 'approved' || r.status === 'locked').length,
+    totalHours: rows.reduce((sum, r) => sum + r.totalHours, 0),
+  }
+
+  return { rows, summary }
+}
+
+/**
+ * Bulk approve multiple timesheets
+ */
+export async function bulkApproveTimesheets(timesheetIds: string[]) {
+  const supabase = await createClient()
+  const profile = await getProfile()
+
+  if (!profile) {
+    return { error: 'Not authenticated' }
+  }
+
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'timesheets.approve') && !hasPermission(permissions, 'admin.manage')) {
+    return { error: 'Not authorized to approve timesheets' }
+  }
+
+  // Get all submitted timesheets
+  const { data: timesheets, error: fetchError } = await supabase
+    .from('timesheets')
+    .select('id, status, user_id')
+    .in('id', timesheetIds)
+    .eq('status', 'submitted')
+
+  if (fetchError || !timesheets || timesheets.length === 0) {
+    return { error: 'No submitted timesheets found' }
+  }
+
+  // Approve all
+  const { error: updateError } = await supabase
+    .from('timesheets')
+    .update({
+      status: 'approved',
+      approved_at: new Date().toISOString(),
+      approved_by: profile.id,
+    })
+    .in('id', timesheets.map((ts) => ts.id))
+
+  if (updateError) {
+    console.error('Error bulk approving:', updateError)
+    return { error: 'Failed to approve timesheets' }
+  }
+
+  revalidatePath('/timesheets')
+  return { success: true, approvedCount: timesheets.length }
+}

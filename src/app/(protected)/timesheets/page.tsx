@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatDateISO, getCurrentWeekStart } from '@/lib/date'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Plus, Users } from 'lucide-react'
 
 interface TimesheetsPageProps {
   searchParams: Promise<{
@@ -33,6 +33,7 @@ export default async function TimesheetsPage({ searchParams }: TimesheetsPagePro
   ])
 
   const canApprove = hasPermission(permissions, 'timesheets.approve')
+  const canViewAll = hasPermission(permissions, 'timesheets.view_all') || hasPermission(permissions, 'admin.manage')
   const currentWeekStart = formatDateISO(getCurrentWeekStart())
 
   return (
@@ -42,12 +43,22 @@ export default async function TimesheetsPage({ searchParams }: TimesheetsPagePro
           <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
-        <Button asChild>
-          <Link href={`/timesheets/${currentWeekStart}`}>
-            <Plus className="mr-2 h-4 w-4" />
-            {t('current_week')}
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          {canViewAll && (
+            <Button variant="outline" asChild>
+              <Link href={`/timesheets/team/${currentWeekStart}`}>
+                <Users className="mr-2 h-4 w-4" />
+                {t('team.title')}
+              </Link>
+            </Button>
+          )}
+          <Button asChild>
+            <Link href={`/timesheets/${currentWeekStart}`}>
+              <Plus className="mr-2 h-4 w-4" />
+              {t('current_week')}
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue={tab} className="space-y-4">

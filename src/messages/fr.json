@@ -653,6 +653,44 @@
       "copy_failed": "Échec de la copie",
       "approve_failed": "Échec de l'approbation",
       "reject_failed": "Échec du refus"
+    },
+    "team": {
+      "title": "Feuilles de temps de l'équipe",
+      "subtitle": "Consultez et gérez les soumissions de feuilles de temps de l'équipe",
+      "summary": {
+        "total": "Membres de l'équipe",
+        "submitted": "En attente de révision",
+        "approved": "Approuvées",
+        "draft": "En cours",
+        "total_hours": "Total des heures"
+      },
+      "status": {
+        "not_started": "Non commencé",
+        "draft": "Brouillon",
+        "submitted": "Soumise",
+        "approved": "Approuvée",
+        "rejected": "Refusée",
+        "locked": "Verrouillée"
+      },
+      "columns": {
+        "employee": "Employé",
+        "status": "Statut",
+        "hours": "Heures",
+        "submitted": "Soumis le",
+        "actions": "Actions"
+      },
+      "filter": {
+        "all": "Tous les statuts"
+      },
+      "search_placeholder": "Rechercher par nom ou courriel...",
+      "select_all_submitted": "Sélectionner les soumises",
+      "deselect_all": "Tout désélectionner",
+      "approve_selected": "Approuver la sélection ({count})",
+      "approved_success": "Feuille de temps approuvée",
+      "rejected_success": "Feuille de temps refusée",
+      "bulk_approved_success": "{count} feuilles de temps approuvées",
+      "no_results": "Aucun membre de l'équipe ne correspond à vos filtres",
+      "footer_stats": "Affichage de {showing} sur {total} membres | {pendingCount} en attente de révision"
     }
   },
   "expenses": {
