@@ -47,9 +47,15 @@ import {
   approveTimesheet,
   rejectTimesheet,
   getTimesheetById,
+  approveTimesheetOnly,
+  rejectTimesheetOnly,
+  approveExpensesOnly,
+  rejectExpensesOnly,
+  approveBoth,
+  rejectBoth,
 } from '@/app/(protected)/timesheets/actions'
 import { getExpensesByUserAndWeek } from '@/app/(protected)/expenses/actions'
-import { TimesheetDetailPanel } from './timesheet-detail-panel'
+import { TimesheetDetailPanel, type ApprovalTarget, type RejectionTarget } from './timesheet-detail-panel'
 
 interface TeamTimesheetTableProps {
   rows: TeamTimesheetRow[]
@@ -161,6 +167,84 @@ export function TeamTimesheetTable({
       router.refresh()
     }
   }, [t, router])
+
+  // Granular approval handlers for Phase 3
+  const handleApproveGranular = useCallback(async (
+    timesheetId: string | null,
+    expenseId: string | null,
+    target: ApprovalTarget
+  ) => {
+    let result: { success?: boolean; error?: string }
+
+    if (target === 'both' && timesheetId && expenseId) {
+      result = await approveBoth(timesheetId, expenseId)
+    } else if (target === 'timesheet' && timesheetId) {
+      result = await approveTimesheetOnly(timesheetId)
+    } else if (target === 'expenses' && expenseId) {
+      result = await approveExpensesOnly(expenseId)
+    } else {
+      toast.error(t('team.nothing_to_approve'))
+      return
+    }
+
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      toast.success(t('toast.approved'))
+      // Refresh data in detail panel
+      if (detailData?.id) {
+        const userId = (Array.isArray(detailData.user) ? detailData.user[0] : detailData.user)?.id
+        if (userId) {
+          const [newTimesheet, newExpenses] = await Promise.all([
+            getTimesheetById(detailData.id),
+            getExpensesByUserAndWeek(userId, weekStart),
+          ])
+          setDetailData(newTimesheet)
+          setExpenseData(newExpenses)
+        }
+      }
+      router.refresh()
+    }
+  }, [t, router, detailData, weekStart])
+
+  const handleRejectGranular = useCallback(async (
+    timesheetId: string | null,
+    expenseId: string | null,
+    target: RejectionTarget,
+    reason?: string
+  ) => {
+    let result: { success?: boolean; error?: string }
+
+    if (target === 'both' && timesheetId) {
+      result = await rejectBoth(timesheetId, expenseId, reason)
+    } else if (target === 'timesheet' && timesheetId) {
+      result = await rejectTimesheetOnly(timesheetId, reason)
+    } else if (target === 'expenses' && expenseId) {
+      result = await rejectExpensesOnly(expenseId, reason)
+    } else {
+      toast.error(t('team.nothing_to_reject'))
+      return
+    }
+
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      toast.success(t('toast.rejected'))
+      // Refresh data in detail panel
+      if (detailData?.id) {
+        const userId = (Array.isArray(detailData.user) ? detailData.user[0] : detailData.user)?.id
+        if (userId) {
+          const [newTimesheet, newExpenses] = await Promise.all([
+            getTimesheetById(detailData.id),
+            getExpensesByUserAndWeek(userId, weekStart),
+          ])
+          setDetailData(newTimesheet)
+          setExpenseData(newExpenses)
+        }
+      }
+      router.refresh()
+    }
+  }, [t, router, detailData, weekStart])
 
   const handleViewDetail = useCallback(async (row: TeamTimesheetRow) => {
     if (!row.timesheetId) {
@@ -400,6 +484,8 @@ export function TeamTimesheetTable({
             locale={locale}
             onApprove={handleApprove}
             onReject={handleReject}
+            onApproveGranular={handleApproveGranular}
+            onRejectGranular={handleRejectGranular}
             canApprove={canApprove}
           />
         </SheetContent>

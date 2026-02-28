@@ -945,3 +945,408 @@ export async function bulkApproveTimesheets(timesheetIds: string[]) {
   revalidatePath('/timesheets')
   return { success: true, approvedCount: timesheets.length }
 }
+
+// === COMBINED SUBMISSION (PHASE 3) ===
+
+/**
+ * Submit both timesheet and expenses for a week in one action
+ * Creates expense report if it doesn't exist but has no entries
+ */
+export async function submitWeek(weekStart: string) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Normalize to Monday
+  const monday = getMonday(new Date(weekStart))
+  const weekStartISO = formatDateISO(monday)
+
+  // Get timesheet for this week
+  const { data: timesheet } = await supabase
+    .from('timesheets')
+    .select('id, status, user_id')
+    .eq('user_id', user.id)
+    .eq('week_start', weekStartISO)
+    .single()
+
+  // Get expense report for this week
+  const { data: expense } = await supabase
+    .from('expenses')
+    .select('id, status, user_id')
+    .eq('user_id', user.id)
+    .eq('week_start', weekStartISO)
+    .single()
+
+  const results: {
+    timesheetSubmitted: boolean
+    expenseSubmitted: boolean
+    timesheetError?: string
+    expenseError?: string
+  } = {
+    timesheetSubmitted: false,
+    expenseSubmitted: false,
+  }
+
+  // Submit timesheet if exists and is draft
+  if (timesheet) {
+    if (timesheet.status === 'draft') {
+      // Check has entries
+      const { count: entryCount } = await supabase
+        .from('timesheet_entries')
+        .select('*', { count: 'exact', head: true })
+        .eq('timesheet_id', timesheet.id)
+
+      if (entryCount && entryCount > 0) {
+        const { error: tsError } = await supabase
+          .from('timesheets')
+          .update({
+            status: 'submitted',
+            submitted_at: new Date().toISOString(),
+          })
+          .eq('id', timesheet.id)
+
+        if (tsError) {
+          results.timesheetError = 'Failed to submit timesheet'
+        } else {
+          results.timesheetSubmitted = true
+        }
+      } else {
+        results.timesheetError = 'No timesheet entries to submit'
+      }
+    } else if (timesheet.status === 'submitted' || timesheet.status === 'approved') {
+      results.timesheetError = 'Timesheet already submitted'
+    }
+  } else {
+    results.timesheetError = 'No timesheet for this week'
+  }
+
+  // Submit expense if exists and is draft
+  if (expense) {
+    if (expense.status === 'draft') {
+      // Check has entries
+      const { count: expEntryCount } = await supabase
+        .from('expense_entries')
+        .select('*', { count: 'exact', head: true })
+        .eq('expense_id', expense.id)
+
+      if (expEntryCount && expEntryCount > 0) {
+        const { error: expError } = await supabase
+          .from('expenses')
+          .update({
+            status: 'submitted',
+            submitted_at: new Date().toISOString(),
+          })
+          .eq('id', expense.id)
+
+        if (expError) {
+          results.expenseError = 'Failed to submit expenses'
+        } else {
+          results.expenseSubmitted = true
+        }
+      } else {
+        // No expense entries - this is OK, not an error
+        results.expenseError = 'No expense entries'
+      }
+    } else if (expense.status === 'submitted' || expense.status === 'approved') {
+      results.expenseError = 'Expenses already submitted'
+    }
+  }
+  // No expense report is OK - not everyone has expenses
+
+  revalidatePath('/timesheets')
+  revalidatePath('/expenses')
+
+  // Return success if at least timesheet was submitted
+  if (results.timesheetSubmitted) {
+    return { success: true, ...results }
+  }
+
+  return { error: results.timesheetError || 'Nothing to submit', ...results }
+}
+
+// === GRANULAR APPROVAL FOR TEAM VIEW (PHASE 3) ===
+
+/**
+ * Admin approve timesheet only (granular approval)
+ */
+export async function approveTimesheetOnly(timesheetId: string) {
+  const supabase = await createClient()
+  const profile = await getProfile()
+
+  if (!profile) {
+    return { error: 'Not authenticated' }
+  }
+
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'timesheets.approve') && !hasPermission(permissions, 'admin.manage')) {
+    return { error: 'Not authorized to approve timesheets' }
+  }
+
+  // Get timesheet
+  const { data: timesheet, error: tsError } = await supabase
+    .from('timesheets')
+    .select('id, status')
+    .eq('id', timesheetId)
+    .single()
+
+  if (tsError || !timesheet) {
+    return { error: 'Timesheet not found' }
+  }
+
+  if (timesheet.status !== 'submitted') {
+    return { error: 'Timesheet not pending approval' }
+  }
+
+  const { error } = await supabase
+    .from('timesheets')
+    .update({
+      status: 'approved',
+      approved_at: new Date().toISOString(),
+      approved_by: profile.id,
+    })
+    .eq('id', timesheetId)
+
+  if (error) {
+    console.error('Error approving timesheet:', error)
+    return { error: 'Failed to approve timesheet' }
+  }
+
+  revalidatePath('/timesheets')
+  return { success: true }
+}
+
+/**
+ * Admin reject timesheet only (granular rejection)
+ */
+export async function rejectTimesheetOnly(timesheetId: string, reason?: string) {
+  const supabase = await createClient()
+  const profile = await getProfile()
+
+  if (!profile) {
+    return { error: 'Not authenticated' }
+  }
+
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'timesheets.approve') && !hasPermission(permissions, 'admin.manage')) {
+    return { error: 'Not authorized to reject timesheets' }
+  }
+
+  // Get timesheet
+  const { data: timesheet, error: tsError } = await supabase
+    .from('timesheets')
+    .select('id, status')
+    .eq('id', timesheetId)
+    .single()
+
+  if (tsError || !timesheet) {
+    return { error: 'Timesheet not found' }
+  }
+
+  if (!['submitted', 'approved'].includes(timesheet.status ?? '')) {
+    return { error: 'Cannot reject this timesheet' }
+  }
+
+  const { error } = await supabase
+    .from('timesheets')
+    .update({
+      status: 'draft',
+      submitted_at: null,
+      approved_at: null,
+      approved_by: null,
+      rejection_reason: reason || null,
+    })
+    .eq('id', timesheetId)
+
+  if (error) {
+    console.error('Error rejecting timesheet:', error)
+    return { error: 'Failed to reject timesheet' }
+  }
+
+  revalidatePath('/timesheets')
+  return { success: true }
+}
+
+/**
+ * Admin approve expenses only (granular approval)
+ */
+export async function approveExpensesOnly(expenseId: string) {
+  const supabase = await createClient()
+  const profile = await getProfile()
+
+  if (!profile) {
+    return { error: 'Not authenticated' }
+  }
+
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'expenses.approve') && !hasPermission(permissions, 'admin.manage')) {
+    return { error: 'Not authorized to approve expenses' }
+  }
+
+  // Get expense
+  const { data: expense, error: expError } = await supabase
+    .from('expenses')
+    .select('id, status')
+    .eq('id', expenseId)
+    .single()
+
+  if (expError || !expense) {
+    return { error: 'Expense report not found' }
+  }
+
+  if (expense.status !== 'submitted') {
+    return { error: 'Expense report not pending approval' }
+  }
+
+  const { error } = await supabase
+    .from('expenses')
+    .update({
+      status: 'approved',
+      approved_at: new Date().toISOString(),
+      approved_by: profile.id,
+    })
+    .eq('id', expenseId)
+
+  if (error) {
+    console.error('Error approving expenses:', error)
+    return { error: 'Failed to approve expenses' }
+  }
+
+  revalidatePath('/expenses')
+  revalidatePath('/timesheets')
+  return { success: true }
+}
+
+/**
+ * Admin reject expenses only (granular rejection)
+ */
+export async function rejectExpensesOnly(expenseId: string, reason?: string) {
+  const supabase = await createClient()
+  const profile = await getProfile()
+
+  if (!profile) {
+    return { error: 'Not authenticated' }
+  }
+
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'expenses.approve') && !hasPermission(permissions, 'admin.manage')) {
+    return { error: 'Not authorized to reject expenses' }
+  }
+
+  // Get expense
+  const { data: expense, error: expError } = await supabase
+    .from('expenses')
+    .select('id, status')
+    .eq('id', expenseId)
+    .single()
+
+  if (expError || !expense) {
+    return { error: 'Expense report not found' }
+  }
+
+  if (!['submitted', 'approved'].includes(expense.status ?? '')) {
+    return { error: 'Cannot reject this expense report' }
+  }
+
+  const { error } = await supabase
+    .from('expenses')
+    .update({
+      status: 'draft',
+      submitted_at: null,
+      approved_at: null,
+      approved_by: null,
+      rejection_reason: reason || null,
+    })
+    .eq('id', expenseId)
+
+  if (error) {
+    console.error('Error rejecting expenses:', error)
+    return { error: 'Failed to reject expenses' }
+  }
+
+  revalidatePath('/expenses')
+  revalidatePath('/timesheets')
+  return { success: true }
+}
+
+/**
+ * Approve both timesheet and expenses together
+ */
+export async function approveBoth(timesheetId: string, expenseId: string | null) {
+  const results: {
+    timesheetApproved: boolean
+    expenseApproved: boolean
+    timesheetError?: string
+    expenseError?: string
+  } = {
+    timesheetApproved: false,
+    expenseApproved: false,
+  }
+
+  // Approve timesheet
+  const tsResult = await approveTimesheetOnly(timesheetId)
+  if (tsResult.error) {
+    results.timesheetError = tsResult.error
+  } else {
+    results.timesheetApproved = true
+  }
+
+  // Approve expenses if exists
+  if (expenseId) {
+    const expResult = await approveExpensesOnly(expenseId)
+    if (expResult.error) {
+      results.expenseError = expResult.error
+    } else {
+      results.expenseApproved = true
+    }
+  }
+
+  if (results.timesheetApproved || results.expenseApproved) {
+    return { success: true, ...results }
+  }
+
+  return { error: results.timesheetError || 'Nothing to approve', ...results }
+}
+
+/**
+ * Reject both timesheet and expenses together
+ */
+export async function rejectBoth(timesheetId: string, expenseId: string | null, reason?: string) {
+  const results: {
+    timesheetRejected: boolean
+    expenseRejected: boolean
+    timesheetError?: string
+    expenseError?: string
+  } = {
+    timesheetRejected: false,
+    expenseRejected: false,
+  }
+
+  // Reject timesheet
+  const tsResult = await rejectTimesheetOnly(timesheetId, reason)
+  if (tsResult.error) {
+    results.timesheetError = tsResult.error
+  } else {
+    results.timesheetRejected = true
+  }
+
+  // Reject expenses if exists
+  if (expenseId) {
+    const expResult = await rejectExpensesOnly(expenseId, reason)
+    if (expResult.error) {
+      results.expenseError = expResult.error
+    } else {
+      results.expenseRejected = true
+    }
+  }
+
+  if (results.timesheetRejected || results.expenseRejected) {
+    return { success: true, ...results }
+  }
+
+  return { error: results.timesheetError || 'Nothing to reject', ...results }
+}
