@@ -101,6 +101,142 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams): Promise<
   }
 }
 
+// === TIMESHEET REMINDER EMAILS ===
+
+export interface SendTimesheetReminderParams {
+  to: string
+  employeeName: string
+  weekRange: string
+  dueDate: string
+  companyName?: string
+  companyEmail?: string
+}
+
+/**
+ * Send timesheet reminder email to an employee
+ */
+export async function sendTimesheetReminder(params: SendTimesheetReminderParams): Promise<{
+  success: boolean
+  error?: string
+}> {
+  const {
+    to,
+    employeeName,
+    weekRange,
+    dueDate,
+    companyName = 'Systèmes Intérieurs Grand Canyon',
+    companyEmail = 'admin@grandcanyon.ca',
+  } = params
+
+  const subject = `Rappel: Feuille de temps / Timesheet Reminder - ${weekRange}`
+  const body = generateTimesheetReminderBody({
+    employeeName,
+    weekRange,
+    dueDate,
+    companyName,
+    companyEmail,
+  })
+
+  try {
+    const result = await getResend().emails.send({
+      from: `${companyName} <timesheets@grandcanyon.ca>`,
+      to,
+      replyTo: companyEmail,
+      subject,
+      html: body,
+    })
+
+    if (result.error) {
+      return { success: false, error: result.error.message }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error('Error sending timesheet reminder:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to send email',
+    }
+  }
+}
+
+/**
+ * Generate bilingual HTML body for timesheet reminder
+ */
+function generateTimesheetReminderBody(params: {
+  employeeName: string
+  weekRange: string
+  dueDate: string
+  companyName: string
+  companyEmail: string
+}): string {
+  const { employeeName, weekRange, dueDate, companyName, companyEmail } = params
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background-color: #fef3c7; border-radius: 8px; padding: 30px; margin-bottom: 20px; border-left: 4px solid #f59e0b;">
+    <h1 style="margin: 0 0 10px 0; color: #1a1a1a; font-size: 24px;">
+      ⏰ Rappel de feuille de temps
+    </h1>
+    <p style="margin: 0; color: #666; font-size: 14px;">
+      Timesheet Reminder
+    </p>
+  </div>
+
+  <p style="margin-bottom: 20px;">Bonjour ${employeeName},</p>
+
+  <p style="margin-bottom: 20px;">
+    Ce message est un rappel amical que votre feuille de temps pour la semaine du <strong>${weekRange}</strong> n'a pas encore été soumise.
+    <br><br>
+    <span style="color: #666;">This is a friendly reminder that your timesheet for the week of <strong>${weekRange}</strong> has not been submitted yet.</span>
+  </p>
+
+  <table style="width: 100%; border-collapse: collapse; margin: 25px 0; background-color: #f8f9fa; border-radius: 8px; overflow: hidden;">
+    <tr>
+      <td style="padding: 15px 20px; border-bottom: 1px solid #e9ecef;">
+        <strong>Semaine / Week</strong>
+      </td>
+      <td style="padding: 15px 20px; border-bottom: 1px solid #e9ecef; text-align: right; font-weight: bold;">
+        ${weekRange}
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 15px 20px;">
+        <strong>Date limite / Due Date</strong>
+      </td>
+      <td style="padding: 15px 20px; text-align: right; color: #dc2626; font-weight: bold;">
+        ${dueDate}
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin: 25px 0;">
+    Veuillez soumettre votre feuille de temps dès que possible.<br>
+    <span style="color: #666;">Please submit your timesheet as soon as possible.</span>
+  </p>
+
+  <p style="margin-bottom: 30px; color: #666;">
+    Merci de votre collaboration!<br>
+    <span style="color: #999;">Thank you for your cooperation!</span>
+  </p>
+
+  <hr style="border: none; border-top: 1px solid #e9ecef; margin: 30px 0;">
+
+  <p style="font-size: 12px; color: #666; margin: 0;">
+    ${companyName}<br>
+    <a href="mailto:${companyEmail}" style="color: #0066cc;">${companyEmail}</a>
+  </p>
+</body>
+</html>
+  `.trim()
+}
+
 /**
  * Generate bilingual HTML email body
  */

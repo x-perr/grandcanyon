@@ -723,7 +723,24 @@
       "rejecting": "Rejecting...",
       "confirm_reject": "Confirm Rejection",
       "nothing_to_approve": "Nothing to approve",
-      "nothing_to_reject": "Nothing to reject"
+      "nothing_to_reject": "Nothing to reject",
+      "export": "Export CSV",
+      "send_reminders": "Send Reminders ({count})",
+      "csv": {
+        "last_name": "Last Name",
+        "first_name": "First Name",
+        "email": "Email",
+        "status": "Status",
+        "hours": "Hours",
+        "submitted_at": "Submitted Date",
+        "approved_at": "Approved Date",
+        "exported": "Timesheets exported to CSV"
+      },
+      "reminders": {
+        "confirm": "Send reminder emails to {count} employees who haven't submitted their timesheets?",
+        "sent": "Sent {count} reminders successfully",
+        "failed": "{count} reminders failed to send"
+      }
     },
     "detail": {
       "hours_by_project": "Hours by Project",

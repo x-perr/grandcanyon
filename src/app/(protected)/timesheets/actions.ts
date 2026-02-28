@@ -3,7 +3,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { getUserPermissions, hasPermission, getProfile } from '@/lib/auth'
-import { formatDateISO, getMonday, getSunday, getPreviousWeekStart } from '@/lib/date'
+import { formatDateISO, getMonday, getSunday, getPreviousWeekStart, formatWeekRangeLocale } from '@/lib/date'
+import { logAudit } from '@/lib/audit'
+import { sendTimesheetReminder } from '@/lib/email'
 import { timesheetEntrySchema } from '@/lib/validations/timesheet'
 import type { Enums, Tables } from '@/types/database'
 
@@ -629,6 +631,15 @@ export async function approveTimesheet(timesheetId: string) {
     return { error: 'Failed to approve timesheet' }
   }
 
+  // Audit log
+  await logAudit({
+    action: 'approve',
+    entityType: 'timesheet',
+    entityId: timesheetId,
+    oldValues: { status: 'submitted' },
+    newValues: { status: 'approved', approved_by: profile.id },
+  })
+
   revalidatePath('/timesheets')
   return { success: true }
 }
@@ -690,6 +701,15 @@ export async function rejectTimesheet(timesheetId: string, reason?: string) {
     console.error('Error rejecting timesheet:', error)
     return { error: 'Failed to reject timesheet' }
   }
+
+  // Audit log
+  await logAudit({
+    action: 'reject',
+    entityType: 'timesheet',
+    entityId: timesheetId,
+    oldValues: { status: timesheet.status },
+    newValues: { status: 'draft', rejection_reason: reason || null },
+  })
 
   revalidatePath('/timesheets')
   return { success: true }
@@ -942,6 +962,17 @@ export async function bulkApproveTimesheets(timesheetIds: string[]) {
     return { error: 'Failed to approve timesheets' }
   }
 
+  // Audit log for each timesheet
+  for (const ts of timesheets) {
+    await logAudit({
+      action: 'approve',
+      entityType: 'timesheet',
+      entityId: ts.id,
+      oldValues: { status: 'submitted' },
+      newValues: { status: 'approved', approved_by: profile.id, bulk: true },
+    })
+  }
+
   revalidatePath('/timesheets')
   return { success: true, approvedCount: timesheets.length }
 }
@@ -1116,6 +1147,15 @@ export async function approveTimesheetOnly(timesheetId: string) {
     return { error: 'Failed to approve timesheet' }
   }
 
+  // Audit log
+  await logAudit({
+    action: 'approve',
+    entityType: 'timesheet',
+    entityId: timesheetId,
+    oldValues: { status: 'submitted' },
+    newValues: { status: 'approved', approved_by: profile.id },
+  })
+
   revalidatePath('/timesheets')
   return { success: true }
 }
@@ -1151,6 +1191,8 @@ export async function rejectTimesheetOnly(timesheetId: string, reason?: string) 
     return { error: 'Cannot reject this timesheet' }
   }
 
+  const previousStatus = timesheet.status
+
   const { error } = await supabase
     .from('timesheets')
     .update({
@@ -1166,6 +1208,15 @@ export async function rejectTimesheetOnly(timesheetId: string, reason?: string) 
     console.error('Error rejecting timesheet:', error)
     return { error: 'Failed to reject timesheet' }
   }
+
+  // Audit log
+  await logAudit({
+    action: 'reject',
+    entityType: 'timesheet',
+    entityId: timesheetId,
+    oldValues: { status: previousStatus },
+    newValues: { status: 'draft', rejection_reason: reason || null },
+  })
 
   revalidatePath('/timesheets')
   return { success: true }
@@ -1216,6 +1267,15 @@ export async function approveExpensesOnly(expenseId: string) {
     return { error: 'Failed to approve expenses' }
   }
 
+  // Audit log
+  await logAudit({
+    action: 'approve',
+    entityType: 'expense',
+    entityId: expenseId,
+    oldValues: { status: 'submitted' },
+    newValues: { status: 'approved', approved_by: profile.id },
+  })
+
   revalidatePath('/expenses')
   revalidatePath('/timesheets')
   return { success: true }
@@ -1252,6 +1312,8 @@ export async function rejectExpensesOnly(expenseId: string, reason?: string) {
     return { error: 'Cannot reject this expense report' }
   }
 
+  const previousStatus = expense.status
+
   const { error } = await supabase
     .from('expenses')
     .update({
@@ -1267,6 +1329,15 @@ export async function rejectExpensesOnly(expenseId: string, reason?: string) {
     console.error('Error rejecting expenses:', error)
     return { error: 'Failed to reject expenses' }
   }
+
+  // Audit log
+  await logAudit({
+    action: 'reject',
+    entityType: 'expense',
+    entityId: expenseId,
+    oldValues: { status: previousStatus },
+    newValues: { status: 'draft', rejection_reason: reason || null },
+  })
 
   revalidatePath('/expenses')
   revalidatePath('/timesheets')
@@ -1349,4 +1420,110 @@ export async function rejectBoth(timesheetId: string, expenseId: string | null, 
   }
 
   return { error: results.timesheetError || 'Nothing to reject', ...results }
+}
+
+// === EMAIL REMINDERS (PHASE 4) ===
+
+export type ReminderResult = {
+  userId: string
+  email: string
+  name: string
+  success: boolean
+  error?: string
+}
+
+/**
+ * Send email reminders to users who haven't submitted their timesheet for a week.
+ * Requires admin.manage or timesheets.view_all permission.
+ */
+export async function sendTimesheetReminders(
+  weekStart: string,
+  userIds: string[]
+): Promise<{ success: boolean; results: ReminderResult[]; error?: string }> {
+  const supabase = await createClient()
+  const permissions = await getUserPermissions()
+
+  // Check permission
+  if (!hasPermission(permissions, 'timesheets.view_all') && !hasPermission(permissions, 'admin.manage')) {
+    return { success: false, results: [], error: 'Not authorized to send reminders' }
+  }
+
+  if (userIds.length === 0) {
+    return { success: false, results: [], error: 'No users selected' }
+  }
+
+  // Normalize week start
+  const monday = getMonday(new Date(weekStart))
+  const weekStartISO = formatDateISO(monday)
+
+  // Get user details
+  const { data: users, error: usersError } = await supabase
+    .from('profiles')
+    .select('id, first_name, last_name, email')
+    .in('id', userIds)
+    .eq('is_active', true)
+
+  if (usersError || !users || users.length === 0) {
+    return { success: false, results: [], error: 'Failed to fetch user details' }
+  }
+
+  // Calculate due date (typically Friday of the week)
+  const dueDate = new Date(monday)
+  dueDate.setDate(dueDate.getDate() + 4) // Friday
+  const dueDateStr = dueDate.toLocaleDateString('fr-CA', { dateStyle: 'long' })
+
+  // Format week range for display
+  const weekRange = formatWeekRangeLocale(monday, 'fr')
+
+  const results: ReminderResult[] = []
+
+  // Send reminders
+  for (const user of users) {
+    if (!user.email) {
+      results.push({
+        userId: user.id,
+        email: '',
+        name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+        success: false,
+        error: 'No email address',
+      })
+      continue
+    }
+
+    const result = await sendTimesheetReminder({
+      to: user.email,
+      employeeName: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Équipier',
+      weekRange,
+      dueDate: dueDateStr,
+    })
+
+    results.push({
+      userId: user.id,
+      email: user.email,
+      name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+      success: result.success,
+      error: result.error,
+    })
+
+    // Audit log for each reminder sent
+    if (result.success) {
+      await logAudit({
+        action: 'send',
+        entityType: 'timesheet',
+        entityId: null,
+        newValues: {
+          reminder_type: 'missing_timesheet',
+          user_id: user.id,
+          week_start: weekStartISO,
+          email: user.email,
+        },
+      })
+    }
+  }
+
+  const successCount = results.filter((r) => r.success).length
+  return {
+    success: successCount > 0,
+    results,
+  }
 }

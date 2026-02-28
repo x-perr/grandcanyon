@@ -722,7 +722,24 @@
       "rejecting": "Refus en cours...",
       "confirm_reject": "Confirmer le refus",
       "nothing_to_approve": "Rien à approuver",
-      "nothing_to_reject": "Rien à refuser"
+      "nothing_to_reject": "Rien à refuser",
+      "export": "Exporter CSV",
+      "send_reminders": "Envoyer rappels ({count})",
+      "csv": {
+        "last_name": "Nom",
+        "first_name": "Prénom",
+        "email": "Courriel",
+        "status": "Statut",
+        "hours": "Heures",
+        "submitted_at": "Date de soumission",
+        "approved_at": "Date d'approbation",
+        "exported": "Feuilles de temps exportées en CSV"
+      },
+      "reminders": {
+        "confirm": "Envoyer des courriels de rappel à {count} employés qui n'ont pas soumis leurs feuilles de temps?",
+        "sent": "{count} rappels envoyés avec succès",
+        "failed": "{count} rappels n'ont pas pu être envoyés"
+      }
     },
     "detail": {
       "hours_by_project": "Heures par projet",

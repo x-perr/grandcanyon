@@ -14,6 +14,9 @@ import {
   Users,
   CheckCircle,
   AlertCircle,
+  Download,
+  Mail,
+  Loader2,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -41,6 +44,7 @@ import {
   parseDateISO,
   addDays,
 } from '@/lib/date'
+import { generateCSV, downloadCSV, formatHoursForCSV, formatDateForCSV } from '@/lib/csv'
 import type { TeamTimesheetRow, TeamTimesheetSummary } from '@/app/(protected)/timesheets/actions'
 import {
   bulkApproveTimesheets,
@@ -53,6 +57,7 @@ import {
   rejectExpensesOnly,
   approveBoth,
   rejectBoth,
+  sendTimesheetReminders,
 } from '@/app/(protected)/timesheets/actions'
 import { getExpensesByUserAndWeek } from '@/app/(protected)/expenses/actions'
 import { TimesheetDetailPanel, type ApprovalTarget, type RejectionTarget } from './timesheet-detail-panel'
@@ -83,6 +88,7 @@ export function TeamTimesheetTable({
   const [detailData, setDetailData] = useState<TimesheetDetail | null>(null)
   const [expenseData, setExpenseData] = useState<ExpenseDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
+  const [isSendingReminders, setIsSendingReminders] = useState(false)
 
   // Calculate week range
   const weekDate = useMemo(() => parseDateISO(weekStart), [weekStart])
@@ -267,6 +273,61 @@ export function TeamTimesheetTable({
     setDetailLoading(false)
   }, [t, weekStart])
 
+  // CSV Export
+  const handleExportCSV = useCallback(() => {
+    const csv = generateCSV(rows, [
+      { key: 'lastName', header: t('team.csv.last_name') },
+      { key: 'firstName', header: t('team.csv.first_name') },
+      { key: 'email', header: t('team.csv.email') },
+      { key: 'status', header: t('team.csv.status'), format: (v) => tCommon(`status.${v}`) },
+      { key: 'totalHours', header: t('team.csv.hours'), format: (v) => formatHoursForCSV(v as number) },
+      { key: 'submittedAt', header: t('team.csv.submitted_at'), format: (v) => formatDateForCSV(v as string | null) },
+      { key: 'approvedAt', header: t('team.csv.approved_at'), format: (v) => formatDateForCSV(v as string | null) },
+    ])
+
+    const filename = `timesheets-${weekStart}.csv`
+    downloadCSV(csv, filename)
+    toast.success(t('team.csv.exported'))
+  }, [rows, weekStart, t, tCommon])
+
+  // Missing timesheets (not started or draft)
+  const missingRows = useMemo(
+    () => rows.filter((r) => r.status === 'not_started' || r.status === 'draft'),
+    [rows]
+  )
+
+  // Send reminders
+  const handleSendReminders = useCallback(async () => {
+    if (missingRows.length === 0) return
+
+    const confirmed = window.confirm(
+      t('team.reminders.confirm', { count: missingRows.length })
+    )
+    if (!confirmed) return
+
+    setIsSendingReminders(true)
+    try {
+      const userIds = missingRows.map((r) => r.userId)
+      const result = await sendTimesheetReminders(weekStart, userIds)
+
+      if (result.error) {
+        toast.error(result.error)
+      } else {
+        const successCount = result.results.filter((r) => r.success).length
+        const failCount = result.results.filter((r) => !r.success).length
+
+        if (successCount > 0) {
+          toast.success(t('team.reminders.sent', { count: successCount }))
+        }
+        if (failCount > 0) {
+          toast.error(t('team.reminders.failed', { count: failCount }))
+        }
+      }
+    } finally {
+      setIsSendingReminders(false)
+    }
+  }, [missingRows, weekStart, t])
+
   const formatHours = (hours: number) => hours.toFixed(1)
 
   return (
@@ -297,6 +358,26 @@ export function TeamTimesheetTable({
           <Button variant="ghost" size="sm" onClick={goToToday} disabled={isPending}>
             {t('team.today')}
           </Button>
+          <Button variant="outline" size="sm" onClick={handleExportCSV}>
+            <Download className="mr-2 h-4 w-4" />
+            {t('team.export')}
+          </Button>
+          {canApprove && missingRows.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSendReminders}
+              disabled={isSendingReminders}
+              className="text-amber-600 border-amber-300 hover:bg-amber-50"
+            >
+              {isSendingReminders ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Mail className="mr-2 h-4 w-4" />
+              )}
+              {t('team.send_reminders', { count: missingRows.length })}
+            </Button>
+          )}
         </div>
 
         {/* Bulk Actions */}

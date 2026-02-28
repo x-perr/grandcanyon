@@ -4,10 +4,10 @@ import { getProfile } from '@/lib/auth'
 import type { Json } from '@/types/database'
 
 // Audit action types
-export type AuditAction = 'create' | 'update' | 'delete' | 'send' | 'upload'
+export type AuditAction = 'create' | 'update' | 'delete' | 'send' | 'upload' | 'approve' | 'reject' | 'submit'
 
 // Audit entity types
-export type AuditEntity = 'user' | 'settings' | 'logo' | 'password_reset' | 'invoice' | 'expense' | 'project'
+export type AuditEntity = 'user' | 'settings' | 'logo' | 'password_reset' | 'invoice' | 'expense' | 'project' | 'timesheet'
 
 // Input for logging an audit event
 export interface AuditLogInput {
