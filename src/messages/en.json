@@ -121,6 +121,7 @@
       "showing": "Showing {start} to {end} of {total}",
       "page_of": "Page {current} of {total}",
       "per_page": "per page",
+      "rows_per_page": "Rows per page",
       "no_results": "No results",
       "try_adjusting_filters": "Try adjusting your filters"
     },

@@ -183,5 +183,13 @@ export function parseReportFilters(searchParams: Record<string, string | string[
     filters.endDate = range.endDate
   }
 
+  // Default to this_year if no dates at all (prevents loading all-time data)
+  if (!filters.startDate && !filters.endDate && !filters.preset) {
+    filters.preset = 'this_year'
+    const range = getDateRangeFromPreset('this_year')
+    filters.startDate = range.startDate
+    filters.endDate = range.endDate
+  }
+
   return filters
 }
