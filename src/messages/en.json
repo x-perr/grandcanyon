@@ -177,6 +177,44 @@
     "english": "English",
     "change_to": "Change to {lang}"
   },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "View and manage your profile settings",
+    "manager": "Manager",
+    "contact": {
+      "title": "Contact Information",
+      "description": "Update your contact details",
+      "email": "Email",
+      "email_readonly": "Contact your administrator to change your email",
+      "phone": "Phone",
+      "phone_placeholder": "(514) 555-0123",
+      "updated": "Contact information updated"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "description": "Customize your experience",
+      "language": "Language",
+      "language_note": "Changes will take effect immediately",
+      "updated": "Preferences updated"
+    },
+    "security": {
+      "title": "Security",
+      "description": "Manage your password",
+      "current_password": "Current Password",
+      "new_password": "New Password",
+      "confirm_password": "Confirm New Password",
+      "password_requirements": "Minimum 8 characters",
+      "change_password": "Change Password",
+      "password_changed": "Password changed successfully"
+    },
+    "billing": {
+      "title": "Billing Information",
+      "description": "Your billing rates (read-only)",
+      "default_rate": "Default Rate",
+      "cost_rate": "Cost Rate",
+      "admin_only_note": "Only administrators can modify billing rates"
+    }
+  },
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome back, {name}",

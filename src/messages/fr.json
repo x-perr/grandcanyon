@@ -177,6 +177,44 @@
     "english": "English",
     "change_to": "Changer pour {lang}"
   },
+  "profile": {
+    "title": "Mon profil",
+    "subtitle": "Consulter et gérer les paramètres de votre profil",
+    "manager": "Gestionnaire",
+    "contact": {
+      "title": "Coordonnées",
+      "description": "Mettre à jour vos coordonnées",
+      "email": "Courriel",
+      "email_readonly": "Contactez votre administrateur pour modifier votre courriel",
+      "phone": "Téléphone",
+      "phone_placeholder": "(514) 555-0123",
+      "updated": "Coordonnées mises à jour"
+    },
+    "preferences": {
+      "title": "Préférences",
+      "description": "Personnaliser votre expérience",
+      "language": "Langue",
+      "language_note": "Les changements prendront effet immédiatement",
+      "updated": "Préférences mises à jour"
+    },
+    "security": {
+      "title": "Sécurité",
+      "description": "Gérer votre mot de passe",
+      "current_password": "Mot de passe actuel",
+      "new_password": "Nouveau mot de passe",
+      "confirm_password": "Confirmer le nouveau mot de passe",
+      "password_requirements": "Minimum 8 caractères",
+      "change_password": "Changer le mot de passe",
+      "password_changed": "Mot de passe changé avec succès"
+    },
+    "billing": {
+      "title": "Informations de facturation",
+      "description": "Vos taux de facturation (lecture seule)",
+      "default_rate": "Taux par défaut",
+      "cost_rate": "Taux de coût",
+      "admin_only_note": "Seuls les administrateurs peuvent modifier les taux"
+    }
+  },
   "dashboard": {
     "title": "Tableau de bord",
     "welcome": "Bon retour, {name}",

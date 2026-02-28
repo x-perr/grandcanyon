@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { LogOut, User, Globe } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
 import { logout } from '@/app/(auth)/login/actions'
@@ -59,10 +60,10 @@ export function UserMenu({ profile }: UserMenuProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <a href="/profile" className="cursor-pointer">
+          <Link href="/profile" className="cursor-pointer">
             <User className="mr-2 h-4 w-4" />
             {t('auth.profile')}
-          </a>
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>

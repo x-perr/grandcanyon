@@ -687,6 +687,7 @@ export type Database = {
           manager_id: string | null
           person_id: string | null
           phone: string | null
+          preferred_locale: string | null
           role_id: string | null
           updated_at: string | null
         }
@@ -700,6 +701,7 @@ export type Database = {
           manager_id?: string | null
           person_id?: string | null
           phone?: string | null
+          preferred_locale?: string | null
           role_id?: string | null
           updated_at?: string | null
         }
@@ -713,6 +715,7 @@ export type Database = {
           manager_id?: string | null
           person_id?: string | null
           phone?: string | null
+          preferred_locale?: string | null
           role_id?: string | null
           updated_at?: string | null
         }
@@ -1272,6 +1275,7 @@ export type Database = {
     }
     Functions: {
       generate_project_code: { Args: { p_client_id: string }; Returns: string }
+      has_permission: { Args: { permission_code: string }; Returns: boolean }
       timesheet_total_hours: {
         Args: { p_timesheet_id: string }
         Returns: number
