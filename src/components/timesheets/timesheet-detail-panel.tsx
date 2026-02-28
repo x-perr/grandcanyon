@@ -2,11 +2,12 @@
 
 import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
-import { Check, X, Clock, FileText, User } from 'lucide-react'
+import { Check, X, Clock, FileText, User, Receipt, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -16,12 +17,16 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatWeekRangeLocale, parseDateISO } from '@/lib/date'
+import { formatCurrency } from '@/lib/validations/expense'
 import type { getTimesheetById } from '@/app/(protected)/timesheets/actions'
+import type { getExpensesByUserAndWeek } from '@/app/(protected)/expenses/actions'
 
 type TimesheetDetail = Awaited<ReturnType<typeof getTimesheetById>>
+type ExpenseDetail = Awaited<ReturnType<typeof getExpensesByUserAndWeek>>
 
 interface TimesheetDetailPanelProps {
   data: TimesheetDetail | null
+  expenseData?: ExpenseDetail | null
   loading: boolean
   weekStart: string
   locale: 'en' | 'fr'
@@ -35,6 +40,7 @@ const DAY_LABELS_FR = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
 export function TimesheetDetailPanel({
   data,
+  expenseData,
   loading,
   weekStart,
   locale,
@@ -43,6 +49,7 @@ export function TimesheetDetailPanel({
   canApprove,
 }: TimesheetDetailPanelProps) {
   const t = useTranslations('timesheets')
+  const tExpenses = useTranslations('expenses')
 
   const dayLabels = locale === 'fr' ? DAY_LABELS_FR : DAY_LABELS
 
@@ -199,6 +206,117 @@ export function TimesheetDetailPanel({
           </div>
         </CardContent>
       </Card>
+
+      {/* Expenses Section */}
+      {expenseData && expenseData.entries && expenseData.entries.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Receipt className="h-4 w-4" />
+                {tExpenses('title')}
+              </CardTitle>
+              <StatusBadge status={expenseData.status ?? 'draft'} />
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{tExpenses('table.date')}</TableHead>
+                    <TableHead>{tExpenses('table.type')}</TableHead>
+                    <TableHead>{tExpenses('table.description')}</TableHead>
+                    <TableHead className="text-right">{tExpenses('table.amount')}</TableHead>
+                    <TableHead className="text-right">{tExpenses('table.taxes')}</TableHead>
+                    <TableHead className="text-right">{tExpenses('table.total')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {expenseData.entries.map((entry) => {
+                    const expenseType = Array.isArray(entry.expense_type)
+                      ? entry.expense_type[0]
+                      : entry.expense_type
+                    const project = Array.isArray(entry.project)
+                      ? entry.project[0]
+                      : entry.project
+
+                    return (
+                      <TableRow key={entry.id}>
+                        <TableCell className="text-sm">
+                          {entry.expense_date
+                            ? new Date(entry.expense_date).toLocaleDateString(locale, {
+                                month: 'short',
+                                day: 'numeric',
+                              })
+                            : '-'}
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-medium text-sm">{expenseType?.name ?? '-'}</div>
+                          <div className="text-xs text-muted-foreground">{project?.code}</div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm max-w-[200px] truncate" title={entry.description ?? ''}>
+                            {entry.description}
+                          </div>
+                          {entry.receipt_number && (
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <span>#{entry.receipt_number}</span>
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right font-mono text-sm">
+                          {formatCurrency(entry.subtotal ?? 0)}
+                        </TableCell>
+                        <TableCell className="text-right text-xs text-muted-foreground">
+                          <div>{tExpenses('table.gst')}: {formatCurrency(entry.gst_amount ?? 0)}</div>
+                          <div>{tExpenses('table.qst')}: {formatCurrency(entry.qst_amount ?? 0)}</div>
+                        </TableCell>
+                        <TableCell className="text-right font-mono font-medium">
+                          {formatCurrency(entry.total ?? 0)}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                  {/* Expense Totals */}
+                  <TableRow className="bg-muted/50 font-medium">
+                    <TableCell colSpan={3} className="text-right">
+                      {tExpenses('summary.total_expenses')}
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {formatCurrency(expenseData.totals?.subtotal ?? 0)}
+                    </TableCell>
+                    <TableCell className="text-right text-xs">
+                      <div>{tExpenses('table.gst')}: {formatCurrency(expenseData.totals?.gst ?? 0)}</div>
+                      <div>{tExpenses('table.qst')}: {formatCurrency(expenseData.totals?.qst ?? 0)}</div>
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {formatCurrency(expenseData.totals?.total ?? 0)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* No Expenses Indicator */}
+      {expenseData && (!expenseData.entries || expenseData.entries.length === 0) && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Receipt className="h-4 w-4" />
+              {tExpenses('title')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground text-center py-4">
+              {tExpenses('grid.no_entries')}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Approval Actions */}
       {canApprove && data.status === 'submitted' && (

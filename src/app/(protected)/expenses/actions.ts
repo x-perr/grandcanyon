@@ -742,6 +742,84 @@ export async function rejectExpense(expenseId: string, reason?: string) {
 }
 
 /**
+ * Get expenses for a specific user and week (for team view)
+ * Returns expense entries with totals
+ */
+export async function getExpensesByUserAndWeek(userId: string, weekStart: string) {
+  const supabase = await createClient()
+  const permissions = await getUserPermissions()
+
+  // Check permission to view others' expenses
+  const { data: { user } } = await supabase.auth.getUser()
+  if (userId !== user?.id) {
+    if (!hasPermission(permissions, 'expenses.view_all') && !hasPermission(permissions, 'admin.manage')) {
+      return null
+    }
+  }
+
+  // Normalize to Monday
+  const monday = getMonday(new Date(weekStart))
+  const weekStartISO = formatDateISO(monday)
+
+  // Get expense report for this user/week
+  const { data: expense, error } = await supabase
+    .from('expenses')
+    .select(
+      `
+      id,
+      status,
+      week_start,
+      week_end,
+      submitted_at,
+      approved_at,
+      rejection_reason,
+      entries:expense_entries(
+        id,
+        expense_date,
+        description,
+        quantity,
+        unit_price,
+        subtotal,
+        gst_amount,
+        qst_amount,
+        total,
+        receipt_number,
+        is_billable,
+        expense_type:expense_types!expense_entries_expense_type_id_fkey(id, code, name),
+        project:projects!expense_entries_project_id_fkey(id, code, name)
+      )
+    `
+    )
+    .eq('user_id', userId)
+    .eq('week_start', weekStartISO)
+    .single()
+
+  if (error || !expense) {
+    return null
+  }
+
+  // Calculate totals
+  const totals = {
+    subtotal: 0,
+    gst: 0,
+    qst: 0,
+    total: 0,
+  }
+
+  expense.entries?.forEach((entry) => {
+    totals.subtotal += entry.subtotal ?? 0
+    totals.gst += entry.gst_amount ?? 0
+    totals.qst += entry.qst_amount ?? 0
+    totals.total += entry.total ?? 0
+  })
+
+  return {
+    ...expense,
+    totals,
+  }
+}
+
+/**
  * Copy entries from previous week
  */
 export async function copyPreviousWeek(expenseId: string) {

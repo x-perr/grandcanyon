@@ -48,6 +48,7 @@ import {
   rejectTimesheet,
   getTimesheetById,
 } from '@/app/(protected)/timesheets/actions'
+import { getExpensesByUserAndWeek } from '@/app/(protected)/expenses/actions'
 import { TimesheetDetailPanel } from './timesheet-detail-panel'
 
 interface TeamTimesheetTableProps {
@@ -58,6 +59,7 @@ interface TeamTimesheetTableProps {
 }
 
 type TimesheetDetail = Awaited<ReturnType<typeof getTimesheetById>>
+type ExpenseDetail = Awaited<ReturnType<typeof getExpensesByUserAndWeek>>
 
 export function TeamTimesheetTable({
   rows,
@@ -73,6 +75,7 @@ export function TeamTimesheetTable({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [detailOpen, setDetailOpen] = useState(false)
   const [detailData, setDetailData] = useState<TimesheetDetail | null>(null)
+  const [expenseData, setExpenseData] = useState<ExpenseDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
 
   // Calculate week range
@@ -167,11 +170,18 @@ export function TeamTimesheetTable({
 
     setDetailLoading(true)
     setDetailOpen(true)
+    setExpenseData(null)
 
-    const data = await getTimesheetById(row.timesheetId)
-    setDetailData(data)
+    // Fetch timesheet and expenses in parallel
+    const [timesheetData, expenses] = await Promise.all([
+      getTimesheetById(row.timesheetId),
+      getExpensesByUserAndWeek(row.userId, weekStart),
+    ])
+
+    setDetailData(timesheetData)
+    setExpenseData(expenses)
     setDetailLoading(false)
-  }, [t])
+  }, [t, weekStart])
 
   const formatHours = (hours: number) => hours.toFixed(1)
 
@@ -384,6 +394,7 @@ export function TeamTimesheetTable({
           </SheetHeader>
           <TimesheetDetailPanel
             data={detailData}
+            expenseData={expenseData}
             loading={detailLoading}
             weekStart={weekStart}
             locale={locale}
