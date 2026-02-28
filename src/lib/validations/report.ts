@@ -27,6 +27,7 @@ export const reportFiltersSchema = z.object({
   clientId: z.string().uuid().optional(),
   status: z.string().optional(),
   preset: z.enum(dateRangePresets).optional(),
+  activeOnly: z.boolean().optional(),
 })
 
 export type ReportFilters = z.infer<typeof reportFiltersSchema>
@@ -174,6 +175,12 @@ export function parseReportFilters(searchParams: Record<string, string | string[
   }
   if (searchParams.preset && typeof searchParams.preset === 'string') {
     filters.preset = searchParams.preset as DateRangePreset
+  }
+  // activeOnly defaults to true unless explicitly set to 'false'
+  if (searchParams.activeOnly && typeof searchParams.activeOnly === 'string') {
+    filters.activeOnly = searchParams.activeOnly !== 'false'
+  } else {
+    filters.activeOnly = true // Default to active projects only
   }
 
   // Apply preset if no explicit dates

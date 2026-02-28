@@ -492,12 +492,18 @@ export async function getProfitabilityReportData(
       billing_type,
       fixed_price,
       status,
+      is_active,
       client:clients!projects_client_id_fkey(
         id,
         name
       )
     `)
     .is('deleted_at', null)
+
+  // Filter by active status (defaults to true)
+  if (filters.activeOnly !== false) {
+    projectQuery = projectQuery.eq('is_active', true)
+  }
 
   if (filters.projectId) {
     projectQuery = projectQuery.eq('id', filters.projectId)

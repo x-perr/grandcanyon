@@ -4,7 +4,7 @@ import { getProjects } from './actions'
 import type { SortColumn, SortDirection } from './actions'
 import { ProjectList } from '@/components/projects/project-list'
 
-const VALID_SORT_COLUMNS: SortColumn[] = ['code', 'name', 'status', 'start_date', 'created_at']
+const VALID_SORT_COLUMNS: SortColumn[] = ['code', 'name', 'status', 'start_date', 'created_at', 'client_name']
 
 interface ProjectsPageProps {
   searchParams: Promise<{

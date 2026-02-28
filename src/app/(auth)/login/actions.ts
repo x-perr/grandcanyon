@@ -3,10 +3,16 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 
 export interface LoginState {
   error?: string
   success?: boolean
+}
+
+export interface OAuthResult {
+  url?: string
+  error?: string
 }
 
 export async function login(
@@ -43,4 +49,23 @@ export async function logout(): Promise<void> {
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
   redirect('/login')
+}
+
+export async function signInWithGoogle(): Promise<OAuthResult> {
+  const supabase = await createClient()
+  const headersList = await headers()
+  const origin = headersList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${origin}/auth/callback`,
+    },
+  })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  return { url: data.url }
 }

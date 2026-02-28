@@ -166,7 +166,9 @@
       "password_placeholder": "Enter your password",
       "submit": "Sign In",
       "error": "Invalid email or password",
-      "logging_in": "Signing in..."
+      "logging_in": "Signing in...",
+      "continue_with_google": "Continue with Google",
+      "or": "or"
     },
     "logout": "Sign Out",
     "profile": "Profile",
@@ -541,11 +543,22 @@
       "title": "Delete Project",
       "message": "Are you sure you want to delete {name} ({code})? This action can be undone by an administrator."
     },
+    "toggle": {
+      "activate_title": "Activate Project",
+      "deactivate_title": "Deactivate Project",
+      "activate_message": "Are you sure you want to activate {name} ({code})? It will appear in project lists and dropdowns again.",
+      "deactivate_message": "Are you sure you want to deactivate {name} ({code})? It will be hidden from project lists and dropdowns."
+    },
+    "activate": "Activate",
+    "deactivate": "Deactivate",
     "toast": {
       "created": "Project created successfully",
       "updated": "Project updated successfully",
       "deleted": "Project deleted successfully",
-      "error_delete": "Error deleting project"
+      "activated": "Project activated successfully",
+      "deactivated": "Project deactivated successfully",
+      "error_delete": "Error deleting project",
+      "error_toggle": "Error updating project status"
     }
   },
   "timesheets": {
@@ -1156,7 +1169,8 @@
       "all_statuses": "All statuses",
       "apply": "Apply",
       "reset": "Reset",
-      "clear_filters": "Clear all filters"
+      "clear_filters": "Clear all filters",
+      "active_only": "Active projects only"
     },
     "export": {
       "csv": "Export CSV",

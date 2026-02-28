@@ -13,6 +13,9 @@ import type { Enums, Tables } from '@/types/database'
 
 type InvoiceStatus = Enums<'invoice_status'>
 
+export type SortColumn = 'invoice_number' | 'invoice_date' | 'due_date' | 'total' | 'status' | 'created_at'
+export type SortDirection = 'asc' | 'desc'
+
 // === TYPE DEFINITIONS ===
 
 export type InvoiceWithRelations = Tables<'invoices'> & {
@@ -104,9 +107,20 @@ export async function getInvoices(options?: {
   year?: number
   limit?: number
   offset?: number
+  sortColumn?: SortColumn
+  sortDirection?: SortDirection
 }): Promise<{ invoices: InvoiceWithRelations[]; count: number }> {
   const supabase = await createClient()
-  const { search, clientId, status, year, limit = 25, offset = 0 } = options ?? {}
+  const {
+    search,
+    clientId,
+    status,
+    year,
+    limit = 25,
+    offset = 0,
+    sortColumn = 'invoice_date',
+    sortDirection = 'desc',
+  } = options ?? {}
 
   let query = supabase
     .from('invoices')
@@ -146,8 +160,10 @@ export async function getInvoices(options?: {
       .lte('invoice_date', `${year}-12-31`)
   }
 
-  // Pagination & order
-  query = query.order('invoice_date', { ascending: false }).range(offset, offset + limit - 1)
+  // Sorting & pagination
+  query = query
+    .order(sortColumn, { ascending: sortDirection === 'asc' })
+    .range(offset, offset + limit - 1)
 
   const { data, count, error } = await query
 
@@ -368,6 +384,7 @@ export async function getProjectsForClient(clientId: string): Promise<ProjectFor
     .select('id, code, name, client_id')
     .eq('client_id', clientId)
     .eq('status', 'active')
+    .eq('is_active', true)
     .is('deleted_at', null)
     .order('code')
 

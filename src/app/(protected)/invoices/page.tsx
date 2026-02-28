@@ -5,12 +5,15 @@ import {
   getClientsForInvoice,
   getInvoiceYears,
 } from './actions'
+import type { SortColumn, SortDirection } from './actions'
 import { InvoiceList } from '@/components/invoices/invoice-list'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Plus, Layers } from 'lucide-react'
 import type { Enums } from '@/types/database'
 import { getTranslations } from 'next-intl/server'
+
+const VALID_SORT_COLUMNS: SortColumn[] = ['invoice_number', 'invoice_date', 'due_date', 'total', 'status', 'created_at']
 
 interface InvoicesPageProps {
   searchParams: Promise<{
@@ -19,6 +22,8 @@ interface InvoicesPageProps {
     status?: string
     year?: string
     page?: string
+    sort?: string
+    order?: string
   }>
 }
 
@@ -27,6 +32,10 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
   const page = Number(params.page) || 1
   const pageSize = 25
   const year = params.year ? Number(params.year) : undefined
+  const sortColumn = VALID_SORT_COLUMNS.includes(params.sort as SortColumn)
+    ? (params.sort as SortColumn)
+    : 'invoice_date'
+  const sortDirection: SortDirection = params.order === 'asc' ? 'asc' : 'desc'
 
   const [{ invoices, count }, summary, clients, years, permissions, t] = await Promise.all([
     getInvoices({
@@ -36,6 +45,8 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
       year,
       limit: pageSize,
       offset: (page - 1) * pageSize,
+      sortColumn,
+      sortDirection,
     }),
     getInvoiceSummary(year),
     getClientsForInvoice(),
@@ -79,6 +90,8 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
         clients={clients}
         years={years}
         summary={summary}
+        sortColumn={sortColumn}
+        sortDirection={sortDirection}
         filters={{
           search: params.search,
           clientId: params.clientId,

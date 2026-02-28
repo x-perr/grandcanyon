@@ -32,7 +32,7 @@ export type ProjectWithClient = {
   } | null
 }
 
-export type SortColumn = 'code' | 'name' | 'status' | 'start_date' | 'created_at'
+export type SortColumn = 'code' | 'name' | 'status' | 'start_date' | 'created_at' | 'client_name'
 export type SortDirection = 'asc' | 'desc'
 
 export async function getProjects(options?: {
@@ -112,9 +112,16 @@ export async function getProjects(options?: {
   }
 
   // Sorting & pagination
-  query = query
-    .order(sortColumn, { ascending: sortDirection === 'asc' })
-    .range(offset, offset + limit - 1)
+  if (sortColumn === 'client_name') {
+    // Sort by client name using foreign table ordering
+    query = query.order('name', {
+      ascending: sortDirection === 'asc',
+      referencedTable: 'clients',
+    })
+  } else {
+    query = query.order(sortColumn, { ascending: sortDirection === 'asc' })
+  }
+  query = query.range(offset, offset + limit - 1)
 
   const { data, count, error } = await query
 
@@ -377,4 +384,49 @@ export async function deleteProjectAction(id: string) {
     revalidatePath(`/clients/${project.client_id}`)
   }
   redirect('/projects')
+}
+
+/**
+ * Toggle project active status
+ */
+export async function toggleProjectActive(id: string) {
+  const supabase = await createClient()
+
+  // Verify permission
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'projects.edit')) {
+    return { error: 'You do not have permission to update projects' }
+  }
+
+  // Get current status
+  const { data: project, error: fetchError } = await supabase
+    .from('projects')
+    .select('is_active, client_id')
+    .eq('id', id)
+    .single()
+
+  if (fetchError || !project) {
+    return { error: 'Project not found' }
+  }
+
+  const newStatus = !project.is_active
+
+  // Toggle
+  const { error } = await supabase
+    .from('projects')
+    .update({ is_active: newStatus })
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error toggling project status:', error)
+    return { error: 'Failed to update project status' }
+  }
+
+  revalidatePath('/projects')
+  revalidatePath(`/projects/${id}`)
+  if (project.client_id) {
+    revalidatePath(`/clients/${project.client_id}`)
+  }
+
+  return { success: true, is_active: newStatus }
 }

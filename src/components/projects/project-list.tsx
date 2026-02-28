@@ -4,7 +4,7 @@ import { useState, useTransition, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { FolderKanban, MoreHorizontal, Pencil, Trash2, Plus, ExternalLink } from 'lucide-react'
+import { FolderKanban, MoreHorizontal, Pencil, Trash2, Plus, ExternalLink, Power } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { SearchInput } from '@/components/ui/search-input'
@@ -44,7 +44,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { useDebounceSearch, usePagination, useSort } from '@/hooks'
 import type { ProjectWithClient, SortDirection } from '@/app/(protected)/projects/actions'
-import { deleteProjectAction } from '@/app/(protected)/projects/actions'
+import { deleteProjectAction, toggleProjectActive } from '@/app/(protected)/projects/actions'
 import { projectStatuses } from '@/lib/validations/project'
 
 interface ProjectListProps {
@@ -78,6 +78,8 @@ export function ProjectList({
   const tCommon = useTranslations('common')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [toggleId, setToggleId] = useState<string | null>(null)
+  const [isToggling, setIsToggling] = useState(false)
   const [isFilterPending, startTransition] = useTransition()
 
   // Use custom hooks for debounced search and pagination
@@ -114,6 +116,7 @@ export function ProjectList({
 
   const isPending = isSearchPending || isPagePending || isFilterPending || isSortPending
   const projectToDelete = useMemo(() => projects.find((p) => p.id === deleteId), [projects, deleteId])
+  const projectToToggle = useMemo(() => projects.find((p) => p.id === toggleId), [projects, toggleId])
 
   const updateStatus = useCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -157,6 +160,28 @@ export function ProjectList({
       toast.error(t('toast.error_delete'))
     } finally {
       setIsDeleting(false)
+    }
+  }
+
+  const handleToggleActive = async () => {
+    if (!toggleId) return
+    setIsToggling(true)
+    try {
+      const result = await toggleProjectActive(toggleId)
+      if (result.error) {
+        toast.error(result.error)
+      } else {
+        toast.success(
+          result.is_active
+            ? t('toast.activated')
+            : t('toast.deactivated')
+        )
+      }
+      setToggleId(null)
+    } catch {
+      toast.error(t('toast.error_toggle'))
+    } finally {
+      setIsToggling(false)
     }
   }
 
@@ -254,7 +279,14 @@ export function ProjectList({
                   direction={getSortDirection('name')}
                   onClick={() => handleSort('name')}
                 />
-                <TableHead className="hidden md:table-cell">{t('list.client')}</TableHead>
+                <SortableHeader
+                  column="client_name"
+                  label={t('list.client')}
+                  isSorted={isSorted('client_name')}
+                  direction={getSortDirection('client_name')}
+                  onClick={() => handleSort('client_name')}
+                  className="hidden md:table-cell"
+                />
                 <SortableHeader
                   column="status"
                   label={t('list.status')}
@@ -321,6 +353,10 @@ export function ProjectList({
                                 <Pencil className="mr-2 h-4 w-4" />
                                 {tCommon('actions.edit')}
                               </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setToggleId(project.id)}>
+                              <Power className="mr-2 h-4 w-4" />
+                              {project.is_active ? t('deactivate') : t('activate')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
@@ -391,6 +427,44 @@ export function ProjectList({
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
               {isDeleting ? tCommon('actions.deleting') : tCommon('actions.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Toggle Active Confirmation Dialog */}
+      <Dialog open={!!toggleId} onOpenChange={() => setToggleId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {projectToToggle?.is_active ? t('toggle.deactivate_title') : t('toggle.activate_title')}
+            </DialogTitle>
+            <DialogDescription>
+              {projectToToggle?.is_active
+                ? t('toggle.deactivate_message', {
+                    name: projectToToggle?.name ?? '',
+                    code: projectToToggle?.code ?? '',
+                  })
+                : t('toggle.activate_message', {
+                    name: projectToToggle?.name ?? '',
+                    code: projectToToggle?.code ?? '',
+                  })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setToggleId(null)} disabled={isToggling}>
+              {tCommon('actions.cancel')}
+            </Button>
+            <Button
+              variant={projectToToggle?.is_active ? 'destructive' : 'default'}
+              onClick={handleToggleActive}
+              disabled={isToggling}
+            >
+              {isToggling
+                ? tCommon('actions.loading')
+                : projectToToggle?.is_active
+                  ? t('deactivate')
+                  : t('activate')}
             </Button>
           </DialogFooter>
         </DialogContent>

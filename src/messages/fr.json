@@ -165,7 +165,9 @@
       "password_placeholder": "Entrez votre mot de passe",
       "submit": "Se connecter",
       "error": "Courriel ou mot de passe invalide",
-      "logging_in": "Connexion en cours..."
+      "logging_in": "Connexion en cours...",
+      "continue_with_google": "Continuer avec Google",
+      "or": "ou"
     },
     "logout": "Déconnexion",
     "profile": "Profil",
@@ -540,11 +542,22 @@
       "title": "Supprimer le projet",
       "message": "Êtes-vous sûr de vouloir supprimer {name} ({code})? Cette action peut être annulée par un administrateur."
     },
+    "toggle": {
+      "activate_title": "Activer le projet",
+      "deactivate_title": "Désactiver le projet",
+      "activate_message": "Êtes-vous sûr de vouloir activer {name} ({code})? Il apparaîtra à nouveau dans les listes et menus déroulants.",
+      "deactivate_message": "Êtes-vous sûr de vouloir désactiver {name} ({code})? Il sera masqué des listes et menus déroulants."
+    },
+    "activate": "Activer",
+    "deactivate": "Désactiver",
     "toast": {
       "created": "Projet créé avec succès",
       "updated": "Projet mis à jour avec succès",
       "deleted": "Projet supprimé avec succès",
-      "error_delete": "Erreur lors de la suppression du projet"
+      "activated": "Projet activé avec succès",
+      "deactivated": "Projet désactivé avec succès",
+      "error_delete": "Erreur lors de la suppression du projet",
+      "error_toggle": "Erreur lors de la mise à jour du statut du projet"
     }
   },
   "timesheets": {
@@ -1155,7 +1168,8 @@
       "all_statuses": "Tous les statuts",
       "apply": "Appliquer",
       "reset": "Réinitialiser",
-      "clear_filters": "Effacer les filtres"
+      "clear_filters": "Effacer les filtres",
+      "active_only": "Projets actifs seulement"
     },
     "export": {
       "csv": "Exporter CSV",

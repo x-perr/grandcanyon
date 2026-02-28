@@ -7,6 +7,7 @@ import { FileText, ExternalLink, Download, MoreHorizontal, Check } from 'lucide-
 import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { SearchInput } from '@/components/ui/search-input'
+import { SortableHeader } from '@/components/ui/sortable-header'
 import {
   Select,
   SelectContent,
@@ -30,9 +31,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/tax'
-import { useDebounceSearch, usePagination } from '@/hooks'
+import { useDebounceSearch, usePagination, useSort } from '@/hooks'
 import { markInvoicePaid } from '@/app/(protected)/invoices/actions'
-import type { InvoiceWithRelations, ClientForSelect } from '@/app/(protected)/invoices/actions'
+import type { InvoiceWithRelations, ClientForSelect, SortDirection } from '@/app/(protected)/invoices/actions'
 import type { InvoiceStatus } from '@/lib/validations/invoice'
 import { toast } from 'sonner'
 import { useTranslations, useLocale } from 'next-intl'
@@ -45,6 +46,8 @@ interface InvoiceListProps {
   clients: ClientForSelect[]
   years: number[]
   summary: { draft: number; sent: number; paid: number }
+  sortColumn: string
+  sortDirection: SortDirection
   filters: {
     search?: string
     clientId?: string
@@ -61,6 +64,8 @@ export function InvoiceList({
   clients,
   years,
   summary,
+  sortColumn,
+  sortDirection,
   filters,
 }: InvoiceListProps) {
   const router = useRouter()
@@ -91,7 +96,18 @@ export function InvoiceList({
     basePath: '/invoices',
   })
 
-  const isPending = isSearchPending || isPagePending || isFilterPending
+  const {
+    handleSort,
+    isSorted,
+    getSortDirection,
+    isPending: isSortPending,
+  } = useSort({
+    basePath: '/invoices',
+    defaultColumn: sortColumn,
+    defaultDirection: sortDirection,
+  })
+
+  const isPending = isSearchPending || isPagePending || isFilterPending || isSortPending
 
   const updateFilters = useCallback((updates: Record<string, string | undefined>) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -238,12 +254,39 @@ export function InvoiceList({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t('list.invoice_number')}</TableHead>
+                <SortableHeader
+                  column="invoice_number"
+                  label={t('list.invoice_number')}
+                  isSorted={isSorted('invoice_number')}
+                  direction={getSortDirection('invoice_number')}
+                  onClick={() => handleSort('invoice_number')}
+                  className="w-[120px]"
+                />
                 <TableHead className="hidden md:table-cell">{t('list.client')}</TableHead>
                 <TableHead className="hidden lg:table-cell">{t('list.project')}</TableHead>
-                <TableHead className="hidden sm:table-cell">{t('list.date')}</TableHead>
-                <TableHead className="text-right">{t('list.total')}</TableHead>
-                <TableHead>{t('list.status')}</TableHead>
+                <SortableHeader
+                  column="invoice_date"
+                  label={t('list.date')}
+                  isSorted={isSorted('invoice_date')}
+                  direction={getSortDirection('invoice_date')}
+                  onClick={() => handleSort('invoice_date')}
+                  className="hidden sm:table-cell"
+                />
+                <SortableHeader
+                  column="total"
+                  label={t('list.total')}
+                  isSorted={isSorted('total')}
+                  direction={getSortDirection('total')}
+                  onClick={() => handleSort('total')}
+                  className="text-right"
+                />
+                <SortableHeader
+                  column="status"
+                  label={t('list.status')}
+                  isSorted={isSorted('status')}
+                  direction={getSortDirection('status')}
+                  onClick={() => handleSort('status')}
+                />
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>

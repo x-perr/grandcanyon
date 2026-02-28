@@ -6,6 +6,7 @@ import { Calendar, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -26,6 +27,7 @@ interface ReportFiltersProps {
   showUserFilter?: boolean
   showClientFilter?: boolean
   showStatusFilter?: boolean
+  showActiveOnlyFilter?: boolean
   statusOptions?: { value: string; label: string }[]
   currentFilters: {
     startDate?: string
@@ -35,6 +37,7 @@ interface ReportFiltersProps {
     clientId?: string
     status?: string
     preset?: string
+    activeOnly?: boolean
   }
 }
 
@@ -47,6 +50,7 @@ export function ReportFilters({
   showUserFilter = false,
   showClientFilter = false,
   showStatusFilter = false,
+  showActiveOnlyFilter = false,
   statusOptions = [],
   currentFilters,
 }: ReportFiltersProps) {
@@ -123,7 +127,8 @@ export function ReportFilters({
     currentFilters.projectId ||
     currentFilters.userId ||
     currentFilters.clientId ||
-    currentFilters.status
+    currentFilters.status ||
+    currentFilters.activeOnly === false
 
   return (
     <div className="space-y-4 rounded-lg border bg-card p-4">
@@ -281,6 +286,26 @@ export function ReportFilters({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        )}
+
+        {/* Active Only Filter */}
+        {showActiveOnlyFilter && (
+          <div className="flex items-center space-x-2 self-end pb-2">
+            <Checkbox
+              id="active-only"
+              checked={currentFilters.activeOnly !== false}
+              onCheckedChange={(checked) =>
+                updateFilters({ activeOnly: checked ? undefined : 'false' })
+              }
+              disabled={isPending}
+            />
+            <label
+              htmlFor="active-only"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              {t('active_only')}
+            </label>
           </div>
         )}
 

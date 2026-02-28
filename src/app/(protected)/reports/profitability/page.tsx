@@ -49,12 +49,14 @@ export default async function ProfitabilityReportPage({ searchParams }: PageProp
           clients={clients}
           showProjectFilter={true}
           showClientFilter={true}
+          showActiveOnlyFilter={true}
           currentFilters={{
             startDate: filters.startDate,
             endDate: filters.endDate,
             projectId: filters.projectId,
             clientId: filters.clientId,
             preset: filters.preset,
+            activeOnly: filters.activeOnly,
           }}
         />
       </Suspense>
