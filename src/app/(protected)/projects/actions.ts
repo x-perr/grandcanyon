@@ -14,6 +14,7 @@ export type ProjectWithClient = {
   code: string
   name: string
   status: ProjectStatus | null
+  is_active: boolean | null
   client_id: string
   start_date: string | null
   end_date: string | null
@@ -31,17 +32,34 @@ export type ProjectWithClient = {
   } | null
 }
 
+export type SortColumn = 'code' | 'name' | 'status' | 'start_date' | 'created_at'
+export type SortDirection = 'asc' | 'desc'
+
 export async function getProjects(options?: {
   search?: string
   status?: string
   clientId?: string
   managerId?: string
   showDeleted?: boolean
+  showInactive?: boolean
   limit?: number
   offset?: number
+  sortColumn?: SortColumn
+  sortDirection?: SortDirection
 }): Promise<{ projects: ProjectWithClient[]; count: number }> {
   const supabase = await createClient()
-  const { search, status, clientId, managerId, showDeleted = false, limit = 25, offset = 0 } = options ?? {}
+  const {
+    search,
+    status,
+    clientId,
+    managerId,
+    showDeleted = false,
+    showInactive = false,
+    limit = 25,
+    offset = 0,
+    sortColumn = 'created_at',
+    sortDirection = 'desc',
+  } = options ?? {}
 
   let query = supabase
     .from('projects')
@@ -51,6 +69,7 @@ export async function getProjects(options?: {
       code,
       name,
       status,
+      is_active,
       client_id,
       start_date,
       end_date,
@@ -65,6 +84,11 @@ export async function getProjects(options?: {
   // Filter deleted unless requested
   if (!showDeleted) {
     query = query.is('deleted_at', null)
+  }
+
+  // Filter inactive unless requested
+  if (!showInactive) {
+    query = query.eq('is_active', true)
   }
 
   // Search filter
@@ -87,8 +111,10 @@ export async function getProjects(options?: {
     query = query.eq('project_manager_id', managerId)
   }
 
-  // Pagination & order
-  query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1)
+  // Sorting & pagination
+  query = query
+    .order(sortColumn, { ascending: sortDirection === 'asc' })
+    .range(offset, offset + limit - 1)
 
   const { data, count, error } = await query
 

@@ -177,6 +177,12 @@
     "english": "English",
     "change_to": "Changer pour {lang}"
   },
+  "theme": {
+    "title": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  },
   "profile": {
     "title": "Mon profil",
     "subtitle": "Consulter et gérer les paramètres de votre profil",
@@ -265,6 +271,7 @@
     "no_clients": "Aucun client",
     "no_clients_message": "Commencez par créer votre premier client.",
     "search_placeholder": "Rechercher des clients...",
+    "show_inactive": "Afficher inactifs",
     "list": {
       "search_empty": "Essayez d'ajuster vos termes de recherche"
     },
@@ -375,6 +382,7 @@
     "search_placeholder": "Rechercher par code, nom...",
     "filter_status": "Filtrer par statut",
     "all_statuses": "Tous les statuts",
+    "show_inactive": "Afficher inactifs",
     "list": {
       "adjust_filters": "Essayez d'ajuster vos termes de recherche ou filtres",
       "add_project": "Ajouter un projet",

@@ -178,6 +178,12 @@
     "english": "English",
     "change_to": "Change to {lang}"
   },
+  "theme": {
+    "title": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
   "profile": {
     "title": "My Profile",
     "subtitle": "View and manage your profile settings",
@@ -266,6 +272,7 @@
     "no_clients": "No clients",
     "no_clients_message": "Get started by creating your first client.",
     "search_placeholder": "Search clients...",
+    "show_inactive": "Show inactive",
     "list": {
       "search_empty": "Try adjusting your search terms"
     },
@@ -376,6 +383,7 @@
     "search_placeholder": "Search by code, name...",
     "filter_status": "Filter by status",
     "all_statuses": "All Status",
+    "show_inactive": "Show inactive",
     "list": {
       "adjust_filters": "Try adjusting your search or filters",
       "add_project": "Add Project",

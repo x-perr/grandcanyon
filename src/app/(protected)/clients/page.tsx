@@ -16,6 +16,7 @@ interface ClientsPageProps {
     pageSize?: string
     sort?: string
     order?: string
+    inactive?: string
   }>
 }
 
@@ -28,10 +29,12 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
     ? (params.sort as SortColumn)
     : 'name'
   const sortDirection: SortDirection = params.order === 'desc' ? 'desc' : 'asc'
+  const showInactive = params.inactive === 'true'
 
   const [{ clients, count }, permissions] = await Promise.all([
     getClients({
       search,
+      showInactive,
       limit: pageSize,
       offset: (page - 1) * pageSize,
       sortColumn,
@@ -60,6 +63,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
           searchQuery={search}
           sortColumn={sortColumn}
           sortDirection={sortDirection}
+          showInactive={showInactive}
         />
       </Suspense>
     </div>

@@ -15,6 +15,7 @@ export type ClientWithProjects = {
   charges_qst: boolean | null
   general_email: string | null
   phone: string | null
+  is_active: boolean | null
   created_at: string | null
   deleted_at: string | null
   projects: { count: number }[]
@@ -26,6 +27,7 @@ export type SortDirection = 'asc' | 'desc'
 export async function getClients(options?: {
   search?: string
   showDeleted?: boolean
+  showInactive?: boolean
   limit?: number
   offset?: number
   sortColumn?: SortColumn
@@ -35,6 +37,7 @@ export async function getClients(options?: {
   const {
     search,
     showDeleted = false,
+    showInactive = false,
     limit = 25,
     offset = 0,
     sortColumn = 'name',
@@ -53,6 +56,7 @@ export async function getClients(options?: {
       charges_qst,
       general_email,
       phone,
+      is_active,
       created_at,
       deleted_at,
       projects:projects(count)
@@ -63,6 +67,11 @@ export async function getClients(options?: {
   // Filter deleted unless requested
   if (!showDeleted) {
     query = query.is('deleted_at', null)
+  }
+
+  // Filter inactive unless requested
+  if (!showInactive) {
+    query = query.eq('is_active', true)
   }
 
   // Search filter

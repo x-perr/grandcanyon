@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { LogOut, User, Globe } from 'lucide-react'
+import { LogOut, User, Globe, Sun, Moon, Monitor } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
+import { useTheme } from 'next-themes'
 import { logout } from '@/app/(auth)/login/actions'
 import { setLocale } from '@/lib/locale'
 import {
@@ -28,6 +29,7 @@ interface UserMenuProps {
 export function UserMenu({ profile }: UserMenuProps) {
   const t = useTranslations()
   const locale = useLocale()
+  const { theme, setTheme } = useTheme()
   const initials = `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase()
   const fullName = `${profile.first_name} ${profile.last_name}`
 
@@ -84,6 +86,38 @@ export function UserMenu({ profile }: UserMenuProps) {
             >
               {t('language.english')}
               {locale === 'en' && ' ✓'}
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Sun className="mr-2 h-4 w-4" />
+            {t('theme.title')}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem
+              onClick={() => setTheme('light')}
+              className={theme === 'light' ? 'bg-accent' : ''}
+            >
+              <Sun className="mr-2 h-4 w-4" />
+              {t('theme.light')}
+              {theme === 'light' && ' ✓'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setTheme('dark')}
+              className={theme === 'dark' ? 'bg-accent' : ''}
+            >
+              <Moon className="mr-2 h-4 w-4" />
+              {t('theme.dark')}
+              {theme === 'dark' && ' ✓'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setTheme('system')}
+              className={theme === 'system' ? 'bg-accent' : ''}
+            >
+              <Monitor className="mr-2 h-4 w-4" />
+              {t('theme.system')}
+              {theme === 'system' && ' ✓'}
             </DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuSub>

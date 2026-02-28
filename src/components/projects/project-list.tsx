@@ -9,6 +9,8 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { SearchInput } from '@/components/ui/search-input'
 import { StatusBadge } from '@/components/ui/status-badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import { SortableHeader } from '@/components/ui/sortable-header'
 import {
   Select,
   SelectContent,
@@ -40,8 +42,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Card, CardContent } from '@/components/ui/card'
-import { useDebounceSearch, usePagination } from '@/hooks'
-import type { ProjectWithClient } from '@/app/(protected)/projects/actions'
+import { useDebounceSearch, usePagination, useSort } from '@/hooks'
+import type { ProjectWithClient, SortDirection } from '@/app/(protected)/projects/actions'
 import { deleteProjectAction } from '@/app/(protected)/projects/actions'
 import { projectStatuses } from '@/lib/validations/project'
 
@@ -53,6 +55,9 @@ interface ProjectListProps {
   pageSize: number
   searchQuery: string
   statusFilter: string
+  showInactive: boolean
+  sortColumn: string
+  sortDirection: SortDirection
 }
 
 export function ProjectList({
@@ -63,6 +68,9 @@ export function ProjectList({
   pageSize,
   searchQuery,
   statusFilter,
+  showInactive,
+  sortColumn,
+  sortDirection,
 }: ProjectListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -70,7 +78,7 @@ export function ProjectList({
   const tCommon = useTranslations('common')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [isStatusPending, startTransition] = useTransition()
+  const [isFilterPending, startTransition] = useTransition()
 
   // Use custom hooks for debounced search and pagination
   const { search, setSearch, isPending: isSearchPending } = useDebounceSearch({
@@ -93,7 +101,18 @@ export function ProjectList({
     basePath: '/projects',
   })
 
-  const isPending = isSearchPending || isPagePending || isStatusPending
+  const {
+    handleSort,
+    isSorted,
+    getSortDirection,
+    isPending: isSortPending,
+  } = useSort({
+    basePath: '/projects',
+    defaultColumn: sortColumn,
+    defaultDirection: sortDirection,
+  })
+
+  const isPending = isSearchPending || isPagePending || isFilterPending || isSortPending
   const projectToDelete = useMemo(() => projects.find((p) => p.id === deleteId), [projects, deleteId])
 
   const updateStatus = useCallback((value: string) => {
@@ -104,6 +123,19 @@ export function ProjectList({
       params.delete('status')
     }
     params.delete('page') // Reset to first page on filter
+    startTransition(() => {
+      router.push(`/projects?${params.toString()}`)
+    })
+  }, [searchParams, router])
+
+  const toggleInactive = useCallback((checked: boolean) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (checked) {
+      params.set('inactive', 'true')
+    } else {
+      params.delete('inactive')
+    }
+    params.set('page', '1')
     startTransition(() => {
       router.push(`/projects?${params.toString()}`)
     })
@@ -137,7 +169,7 @@ export function ProjectList({
     <div className="space-y-4">
       {/* Header with Search, Filter, and Add Button */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 gap-2">
+        <div className="flex flex-1 flex-wrap items-center gap-2">
           <SearchInput
             placeholder={t('search_placeholder')}
             value={search}
@@ -157,6 +189,19 @@ export function ProjectList({
               ))}
             </SelectContent>
           </Select>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="show-inactive"
+              checked={showInactive}
+              onCheckedChange={toggleInactive}
+            />
+            <label
+              htmlFor="show-inactive"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              {t('show_inactive')}
+            </label>
+          </div>
         </div>
         {canEdit && (
           <Button asChild>
@@ -194,11 +239,38 @@ export function ProjectList({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[120px]">{t('list.code')}</TableHead>
-                <TableHead>{t('list.name')}</TableHead>
+                <SortableHeader
+                  column="code"
+                  label={t('list.code')}
+                  isSorted={isSorted('code')}
+                  direction={getSortDirection('code')}
+                  onClick={() => handleSort('code')}
+                  className="w-[120px]"
+                />
+                <SortableHeader
+                  column="name"
+                  label={t('list.name')}
+                  isSorted={isSorted('name')}
+                  direction={getSortDirection('name')}
+                  onClick={() => handleSort('name')}
+                />
                 <TableHead className="hidden md:table-cell">{t('list.client')}</TableHead>
-                <TableHead className="hidden sm:table-cell">{t('list.status')}</TableHead>
-                <TableHead className="hidden lg:table-cell">{t('list.start')}</TableHead>
+                <SortableHeader
+                  column="status"
+                  label={t('list.status')}
+                  isSorted={isSorted('status')}
+                  direction={getSortDirection('status')}
+                  onClick={() => handleSort('status')}
+                  className="hidden sm:table-cell"
+                />
+                <SortableHeader
+                  column="start_date"
+                  label={t('list.start')}
+                  isSorted={isSorted('start_date')}
+                  direction={getSortDirection('start_date')}
+                  onClick={() => handleSort('start_date')}
+                  className="hidden lg:table-cell"
+                />
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>

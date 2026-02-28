@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useMemo, useTransition } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Building2, MoreHorizontal, Pencil, Trash2, Plus, ExternalLink } from 'lucide-react'
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { SearchInput } from '@/components/ui/search-input'
 import { SortableHeader } from '@/components/ui/sortable-header'
 import { PaginationBar } from '@/components/ui/pagination-bar'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Table,
   TableBody,
@@ -47,6 +48,7 @@ interface ClientListProps {
   searchQuery: string
   sortColumn: string
   sortDirection: SortDirection
+  showInactive: boolean
 }
 
 export function ClientList({
@@ -58,12 +60,28 @@ export function ClientList({
   searchQuery,
   sortColumn,
   sortDirection,
+  showInactive,
 }: ClientListProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const t = useTranslations('clients')
   const tCommon = useTranslations('common')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isFilterPending, startFilterTransition] = useTransition()
+
+  const toggleInactive = (checked: boolean) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (checked) {
+      params.set('inactive', 'true')
+    } else {
+      params.delete('inactive')
+    }
+    params.set('page', '1')
+    startFilterTransition(() => {
+      router.push(`/clients?${params.toString()}`)
+    })
+  }
 
   // Use custom hooks for debounced search and pagination
   const { search, setSearch, isPending: isSearchPending } = useDebounceSearch({
@@ -94,7 +112,7 @@ export function ClientList({
     defaultDirection: sortDirection,
   })
 
-  const isPending = isSearchPending || isPagePending || isSortPending
+  const isPending = isSearchPending || isPagePending || isSortPending || isFilterPending
   const clientToDelete = useMemo(() => clients.find((c) => c.id === deleteId), [clients, deleteId])
 
   const handleDelete = async () => {
@@ -118,14 +136,29 @@ export function ClientList({
 
   return (
     <div className="space-y-4">
-      {/* Header with Search and Add Button */}
+      {/* Header with Search, Filter, and Add Button */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <SearchInput
-          placeholder={t('search_placeholder')}
-          value={search}
-          onChange={setSearch}
-          className="w-full sm:max-w-sm"
-        />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <SearchInput
+            placeholder={t('search_placeholder')}
+            value={search}
+            onChange={setSearch}
+            className="w-full sm:max-w-sm"
+          />
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="show-inactive"
+              checked={showInactive}
+              onCheckedChange={toggleInactive}
+            />
+            <label
+              htmlFor="show-inactive"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              {t('show_inactive')}
+            </label>
+          </div>
+        </div>
         {canEdit && (
           <Button asChild>
             <Link href="/clients/new">
