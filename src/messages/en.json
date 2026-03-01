@@ -151,6 +151,7 @@
     "clients": "Clients",
     "projects": "Projects",
     "timesheets": "Timesheets",
+    "scheduling": "Scheduling",
     "expenses": "Expenses",
     "invoices": "Invoices",
     "reports": "Reports",
@@ -247,7 +248,10 @@
       "team_members": "Team members",
       "in_progress": "In progress",
       "pending_invoices": "{count} draft invoices",
-      "map_title": "Team & Projects Map"
+      "map_title": "Team & Projects Map",
+      "projects_label": "{count} Projects",
+      "employees_label": "{count} Employees",
+      "no_locations": "No locations to display"
     },
     "quick_actions": {
       "title": "Quick Actions",
@@ -797,6 +801,41 @@
       "no_entries": "No time entries",
       "approved_on": "Approved on {date}",
       "rejection_reason": "Rejection reason"
+    }
+  },
+  "scheduling": {
+    "title": "Team Schedule",
+    "subtitle": "Manage employee assignments to projects",
+    "week_of": "Week of {date}",
+    "previous_week": "Previous",
+    "next_week": "Next",
+    "current_week": "Current Week",
+    "employee": "Employee",
+    "project": "Project",
+    "available": "Available",
+    "assigned": "Assigned",
+    "assign_employee": "Assign Employee",
+    "no_employees": "No employees found",
+    "no_assignments": "No assignments this week",
+    "select_employee": "Select an employee",
+    "select_project": "Select a project",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "hours_per_day": "Hours/Day",
+    "notes_placeholder": "Any special instructions or notes...",
+    "new_assignment": "New Assignment",
+    "new_assignment_desc": "Create a new project assignment for an employee.",
+    "edit_assignment": "Edit Assignment",
+    "edit_assignment_desc": "Update the assignment details.",
+    "cancel_assignment": "Cancel Assignment",
+    "cancel_assignment_title": "Cancel Assignment",
+    "cancel_assignment_message": "Are you sure you want to cancel this assignment? This action cannot be undone.",
+    "confirm_cancel": "Yes, Cancel",
+    "conflict_warning": "This employee is already assigned during this period",
+    "toast": {
+      "created": "Assignment created successfully",
+      "updated": "Assignment updated successfully",
+      "cancelled": "Assignment cancelled"
     }
   },
   "expenses": {

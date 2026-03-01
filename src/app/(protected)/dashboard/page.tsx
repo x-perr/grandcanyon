@@ -8,13 +8,15 @@ import { Clock, FileText, Receipt, FolderKanban } from 'lucide-react'
 import { getProfile } from '@/lib/auth'
 import { StatsCards } from '@/components/dashboard/stats-cards'
 import { RecentActivity } from '@/components/dashboard/recent-activity'
-import { getDashboardStats, getRecentActivity } from './actions'
+import { MontrealMap } from '@/components/dashboard/montreal-map'
+import { getDashboardStats, getRecentActivity, getMapData } from './actions'
 
 export default async function DashboardPage() {
-  const [profile, stats, activities, t] = await Promise.all([
+  const [profile, stats, activities, mapData, t] = await Promise.all([
     getProfile(),
     getDashboardStats(),
     getRecentActivity(10),
+    getMapData(),
     getTranslations('dashboard'),
   ])
 
@@ -38,6 +40,11 @@ export default async function DashboardPage() {
 
       {/* Quick Actions */}
       <QuickActions />
+
+      {/* Montreal Map */}
+      <Suspense fallback={<MapSkeleton />}>
+        <MontrealMap projects={mapData.projects} employees={mapData.employees} />
+      </Suspense>
 
       {/* Recent Activity */}
       <Suspense fallback={<ActivitySkeleton />}>
@@ -102,6 +109,20 @@ function StatsSkeleton() {
         </Card>
       ))}
     </div>
+  )
+}
+
+function MapSkeleton() {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-4 w-4" />
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="h-[400px] w-full rounded-lg" />
+      </CardContent>
+    </Card>
   )
 }
 

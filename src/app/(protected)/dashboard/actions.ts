@@ -327,3 +327,111 @@ function getRelativeTime(timestamp: string): string {
 
   return date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })
 }
+
+// === MAP DATA ===
+
+export type ProjectMapPin = {
+  id: string
+  name: string
+  code: string
+  lat: number
+  lng: number
+  address: string | null
+  clientName: string
+}
+
+export type EmployeeMapPin = {
+  id: string
+  name: string
+  lat: number
+  lng: number
+  address: string | null
+}
+
+export type MapData = {
+  projects: ProjectMapPin[]
+  employees: EmployeeMapPin[]
+}
+
+/**
+ * Get map data for Montreal map view
+ * Returns projects and employees with lat/lng coordinates
+ */
+export async function getMapData(): Promise<MapData> {
+  const supabase = await createClient()
+
+  // Run queries in parallel
+  const [projectsResult, employeesResult] = await Promise.all([
+    // Active projects with coordinates
+    supabase
+      .from('projects')
+      .select(`
+        id,
+        name,
+        code,
+        lat,
+        lng,
+        address,
+        city,
+        client:clients!projects_client_id_fkey(short_name)
+      `)
+      .eq('status', 'active')
+      .is('deleted_at', null)
+      .not('lat', 'is', null)
+      .not('lng', 'is', null),
+
+    // Active employees with coordinates (via people table)
+    supabase
+      .from('profiles')
+      .select(`
+        id,
+        first_name,
+        last_name,
+        person:people!profiles_person_id_fkey(
+          lat,
+          lng,
+          address,
+          city
+        )
+      `)
+      .eq('is_active', true),
+  ])
+
+  // Transform projects
+  const projects: ProjectMapPin[] = []
+  if (projectsResult.data) {
+    for (const p of projectsResult.data) {
+      if (p.lat !== null && p.lng !== null) {
+        const client = Array.isArray(p.client) ? p.client[0] : p.client
+        projects.push({
+          id: p.id,
+          name: p.name,
+          code: p.code,
+          lat: p.lat,
+          lng: p.lng,
+          address: p.address ? `${p.address}${p.city ? `, ${p.city}` : ''}` : null,
+          clientName: client?.short_name ?? 'Unknown',
+        })
+      }
+    }
+  }
+
+  // Transform employees
+  const employees: EmployeeMapPin[] = []
+  if (employeesResult.data) {
+    for (const e of employeesResult.data) {
+      const person = Array.isArray(e.person) ? e.person[0] : e.person
+      if (person?.lat !== null && person?.lng !== null && person?.lat !== undefined && person?.lng !== undefined) {
+        employees.push({
+          id: e.id,
+          name: `${e.first_name} ${e.last_name}`,
+          lat: person.lat,
+          lng: person.lng,
+          address: person.address ? `${person.address}${person.city ? `, ${person.city}` : ''}` : null,
+        })
+      }
+    }
+  }
+
+  return { projects, employees }
+}

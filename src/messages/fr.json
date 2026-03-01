@@ -150,6 +150,7 @@
     "clients": "Clients",
     "projects": "Projets",
     "timesheets": "Feuilles de temps",
+    "scheduling": "Planification",
     "expenses": "Dépenses",
     "invoices": "Factures",
     "reports": "Rapports",
@@ -246,7 +247,10 @@
       "team_members": "Membres de l'équipe",
       "in_progress": "En cours",
       "pending_invoices": "{count} factures brouillon",
-      "map_title": "Carte équipe & projets"
+      "map_title": "Carte équipe & projets",
+      "projects_label": "{count} Projets",
+      "employees_label": "{count} Employés",
+      "no_locations": "Aucun emplacement à afficher"
     },
     "quick_actions": {
       "title": "Actions rapides",
@@ -796,6 +800,41 @@
       "no_entries": "Aucune entrée de temps",
       "approved_on": "Approuvé le {date}",
       "rejection_reason": "Raison du refus"
+    }
+  },
+  "scheduling": {
+    "title": "Horaire de l'équipe",
+    "subtitle": "Gérer les assignations des employés aux projets",
+    "week_of": "Semaine du {date}",
+    "previous_week": "Précédent",
+    "next_week": "Suivant",
+    "current_week": "Semaine en cours",
+    "employee": "Employé",
+    "project": "Projet",
+    "available": "Disponible",
+    "assigned": "Assigné",
+    "assign_employee": "Assigner un employé",
+    "no_employees": "Aucun employé trouvé",
+    "no_assignments": "Aucune assignation cette semaine",
+    "select_employee": "Sélectionner un employé",
+    "select_project": "Sélectionner un projet",
+    "start_date": "Date de début",
+    "end_date": "Date de fin",
+    "hours_per_day": "Heures/jour",
+    "notes_placeholder": "Instructions spéciales ou notes...",
+    "new_assignment": "Nouvelle assignation",
+    "new_assignment_desc": "Créer une nouvelle assignation de projet pour un employé.",
+    "edit_assignment": "Modifier l'assignation",
+    "edit_assignment_desc": "Mettre à jour les détails de l'assignation.",
+    "cancel_assignment": "Annuler l'assignation",
+    "cancel_assignment_title": "Annuler l'assignation",
+    "cancel_assignment_message": "Êtes-vous sûr de vouloir annuler cette assignation? Cette action est irréversible.",
+    "confirm_cancel": "Oui, annuler",
+    "conflict_warning": "Cet employé est déjà assigné pendant cette période",
+    "toast": {
+      "created": "Assignation créée avec succès",
+      "updated": "Assignation mise à jour avec succès",
+      "cancelled": "Assignation annulée"
     }
   },
   "expenses": {
