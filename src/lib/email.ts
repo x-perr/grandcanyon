@@ -1,5 +1,5 @@
 import { Resend } from 'resend'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 
 // Lazy initialization to avoid crashing when API key is not set
 let resend: Resend | null = null
@@ -73,7 +73,8 @@ export async function updateEmailLogStatus(
   timestamp?: string
 ): Promise<boolean> {
   try {
-    const supabase = await createClient()
+    // Use service client to bypass RLS (called from external webhook)
+    const supabase = createServiceClient()
 
     const updateData: Record<string, unknown> = { status }
 
