@@ -1346,7 +1346,24 @@
       "password_reset_sent": "Password reset email sent to {email}",
       "password_reset_error": "Failed to send password reset email",
       "send_email": "Send Email",
-      "save_success": "User updated successfully"
+      "save_success": "User updated successfully",
+      "detail": {
+        "contact": "Contact Information",
+        "employment": "Employment",
+        "this_period": "This Period",
+        "no_contact": "No contact information",
+        "hired": "Hired",
+        "skill_level": "Skill Level",
+        "hourly_rate": "Hourly Rate",
+        "hours_this_month": "Hours This Month",
+        "expenses_this_month": "Expenses This Month",
+        "recent_timesheets": "Recent Timesheets",
+        "timesheets_description": "Last 8 weeks of timesheet submissions",
+        "recent_expenses": "Recent Expenses",
+        "expenses_description": "Recent expense report submissions",
+        "no_timesheets": "No timesheets",
+        "no_expenses": "No expenses"
+      }
     },
     "roles": {
       "title": "Roles & Permissions",

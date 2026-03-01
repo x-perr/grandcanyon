@@ -1345,7 +1345,24 @@
       "password_reset_sent": "Courriel de réinitialisation envoyé à {email}",
       "password_reset_error": "Échec de l'envoi du courriel de réinitialisation",
       "send_email": "Envoyer le courriel",
-      "save_success": "Utilisateur mis à jour avec succès"
+      "save_success": "Utilisateur mis à jour avec succès",
+      "detail": {
+        "contact": "Coordonnées",
+        "employment": "Emploi",
+        "this_period": "Cette période",
+        "no_contact": "Aucune coordonnée",
+        "hired": "Embauché",
+        "skill_level": "Niveau de compétence",
+        "hourly_rate": "Taux horaire",
+        "hours_this_month": "Heures ce mois",
+        "expenses_this_month": "Dépenses ce mois",
+        "recent_timesheets": "Feuilles de temps récentes",
+        "timesheets_description": "8 dernières semaines de soumissions",
+        "recent_expenses": "Dépenses récentes",
+        "expenses_description": "Soumissions récentes de rapports de dépenses",
+        "no_timesheets": "Aucune feuille de temps",
+        "no_expenses": "Aucune dépense"
+      }
     },
     "roles": {
       "title": "Rôles et permissions",
