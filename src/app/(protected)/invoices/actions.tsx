@@ -24,6 +24,7 @@ export type InvoiceWithRelations = Tables<'invoices'> & {
     code: string
     name: string
     short_name: string | null
+    billing_email: string | null
     billing_address_line1: string | null
     billing_city: string | null
     billing_province: string | null
@@ -128,7 +129,7 @@ export async function getInvoices(options?: {
       `
       *,
       client:clients!invoices_client_id_fkey(
-        id, code, name, short_name,
+        id, code, name, short_name, billing_email,
         billing_address_line1, billing_city, billing_province, billing_postal_code,
         charges_gst, charges_qst
       ),
@@ -234,7 +235,7 @@ export async function getInvoice(id: string): Promise<InvoiceWithRelations | nul
       `
       *,
       client:clients!invoices_client_id_fkey(
-        id, code, name, short_name,
+        id, code, name, short_name, billing_email,
         billing_address_line1, billing_city, billing_province, billing_postal_code,
         charges_gst, charges_qst
       ),

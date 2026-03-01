@@ -1,9 +1,9 @@
 'use client'
 
-import { useTransition, useCallback } from 'react'
+import { useState, useTransition, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { FileText, ExternalLink, Download, MoreHorizontal, Check } from 'lucide-react'
+import { FileText, ExternalLink, Download, MoreHorizontal, Check, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { SearchInput } from '@/components/ui/search-input'
@@ -37,6 +37,7 @@ import type { InvoiceWithRelations, ClientForSelect, SortDirection } from '@/app
 import type { InvoiceStatus } from '@/lib/validations/invoice'
 import { toast } from 'sonner'
 import { useTranslations, useLocale } from 'next-intl'
+import { SendInvoiceDialog } from './send-invoice-dialog'
 
 interface InvoiceListProps {
   invoices: InvoiceWithRelations[]
@@ -74,6 +75,9 @@ export function InvoiceList({
   const t = useTranslations('invoices')
   const tc = useTranslations('common')
   const locale = useLocale()
+
+  // State for resend email dialog
+  const [resendInvoice, setResendInvoice] = useState<InvoiceWithRelations | null>(null)
 
   // Use custom hooks for debounced search and pagination
   const { search, setSearch, isPending: isSearchPending } = useDebounceSearch({
@@ -340,10 +344,16 @@ export function InvoiceList({
                           </Link>
                         </DropdownMenuItem>
                         {invoice.status === 'sent' && (
-                          <DropdownMenuItem onClick={(e) => handleMarkPaid(invoice.id, e as unknown as React.MouseEvent)}>
-                            <Check className="mr-2 h-4 w-4" />
-                            {t('actions.mark_paid')}
-                          </DropdownMenuItem>
+                          <>
+                            <DropdownMenuItem onClick={() => setResendInvoice(invoice)}>
+                              <RefreshCw className="mr-2 h-4 w-4" />
+                              {t('actions.resend_email')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => handleMarkPaid(invoice.id, e as unknown as React.MouseEvent)}>
+                              <Check className="mr-2 h-4 w-4" />
+                              {t('actions.mark_paid')}
+                            </DropdownMenuItem>
+                          </>
                         )}
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -384,6 +394,21 @@ export function InvoiceList({
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Resend Invoice Dialog */}
+      {resendInvoice && (
+        <SendInvoiceDialog
+          open={!!resendInvoice}
+          onOpenChange={(open) => !open && setResendInvoice(null)}
+          invoiceId={resendInvoice.id}
+          invoiceNumber={resendInvoice.invoice_number}
+          clientName={resendInvoice.client?.name ?? ''}
+          clientEmail={resendInvoice.client?.billing_email ?? null}
+          total={formatCurrency(resendInvoice.total)}
+          dueDate={formatDate(resendInvoice.due_date)}
+          isResend={true}
+        />
       )}
     </div>
   )
