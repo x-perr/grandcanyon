@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Clock, FileText, DollarSign } from 'lucide-react'
+import { Clock, FileText, DollarSign, FolderKanban, Users } from 'lucide-react'
 import { formatCurrency } from '@/lib/tax'
 import type { DashboardStats } from '@/app/(protected)/dashboard/actions'
 
@@ -17,43 +17,39 @@ export function StatsCards({ stats }: StatsCardsProps) {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{t('open_timesheets')}</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('last_week_hours')}</CardTitle>
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.openTimesheets}</div>
+          <div className="text-2xl font-bold">{stats.lastWeekHours.toFixed(1)}</div>
           <p className="text-xs text-muted-foreground">
-            {t('awaiting_submission')}
+            {t('team_total')}
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{t('hours_this_week')}</CardTitle>
-          <Clock className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium">{t('active_projects')}</CardTitle>
+          <FolderKanban className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.hoursThisWeek.toFixed(1)}</div>
+          <div className="text-2xl font-bold">{stats.activeProjects}</div>
           <p className="text-xs text-muted-foreground">
-            {stats.pendingApprovals > 0 ? (
-              <span className="text-yellow-600">{t('pending_approvals', { count: stats.pendingApprovals })}</span>
-            ) : (
-              t('all_caught_up')
-            )}
+            {t('in_progress')}
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{t('draft_invoices')}</CardTitle>
-          <FileText className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium">{t('active_employees')}</CardTitle>
+          <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.draftInvoices}</div>
+          <div className="text-2xl font-bold">{stats.activeEmployees}</div>
           <p className="text-xs text-muted-foreground">
-            {t('ready_to_send')}
+            {t('team_members')}
           </p>
         </CardContent>
       </Card>
@@ -66,7 +62,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(stats.outstandingAmount)}</div>
           <p className="text-xs text-muted-foreground">
-            {t('active_projects', { count: stats.activeProjects })}
+            {t('pending_invoices', { count: stats.draftInvoices })}
           </p>
         </CardContent>
       </Card>

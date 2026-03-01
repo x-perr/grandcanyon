@@ -240,7 +240,14 @@
       "outstanding": "Outstanding",
       "across_invoices": "across {count} invoices",
       "active_projects": "Active Projects",
-      "your_projects": "your projects"
+      "your_projects": "your projects",
+      "last_week_hours": "Last Week Hours",
+      "team_total": "Team total",
+      "active_employees": "Active Employees",
+      "team_members": "Team members",
+      "in_progress": "In progress",
+      "pending_invoices": "{count} draft invoices",
+      "map_title": "Team & Projects Map"
     },
     "quick_actions": {
       "title": "Quick Actions",

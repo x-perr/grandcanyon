@@ -13,6 +13,8 @@ export type DashboardStats = {
   draftInvoices: number
   outstandingAmount: number
   activeProjects: number
+  lastWeekHours: number
+  activeEmployees: number
 }
 
 export type ActivityItem = {
@@ -38,6 +40,11 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
   const currentWeekStart = formatDateISO(getMonday(new Date()))
 
+  // Calculate last week's start date
+  const lastWeekDate = new Date()
+  lastWeekDate.setDate(lastWeekDate.getDate() - 7)
+  const lastWeekStart = formatDateISO(getMonday(lastWeekDate))
+
   // Run all queries in parallel
   const [
     openTimesheetsResult,
@@ -46,6 +53,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     draftInvoicesResult,
     outstandingResult,
     activeProjectsResult,
+    lastWeekHoursResult,
+    activeEmployeesResult,
   ] = await Promise.all([
     // 1. Open timesheets (current user's draft timesheets)
     userId
@@ -93,6 +102,21 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       .select('id', { count: 'exact', head: true })
       .eq('status', 'active')
       .is('deleted_at', null),
+
+    // 7. Last week hours (across all employees)
+    supabase
+      .from('timesheet_entries')
+      .select(`
+        hours,
+        timesheet:timesheets!inner(week_start)
+      `)
+      .eq('timesheet.week_start', lastWeekStart),
+
+    // 8. Active employees count
+    supabase
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_active', true),
   ])
 
   // Calculate hours this week
@@ -115,6 +139,17 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     )
   }
 
+  // Calculate last week hours (across all employees)
+  let lastWeekHours = 0
+  if (lastWeekHoursResult.data) {
+    for (const entry of lastWeekHoursResult.data) {
+      const hoursArray = entry.hours as number[]
+      if (hoursArray) {
+        lastWeekHours += hoursArray.reduce((sum, h) => sum + (h ?? 0), 0)
+      }
+    }
+  }
+
   return {
     openTimesheets: openTimesheetsResult.count ?? 0,
     hoursThisWeek,
@@ -122,6 +157,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     draftInvoices: draftInvoicesResult.count ?? 0,
     outstandingAmount,
     activeProjects: activeProjectsResult.count ?? 0,
+    lastWeekHours,
+    activeEmployees: activeEmployeesResult.count ?? 0,
   }
 }
 

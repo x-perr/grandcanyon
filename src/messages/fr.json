@@ -239,7 +239,14 @@
       "outstanding": "À recevoir",
       "across_invoices": "sur {count} factures",
       "active_projects": "Projets actifs",
-      "your_projects": "vos projets"
+      "your_projects": "vos projets",
+      "last_week_hours": "Heures semaine dernière",
+      "team_total": "Total de l'équipe",
+      "active_employees": "Employés actifs",
+      "team_members": "Membres de l'équipe",
+      "in_progress": "En cours",
+      "pending_invoices": "{count} factures brouillon",
+      "map_title": "Carte équipe & projets"
     },
     "quick_actions": {
       "title": "Actions rapides",
