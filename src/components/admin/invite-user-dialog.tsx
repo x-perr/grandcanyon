@@ -75,7 +75,7 @@ export function InviteUserDialog({ roles, trigger }: InviteUserDialogProps) {
     try {
       const result = await createInvitation({
         email,
-        role_id: roleId || null,
+        role_id: roleId && roleId !== 'none' ? roleId : null,
       })
 
       if (result.error) {
@@ -177,7 +177,7 @@ export function InviteUserDialog({ roles, trigger }: InviteUserDialogProps) {
                     <SelectValue placeholder={t('invitations.select_role')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">{tCommon('labels.none')}</SelectItem>
+                    <SelectItem value="none">{tCommon('labels.none')}</SelectItem>
                     {roles.map((role) => (
                       <SelectItem key={role.id} value={role.id}>
                         {role.name}
