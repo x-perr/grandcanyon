@@ -7,7 +7,7 @@ import { renderToBuffer } from '@react-pdf/renderer'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { calculateTaxes, formatCurrency } from '@/lib/tax'
 import { createInvoiceSchema, type CreateInvoiceData, type InvoiceLineFormData } from '@/lib/validations/invoice'
-import { sendInvoiceEmail } from '@/lib/email'
+import { sendInvoiceEmail, getEmailHistory } from '@/lib/email'
 import { InvoicePDF, DEFAULT_COMPANY_INFO } from '@/components/invoices/invoice-pdf'
 import type { Enums, Tables } from '@/types/database'
 
@@ -919,40 +919,52 @@ export type InvoiceEmail = {
 }
 
 /**
- * Get email history for an invoice
+ * Get email history for an invoice (uses unified email_logs table)
  */
 export async function getInvoiceEmails(invoiceId: string): Promise<InvoiceEmail[]> {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from('invoice_emails')
+  // Use unified email_logs table with polymorphic relation
+  const logs = await getEmailHistory('invoice', invoiceId)
+
+  // Get sender names for the logs
+  const senderIds = [...new Set(logs.map((log) => log.id))]
+  if (senderIds.length === 0) return []
+
+  // Fetch sender info from profiles using sent_by from email_logs
+  const { data: logsWithSenders } = await supabase
+    .from('email_logs')
     .select(
       `
       id,
-      sent_to,
-      sent_at,
-      status,
-      error_message,
-      sent_by:profiles!invoice_emails_sent_by_fkey(first_name, last_name)
+      sent_by,
+      metadata,
+      sender:profiles!email_logs_sent_by_fkey(first_name, last_name)
     `
     )
-    .eq('invoice_id', invoiceId)
-    .order('sent_at', { ascending: false })
+    .eq('related_type', 'invoice')
+    .eq('related_id', invoiceId)
 
-  if (error) {
-    console.error('Error fetching invoice emails:', error)
-    return []
+  const senderMap = new Map<string, string>()
+  for (const log of logsWithSenders ?? []) {
+    const sender = Array.isArray(log.sender) ? log.sender[0] : log.sender
+    if (sender) {
+      senderMap.set(log.id, `${sender.first_name} ${sender.last_name}`)
+    }
   }
 
-  return (data ?? []).map((email) => {
-    const sentBy = Array.isArray(email.sent_by) ? email.sent_by[0] : email.sent_by
+  return logs.map((log) => {
+    // Extract error from metadata if status is failed
+    const metadata = (logsWithSenders?.find((l) => l.id === log.id)?.metadata ?? {}) as Record<string, unknown>
+    const errorMessage = log.status === 'failed' ? (metadata.error as string) ?? null : null
+
     return {
-      id: email.id,
-      sent_to: email.sent_to,
-      sent_at: email.sent_at,
-      status: email.status,
-      error_message: email.error_message,
-      sent_by_name: sentBy ? `${sentBy.first_name} ${sentBy.last_name}` : 'Unknown',
+      id: log.id,
+      sent_to: log.recipient_email,
+      sent_at: log.sent_at,
+      status: log.status,
+      error_message: errorMessage,
+      sent_by_name: senderMap.get(log.id) ?? 'Unknown',
     }
   })
 }
@@ -1036,10 +1048,11 @@ export async function sendInvoiceWithEmail(
       })
     : 'Upon Receipt'
 
-  // Send email
+  // Send email (logging is handled inside sendInvoiceEmail via email_logs table)
   const emailResult = await sendInvoiceEmail({
     to: toEmail,
     invoiceNumber: invoice.invoice_number,
+    invoiceId, // For logging
     clientName: invoice.client?.name ?? 'Client',
     total: formatCurrency(invoice.total),
     dueDate,
@@ -1047,18 +1060,7 @@ export async function sendInvoiceWithEmail(
     customMessage,
     companyName: DEFAULT_COMPANY_INFO.name,
     companyEmail: DEFAULT_COMPANY_INFO.email,
-  })
-
-  // Log email attempt
-  await supabase.from('invoice_emails').insert({
-    invoice_id: invoiceId,
-    sent_to: toEmail,
-    sent_by: user.id,
-    subject: emailResult.subject,
-    body: emailResult.body,
-    resend_message_id: emailResult.messageId ?? null,
-    status: emailResult.success ? 'sent' : 'failed',
-    error_message: emailResult.error ?? null,
+    sentBy: user.id, // For logging
   })
 
   if (!emailResult.success) {

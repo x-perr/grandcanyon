@@ -1163,8 +1163,11 @@
       "sent_at": "Le",
       "status": "Statut",
       "status_delivered": "Livré",
+      "status_opened": "Ouvert",
+      "status_clicked": "Cliqué",
       "status_failed": "Échoué",
       "status_bounced": "Rejeté",
+      "status_complained": "Plainte",
       "status_sent": "Envoyé"
     },
     "edit": {

@@ -35,8 +35,13 @@ export function EmailHistory({ emails }: EmailHistoryProps) {
     switch (status) {
       case 'delivered':
         return <CheckCircle className="h-4 w-4 text-green-600" />
+      case 'opened':
+        return <CheckCircle className="h-4 w-4 text-emerald-600" />
+      case 'clicked':
+        return <CheckCircle className="h-4 w-4 text-teal-600" />
       case 'failed':
       case 'bounced':
+      case 'complained':
         return <XCircle className="h-4 w-4 text-red-600" />
       default:
         return <Clock className="h-4 w-4 text-blue-600" />
@@ -51,6 +56,18 @@ export function EmailHistory({ emails }: EmailHistoryProps) {
             {t('status_delivered')}
           </Badge>
         )
+      case 'opened':
+        return (
+          <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700">
+            {t('status_opened')}
+          </Badge>
+        )
+      case 'clicked':
+        return (
+          <Badge variant="outline" className="border-teal-200 bg-teal-50 text-teal-700">
+            {t('status_clicked')}
+          </Badge>
+        )
       case 'failed':
         return (
           <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700">
@@ -61,6 +78,12 @@ export function EmailHistory({ emails }: EmailHistoryProps) {
         return (
           <Badge variant="outline" className="border-orange-200 bg-orange-50 text-orange-700">
             {t('status_bounced')}
+          </Badge>
+        )
+      case 'complained':
+        return (
+          <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700">
+            {t('status_complained')}
           </Badge>
         )
       default:

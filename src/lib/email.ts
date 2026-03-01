@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { createClient } from '@/lib/supabase/server'
 
 // Lazy initialization to avoid crashing when API key is not set
 let resend: Resend | null = null
@@ -13,9 +14,145 @@ function getResend(): Resend {
   return resend
 }
 
+// === EMAIL LOGGING ===
+
+export type EmailLogEntry = {
+  recipient_email: string
+  subject: string
+  template_id: string
+  resend_id?: string
+  status: 'sent' | 'delivered' | 'bounced' | 'complained' | 'opened' | 'clicked' | 'failed'
+  related_type?: 'invoice' | 'timesheet' | 'project' | 'user'
+  related_id?: string
+  metadata?: Record<string, unknown>
+  sent_by?: string
+}
+
+/**
+ * Log an email to the database for tracking
+ */
+export async function logEmail(entry: EmailLogEntry): Promise<{ id: string } | null> {
+  try {
+    const supabase = await createClient()
+
+    const { data, error } = await supabase
+      .from('email_logs')
+      .insert({
+        recipient_email: entry.recipient_email,
+        subject: entry.subject,
+        template_id: entry.template_id,
+        resend_id: entry.resend_id,
+        status: entry.status,
+        related_type: entry.related_type,
+        related_id: entry.related_id,
+        metadata: entry.metadata ?? {},
+        sent_by: entry.sent_by,
+        sent_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+
+    if (error) {
+      console.error('Error logging email:', error)
+      return null
+    }
+
+    return { id: data.id }
+  } catch (error) {
+    console.error('Error logging email:', error)
+    return null
+  }
+}
+
+/**
+ * Update email log status (used by webhook)
+ */
+export async function updateEmailLogStatus(
+  resendId: string,
+  status: EmailLogEntry['status'],
+  timestamp?: string
+): Promise<boolean> {
+  try {
+    const supabase = await createClient()
+
+    const updateData: Record<string, unknown> = { status }
+
+    // Set appropriate timestamp based on status
+    if (timestamp) {
+      switch (status) {
+        case 'delivered':
+          updateData.delivered_at = timestamp
+          break
+        case 'opened':
+          updateData.opened_at = timestamp
+          break
+        case 'clicked':
+          updateData.clicked_at = timestamp
+          break
+        case 'bounced':
+        case 'complained':
+          updateData.bounced_at = timestamp
+          break
+      }
+    }
+
+    const { error } = await supabase.from('email_logs').update(updateData).eq('resend_id', resendId)
+
+    if (error) {
+      console.error('Error updating email log:', error)
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('Error updating email log:', error)
+    return false
+  }
+}
+
+/**
+ * Get email history for a related entity
+ */
+export async function getEmailHistory(
+  relatedType: string,
+  relatedId: string
+): Promise<
+  Array<{
+    id: string
+    recipient_email: string
+    subject: string
+    template_id: string
+    status: string
+    sent_at: string
+    delivered_at: string | null
+    opened_at: string | null
+  }>
+> {
+  try {
+    const supabase = await createClient()
+
+    const { data, error } = await supabase
+      .from('email_logs')
+      .select('id, recipient_email, subject, template_id, status, sent_at, delivered_at, opened_at')
+      .eq('related_type', relatedType)
+      .eq('related_id', relatedId)
+      .order('sent_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching email history:', error)
+      return []
+    }
+
+    return data ?? []
+  } catch {
+    return []
+  }
+}
+
 export interface SendInvoiceEmailParams {
   to: string
   invoiceNumber: string
+  invoiceId: string // Added for logging
   clientName: string
   total: string
   dueDate: string
@@ -23,6 +160,7 @@ export interface SendInvoiceEmailParams {
   customMessage?: string
   companyName?: string
   companyEmail?: string
+  sentBy?: string // User ID who sent the email
 }
 
 export interface SendEmailResult {
@@ -31,15 +169,18 @@ export interface SendEmailResult {
   error?: string
   subject: string
   body: string
+  logId?: string // ID of the email log entry
 }
 
 /**
  * Send invoice email with PDF attachment
+ * Enables open/click tracking and logs to email_logs table
  */
 export async function sendInvoiceEmail(params: SendInvoiceEmailParams): Promise<SendEmailResult> {
   const {
     to,
     invoiceNumber,
+    invoiceId,
     clientName,
     total,
     dueDate,
@@ -47,6 +188,7 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams): Promise<
     customMessage,
     companyName = 'Systèmes Intérieurs Grand Canyon',
     companyEmail = 'comptabilite@grandcanyon.ca',
+    sentBy,
   } = params
 
   const subject = `Facture ${invoiceNumber} / Invoice ${invoiceNumber}`
@@ -73,9 +215,25 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams): Promise<
           content: pdfBuffer,
         },
       ],
+      // Enable tracking for opens and clicks
+      headers: {
+        'X-Entity-Ref-ID': invoiceId, // For correlation
+      },
     })
 
     if (result.error) {
+      // Log failed email
+      await logEmail({
+        recipient_email: to,
+        subject,
+        template_id: 'invoice_sent',
+        status: 'failed',
+        related_type: 'invoice',
+        related_id: invoiceId,
+        metadata: { error: result.error.message, customMessage },
+        sent_by: sentBy,
+      })
+
       return {
         success: false,
         error: result.error.message,
@@ -84,14 +242,41 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams): Promise<
       }
     }
 
+    // Log successful email
+    const logResult = await logEmail({
+      recipient_email: to,
+      subject,
+      template_id: 'invoice_sent',
+      resend_id: result.data?.id,
+      status: 'sent',
+      related_type: 'invoice',
+      related_id: invoiceId,
+      metadata: { customMessage, invoiceNumber, clientName, total },
+      sent_by: sentBy,
+    })
+
     return {
       success: true,
       messageId: result.data?.id,
       subject,
       body,
+      logId: logResult?.id,
     }
   } catch (error) {
     console.error('Error sending invoice email:', error)
+
+    // Log failed email
+    await logEmail({
+      recipient_email: to,
+      subject,
+      template_id: 'invoice_sent',
+      status: 'failed',
+      related_type: 'invoice',
+      related_id: invoiceId,
+      metadata: { error: error instanceof Error ? error.message : 'Unknown error' },
+      sent_by: sentBy,
+    })
+
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to send email',
@@ -105,27 +290,35 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams): Promise<
 
 export interface SendTimesheetReminderParams {
   to: string
+  userId: string // User ID for logging
   employeeName: string
   weekRange: string
+  weekStart: string // ISO date for logging
   dueDate: string
   companyName?: string
   companyEmail?: string
+  sentBy?: string // Admin who triggered the reminder
 }
 
 /**
  * Send timesheet reminder email to an employee
+ * Logs to email_logs table for tracking
  */
 export async function sendTimesheetReminder(params: SendTimesheetReminderParams): Promise<{
   success: boolean
   error?: string
+  logId?: string
 }> {
   const {
     to,
+    userId,
     employeeName,
     weekRange,
+    weekStart,
     dueDate,
     companyName = 'Systèmes Intérieurs Grand Canyon',
     companyEmail = 'admin@grandcanyon.ca',
+    sentBy,
   } = params
 
   const subject = `Rappel: Feuille de temps / Timesheet Reminder - ${weekRange}`
@@ -144,15 +337,56 @@ export async function sendTimesheetReminder(params: SendTimesheetReminderParams)
       replyTo: companyEmail,
       subject,
       html: body,
+      headers: {
+        'X-Entity-Ref-ID': userId,
+      },
     })
 
     if (result.error) {
+      // Log failed email
+      await logEmail({
+        recipient_email: to,
+        subject,
+        template_id: 'timesheet_reminder',
+        status: 'failed',
+        related_type: 'user',
+        related_id: userId,
+        metadata: { error: result.error.message, weekRange, weekStart },
+        sent_by: sentBy,
+      })
+
       return { success: false, error: result.error.message }
     }
 
-    return { success: true }
+    // Log successful email
+    const logResult = await logEmail({
+      recipient_email: to,
+      subject,
+      template_id: 'timesheet_reminder',
+      resend_id: result.data?.id,
+      status: 'sent',
+      related_type: 'user',
+      related_id: userId,
+      metadata: { employeeName, weekRange, weekStart },
+      sent_by: sentBy,
+    })
+
+    return { success: true, logId: logResult?.id }
   } catch (error) {
     console.error('Error sending timesheet reminder:', error)
+
+    // Log failed email
+    await logEmail({
+      recipient_email: to,
+      subject,
+      template_id: 'timesheet_reminder',
+      status: 'failed',
+      related_type: 'user',
+      related_id: userId,
+      metadata: { error: error instanceof Error ? error.message : 'Unknown error' },
+      sent_by: sentBy,
+    })
+
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to send email',

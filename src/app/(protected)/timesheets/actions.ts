@@ -1442,6 +1442,9 @@ export async function sendTimesheetReminders(
 ): Promise<{ success: boolean; results: ReminderResult[]; error?: string }> {
   const supabase = await createClient()
   const permissions = await getUserPermissions()
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser()
 
   // Check permission
   if (!hasPermission(permissions, 'timesheets.view_all') && !hasPermission(permissions, 'admin.manage')) {
@@ -1495,6 +1498,9 @@ export async function sendTimesheetReminders(
       employeeName: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Équipier',
       weekRange,
       dueDate: dueDateStr,
+      userId: user.id,
+      weekStart: weekStartISO,
+      sentBy: currentUser?.id,
     })
 
     results.push({

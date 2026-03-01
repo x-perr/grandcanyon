@@ -1164,8 +1164,11 @@
       "sent_at": "On",
       "status": "Status",
       "status_delivered": "Delivered",
+      "status_opened": "Opened",
+      "status_clicked": "Clicked",
       "status_failed": "Failed",
       "status_bounced": "Bounced",
+      "status_complained": "Complained",
       "status_sent": "Sent"
     },
     "edit": {
