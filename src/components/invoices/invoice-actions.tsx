@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Send, CheckCircle, XCircle, Trash2, MoreHorizontal, Loader2 } from 'lucide-react'
+import { Send, RefreshCw, CheckCircle, XCircle, Trash2, MoreHorizontal, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -52,6 +52,7 @@ export function InvoiceActions({
   const [isPending, startTransition] = useTransition()
   const [dialogAction, setDialogAction] = useState<ActionType>(null)
   const [sendDialogOpen, setSendDialogOpen] = useState(false)
+  const [isResend, setIsResend] = useState(false)
   const t = useTranslations('invoices')
   const tc = useTranslations('common')
 
@@ -140,9 +141,23 @@ export function InvoiceActions({
         <DropdownMenuContent align="end">
           {/* Send - Draft only */}
           {isDraft && (
-            <DropdownMenuItem onClick={() => setSendDialogOpen(true)}>
+            <DropdownMenuItem onClick={() => {
+              setIsResend(false)
+              setSendDialogOpen(true)
+            }}>
               <Send className="mr-2 h-4 w-4" />
               {t('actions.send_invoice')}
+            </DropdownMenuItem>
+          )}
+
+          {/* Resend Email - Sent only */}
+          {isSent && (
+            <DropdownMenuItem onClick={() => {
+              setIsResend(true)
+              setSendDialogOpen(true)
+            }}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              {t('actions.resend_email')}
             </DropdownMenuItem>
           )}
 
@@ -191,6 +206,7 @@ export function InvoiceActions({
         clientEmail={clientEmail}
         total={total}
         dueDate={dueDate}
+        isResend={isResend}
       />
 
       {/* Confirmation Dialog */}

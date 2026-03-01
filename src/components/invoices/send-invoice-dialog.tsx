@@ -29,6 +29,7 @@ interface SendInvoiceDialogProps {
   clientEmail: string | null
   total: string
   dueDate: string
+  isResend?: boolean
 }
 
 export function SendInvoiceDialog({
@@ -40,6 +41,7 @@ export function SendInvoiceDialog({
   clientEmail,
   total,
   dueDate,
+  isResend = false,
 }: SendInvoiceDialogProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -88,9 +90,15 @@ export function SendInvoiceDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            {t('send.send_title', { number: invoiceNumber })}
+            {isResend
+              ? t('send.resend_title', { number: invoiceNumber })
+              : t('send.send_title', { number: invoiceNumber })}
           </DialogTitle>
-          <DialogDescription>{t('send.send_description', { client: clientName })}</DialogDescription>
+          <DialogDescription>
+            {isResend
+              ? t('send.resend_description', { client: clientName })
+              : t('send.send_description', { client: clientName })}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
