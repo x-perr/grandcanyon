@@ -370,7 +370,25 @@
       "next_project_number": "Next Project #",
       "no_address": "No address",
       "no_projects": "No projects yet",
-      "editing_client": "Update client information for {name}"
+      "editing_client": "Update client information for {name}",
+      "financials": "Financial Summary",
+      "total_billed": "Total Billed",
+      "total_paid": "Paid",
+      "total_outstanding": "Outstanding",
+      "invoices_title": "Invoices",
+      "no_invoices": "No invoices yet",
+      "expenses_title": "Billable Expenses",
+      "no_expenses": "No billable expenses",
+      "billed": "Billed",
+      "unbilled": "Unbilled",
+      "overdue": "Overdue",
+      "days_overdue": "{days}d overdue",
+      "due_in_days": "Due in {days}d",
+      "view_all_invoices": "View All Invoices",
+      "view_all_projects": "View All Projects",
+      "activity": "Activity",
+      "last_invoice": "Last Invoice",
+      "active_projects_count": "Active Projects"
     }
   },
   "projects": {

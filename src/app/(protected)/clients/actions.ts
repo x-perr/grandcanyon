@@ -117,6 +117,149 @@ export async function getClient(id: string) {
   return data
 }
 
+// Types for 360° client view
+export type ClientInvoice = {
+  id: string
+  invoice_number: string
+  invoice_date: string
+  due_date: string | null
+  total: number
+  status: 'draft' | 'sent' | 'paid' | 'void'
+  project: { code: string; name: string } | null
+}
+
+export type ClientExpense = {
+  id: string
+  expense_date: string
+  description: string | null
+  total: number
+  is_billable: boolean | null
+  expense_type: { name: string } | null
+  project: { code: string; name: string } | null
+  invoice_line: { invoice_id: string } | null
+}
+
+export type ClientFinancials = {
+  totalBilled: number
+  totalPaid: number
+  totalOutstanding: number
+  invoiceCount: number
+}
+
+export type Client360Data = {
+  client: Awaited<ReturnType<typeof getClient>>
+  invoices: ClientInvoice[]
+  expenses: ClientExpense[]
+  financials: ClientFinancials
+}
+
+export async function getClient360(id: string): Promise<Client360Data | null> {
+  const supabase = await createClient()
+
+  // Fetch client with contacts and projects
+  const { data: client, error: clientError } = await supabase
+    .from('clients')
+    .select(
+      `
+      *,
+      contacts:client_contacts(*),
+      projects:projects(id, code, name, status, is_active)
+    `
+    )
+    .eq('id', id)
+    .single()
+
+  if (clientError || !client) {
+    console.error('Error fetching client:', clientError)
+    return null
+  }
+
+  // Fetch invoices for this client
+  const { data: invoices, error: invoicesError } = await supabase
+    .from('invoices')
+    .select(
+      `
+      id,
+      invoice_number,
+      invoice_date,
+      due_date,
+      total,
+      status,
+      project:projects(code, name)
+    `
+    )
+    .eq('client_id', id)
+    .order('invoice_date', { ascending: false })
+    .limit(10)
+
+  if (invoicesError) {
+    console.error('Error fetching invoices:', invoicesError)
+  }
+
+  // Calculate financials from all invoices (not just recent 10)
+  const { data: allInvoices } = await supabase
+    .from('invoices')
+    .select('total, status')
+    .eq('client_id', id)
+
+  const financials: ClientFinancials = {
+    totalBilled: 0,
+    totalPaid: 0,
+    totalOutstanding: 0,
+    invoiceCount: allInvoices?.length ?? 0,
+  }
+
+  allInvoices?.forEach((inv) => {
+    if (inv.status !== 'void') {
+      financials.totalBilled += inv.total
+      if (inv.status === 'paid') {
+        financials.totalPaid += inv.total
+      } else if (inv.status === 'sent') {
+        financials.totalOutstanding += inv.total
+      }
+    }
+  })
+
+  // Get project IDs for this client to fetch expenses
+  const projectIds = client.projects?.map((p: { id: string }) => p.id) ?? []
+
+  // Fetch billable expenses for this client's projects
+  let expenses: ClientExpense[] = []
+  if (projectIds.length > 0) {
+    const { data: expenseData, error: expensesError } = await supabase
+      .from('expense_entries')
+      .select(
+        `
+        id,
+        expense_date,
+        description,
+        total,
+        is_billable,
+        expense_type:expense_types(name),
+        project:projects(code, name),
+        invoice_line:invoice_lines(invoice_id)
+      `
+      )
+      .in('project_id', projectIds)
+      .eq('is_billable', true)
+      .order('expense_date', { ascending: false })
+      .limit(10)
+
+    if (expensesError) {
+      console.error('Error fetching expenses:', expensesError)
+    } else {
+      expenses = (expenseData ?? []) as unknown as ClientExpense[]
+    }
+  }
+
+  return {
+    client,
+    invoices: (invoices ?? []) as unknown as ClientInvoice[],
+    expenses,
+    financials,
+  }
+}
+
 export async function createClientAction(formData: FormData) {
   const supabase = await createClient()
 

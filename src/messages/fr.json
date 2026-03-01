@@ -369,7 +369,25 @@
       "next_project_number": "Prochain no. projet",
       "no_address": "Aucune adresse",
       "no_projects": "Aucun projet",
-      "editing_client": "Modifier les informations pour {name}"
+      "editing_client": "Modifier les informations pour {name}",
+      "financials": "Résumé financier",
+      "total_billed": "Total facturé",
+      "total_paid": "Payé",
+      "total_outstanding": "En attente",
+      "invoices_title": "Factures",
+      "no_invoices": "Aucune facture",
+      "expenses_title": "Dépenses facturables",
+      "no_expenses": "Aucune dépense facturable",
+      "billed": "Facturé",
+      "unbilled": "Non facturé",
+      "overdue": "En retard",
+      "days_overdue": "{days}j en retard",
+      "due_in_days": "Échéance dans {days}j",
+      "view_all_invoices": "Voir toutes les factures",
+      "view_all_projects": "Voir tous les projets",
+      "activity": "Activité",
+      "last_invoice": "Dernière facture",
+      "active_projects_count": "Projets actifs"
     }
   },
   "projects": {
