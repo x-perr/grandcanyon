@@ -1025,9 +1025,12 @@ export async function sendInvoiceWithEmail(
     return { error: 'Invoice not found' }
   }
 
-  if (invoice.status !== 'draft') {
-    return { error: 'Can only send draft invoices' }
+  // Allow draft (first send) and sent (resend) statuses
+  if (invoice.status !== 'draft' && invoice.status !== 'sent') {
+    return { error: 'Can only send draft or resend sent invoices' }
   }
+
+  const isResend = invoice.status === 'sent'
 
   // Generate PDF buffer
   let pdfBuffer: Buffer
@@ -1068,47 +1071,51 @@ export async function sendInvoiceWithEmail(
     return { error: emailResult.error ?? 'Failed to send email' }
   }
 
-  // Update invoice status
-  const { error: updateError } = await supabase
-    .from('invoices')
-    .update({
-      status: 'sent',
-      sent_at: new Date().toISOString(),
-    })
-    .eq('id', invoiceId)
+  // Update invoice status (only for first send, not resend)
+  if (!isResend) {
+    const { error: updateError } = await supabase
+      .from('invoices')
+      .update({
+        status: 'sent',
+        sent_at: new Date().toISOString(),
+      })
+      .eq('id', invoiceId)
 
-  if (updateError) {
-    console.error('Error updating invoice status:', updateError)
-    // Email sent but status not updated - log and continue
+    if (updateError) {
+      console.error('Error updating invoice status:', updateError)
+      // Email sent but status not updated - log and continue
+    }
   }
 
-  // Lock associated timesheets
-  const { data: invoiceLines } = await supabase
-    .from('invoice_lines')
-    .select('timesheet_entry_id')
-    .eq('invoice_id', invoiceId)
-    .not('timesheet_entry_id', 'is', null)
+  // Lock associated timesheets (only for first send, not resend)
+  if (!isResend) {
+    const { data: invoiceLines } = await supabase
+      .from('invoice_lines')
+      .select('timesheet_entry_id')
+      .eq('invoice_id', invoiceId)
+      .not('timesheet_entry_id', 'is', null)
 
-  const entryIds = (invoiceLines ?? [])
-    .filter((l) => l.timesheet_entry_id)
-    .map((l) => l.timesheet_entry_id as string)
+    const entryIds = (invoiceLines ?? [])
+      .filter((l) => l.timesheet_entry_id)
+      .map((l) => l.timesheet_entry_id as string)
 
-  if (entryIds.length > 0) {
-    const { data: entries } = await supabase
-      .from('timesheet_entries')
-      .select('timesheet_id')
-      .in('id', entryIds)
+    if (entryIds.length > 0) {
+      const { data: entries } = await supabase
+        .from('timesheet_entries')
+        .select('timesheet_id')
+        .in('id', entryIds)
 
-    const timesheetIds = [...new Set((entries ?? []).map((e) => e.timesheet_id))]
+      const timesheetIds = [...new Set((entries ?? []).map((e) => e.timesheet_id))]
 
-    if (timesheetIds.length > 0) {
-      await supabase
-        .from('timesheets')
-        .update({
-          status: 'locked',
-          locked_at: new Date().toISOString(),
-        })
-        .in('id', timesheetIds)
+      if (timesheetIds.length > 0) {
+        await supabase
+          .from('timesheets')
+          .update({
+            status: 'locked',
+            locked_at: new Date().toISOString(),
+          })
+          .in('id', timesheetIds)
+      }
     }
   }
 
