@@ -29,7 +29,8 @@
       "saving": "Enregistrement...",
       "deleting": "Suppression...",
       "select": "Sélectionner",
-      "save_changes": "Enregistrer les modifications"
+      "save_changes": "Enregistrer les modifications",
+      "done": "Terminé"
     },
     "status": {
       "draft": "Brouillon",
@@ -1341,6 +1342,8 @@
     "users": {
       "title": "Utilisateurs",
       "subtitle": "Gérez les comptes utilisateurs, rôles et permissions",
+      "tab_users": "Utilisateurs",
+      "tab_invitations": "Invitations",
       "no_users": "Aucun utilisateur trouvé",
       "no_users_message": "Aucun utilisateur ne correspond aux filtres sélectionnés.",
       "search_empty": "Essayez d'ajuster vos termes de recherche",
@@ -1405,7 +1408,7 @@
     },
     "roles": {
       "title": "Rôles et permissions",
-      "subtitle": "Voir les permissions et niveaux d'accès des rôles (lecture seule)",
+      "subtitle": "Gérer les permissions et niveaux d'accès des rôles",
       "legend": "Légende",
       "has_permission": "A la permission",
       "no_permission": "N'a pas la permission",
@@ -1413,7 +1416,12 @@
       "permissions": "permissions",
       "category_permissions": "{count} permissions dans cette catégorie",
       "summary": "Résumé des rôles",
-      "summary_description": "Aperçu de tous les rôles et leur nombre de permissions"
+      "summary_description": "Aperçu de tous les rôles et leur nombre de permissions",
+      "click_to_toggle": "Cliquez pour modifier les permissions",
+      "click_to_add": "Cliquez pour ajouter la permission",
+      "click_to_remove": "Cliquez pour retirer la permission",
+      "permission_added": "Permission ajoutée",
+      "permission_removed": "Permission retirée"
     },
     "logs": {
       "title": "Journal d'audit",
@@ -1494,6 +1502,42 @@
       "logo_uploaded": "Logo téléversé avec succès",
       "logo_removed": "Logo retiré",
       "error": "Erreur lors de l'enregistrement"
+    },
+    "invitations": {
+      "invite_user": "Inviter un utilisateur",
+      "dialog_title": "Inviter un nouvel utilisateur",
+      "dialog_desc": "Envoyez un courriel d'invitation pour ajouter un nouvel utilisateur au système.",
+      "invite_sent_title": "Invitation envoyée",
+      "invite_sent_desc": "Le lien d'invitation a été généré. Partagez-le avec l'utilisateur pour compléter son inscription.",
+      "invite_link": "Lien d'invitation",
+      "link_expires": "Ce lien expire dans 7 jours.",
+      "invite_another": "Inviter un autre",
+      "email": "Courriel",
+      "role": "Rôle",
+      "select_role": "Sélectionner un rôle (optionnel)",
+      "role_help": "L'utilisateur se verra attribuer ce rôle après avoir accepté l'invitation.",
+      "send_invitation": "Envoyer l'invitation",
+      "status": "Statut",
+      "status_pending": "En attente",
+      "status_accepted": "Acceptée",
+      "status_expired": "Expirée",
+      "status_revoked": "Révoquée",
+      "invited_by": "Invité par",
+      "expires": "Expire",
+      "accepted_at": "Acceptée {date}",
+      "no_invitations": "Aucune invitation",
+      "copy_link": "Copier le lien",
+      "resend": "Renvoyer",
+      "revoke": "Révoquer",
+      "revoke_title": "Révoquer l'invitation",
+      "revoke_message": "Êtes-vous sûr de vouloir révoquer l'invitation pour {email}? Cette personne ne pourra plus utiliser ce lien pour s'inscrire.",
+      "showing": "Affichage de {start} à {end} sur {total}",
+      "toast": {
+        "created": "Invitation créée avec succès",
+        "resent": "Invitation renvoyée avec succès",
+        "revoked": "Invitation révoquée",
+        "copied": "Lien copié dans le presse-papiers"
+      }
     }
   }
 }

@@ -14,6 +14,70 @@ export type Database = {
   }
   public: {
     Tables: {
+      assignments: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          employee_id: string
+          end_date: string
+          hours_per_day: number | null
+          id: string
+          notes: string | null
+          project_id: string
+          start_date: string
+          status: Database["public"]["Enums"]["assignment_status"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          employee_id: string
+          end_date: string
+          hours_per_day?: number | null
+          id?: string
+          notes?: string | null
+          project_id: string
+          start_date: string
+          status?: Database["public"]["Enums"]["assignment_status"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          employee_id?: string
+          end_date?: string
+          hours_per_day?: number | null
+          id?: string
+          notes?: string | null
+          project_id?: string
+          start_date?: string
+          status?: Database["public"]["Enums"]["assignment_status"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -60,6 +124,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      classifications: {
+        Row: {
+          code: string
+          created_at: string | null
+          hourly_rate: number
+          id: string
+          name_en: string
+          name_fr: string
+          sort_order: number
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          hourly_rate: number
+          id?: string
+          name_en: string
+          name_fr: string
+          sort_order?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          hourly_rate?: number
+          id?: string
+          name_en?: string
+          name_fr?: string
+          sort_order?: number
+        }
+        Relationships: []
       }
       client_contacts: {
         Row: {
@@ -125,6 +219,7 @@ export type Database = {
           deleted_at: string | null
           general_email: string | null
           id: string
+          is_active: boolean
           name: string
           next_project_number: number | null
           notes: string | null
@@ -158,6 +253,7 @@ export type Database = {
           deleted_at?: string | null
           general_email?: string | null
           id?: string
+          is_active?: boolean
           name: string
           next_project_number?: number | null
           notes?: string | null
@@ -191,6 +287,7 @@ export type Database = {
           deleted_at?: string | null
           general_email?: string | null
           id?: string
+          is_active?: boolean
           name?: string
           next_project_number?: number | null
           notes?: string | null
@@ -615,42 +712,68 @@ export type Database = {
       }
       people: {
         Row: {
+          address: string | null
+          city: string | null
+          classification_id: string | null
           created_at: string | null
           email: string | null
           first_name: string
           id: string
           is_active: boolean | null
           last_name: string
+          lat: number | null
           legacy_user_id: number | null
+          lng: number | null
           notes: string | null
           phone: string | null
+          postal_code: string | null
           updated_at: string | null
         }
         Insert: {
+          address?: string | null
+          city?: string | null
+          classification_id?: string | null
           created_at?: string | null
           email?: string | null
           first_name?: string
           id?: string
           is_active?: boolean | null
           last_name?: string
+          lat?: number | null
           legacy_user_id?: number | null
+          lng?: number | null
           notes?: string | null
           phone?: string | null
+          postal_code?: string | null
           updated_at?: string | null
         }
         Update: {
+          address?: string | null
+          city?: string | null
+          classification_id?: string | null
           created_at?: string | null
           email?: string | null
           first_name?: string
           id?: string
           is_active?: boolean | null
           last_name?: string
+          lat?: number | null
           legacy_user_id?: number | null
+          lng?: number | null
           notes?: string | null
           phone?: string | null
+          postal_code?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "people_classification_id_fkey"
+            columns: ["classification_id"]
+            isOneToOne: false
+            referencedRelation: "classifications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       permissions: {
         Row: {
@@ -925,6 +1048,7 @@ export type Database = {
           billing_type:
             | Database["public"]["Enums"]["project_billing_type"]
             | null
+          city: string | null
           client_id: string
           code: string
           created_at: string | null
@@ -936,10 +1060,14 @@ export type Database = {
           fixed_price: number | null
           hourly_rate: number | null
           id: string
+          is_active: boolean
           is_global: boolean | null
+          lat: number | null
+          lng: number | null
           name: string
           per_unit_rate: number | null
           po_number: string | null
+          postal_code: string | null
           project_manager_id: string | null
           start_date: string | null
           status: Database["public"]["Enums"]["project_status"] | null
@@ -951,6 +1079,7 @@ export type Database = {
           billing_type?:
             | Database["public"]["Enums"]["project_billing_type"]
             | null
+          city?: string | null
           client_id: string
           code: string
           created_at?: string | null
@@ -962,10 +1091,14 @@ export type Database = {
           fixed_price?: number | null
           hourly_rate?: number | null
           id?: string
+          is_active?: boolean
           is_global?: boolean | null
+          lat?: number | null
+          lng?: number | null
           name: string
           per_unit_rate?: number | null
           po_number?: string | null
+          postal_code?: string | null
           project_manager_id?: string | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["project_status"] | null
@@ -977,6 +1110,7 @@ export type Database = {
           billing_type?:
             | Database["public"]["Enums"]["project_billing_type"]
             | null
+          city?: string | null
           client_id?: string
           code?: string
           created_at?: string | null
@@ -988,10 +1122,14 @@ export type Database = {
           fixed_price?: number | null
           hourly_rate?: number | null
           id?: string
+          is_active?: boolean
           is_global?: boolean | null
+          lat?: number | null
+          lng?: number | null
           name?: string
           per_unit_rate?: number | null
           po_number?: string | null
+          postal_code?: string | null
           project_manager_id?: string | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["project_status"] | null
@@ -1282,6 +1420,7 @@ export type Database = {
       }
     }
     Enums: {
+      assignment_status: "scheduled" | "active" | "completed" | "cancelled"
       expense_status: "draft" | "submitted" | "approved" | "rejected"
       invoice_status: "draft" | "sent" | "paid" | "void"
       project_billing_type: "hourly" | "fixed" | "per_unit"
@@ -1419,6 +1558,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      assignment_status: ["scheduled", "active", "completed", "cancelled"],
       expense_status: ["draft", "submitted", "approved", "rejected"],
       invoice_status: ["draft", "sent", "paid", "void"],
       project_billing_type: ["hourly", "fixed", "per_unit"],

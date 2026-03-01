@@ -29,7 +29,8 @@
       "saving": "Saving...",
       "deleting": "Deleting...",
       "select": "Select",
-      "save_changes": "Save Changes"
+      "save_changes": "Save Changes",
+      "done": "Done"
     },
     "status": {
       "draft": "Draft",
@@ -1342,6 +1343,8 @@
     "users": {
       "title": "Users",
       "subtitle": "Manage user accounts, roles, and permissions",
+      "tab_users": "Users",
+      "tab_invitations": "Invitations",
       "no_users": "No users found",
       "no_users_message": "No users match the selected filters.",
       "search_empty": "Try adjusting your search terms",
@@ -1406,7 +1409,7 @@
     },
     "roles": {
       "title": "Roles & Permissions",
-      "subtitle": "View role permissions and access levels (read-only)",
+      "subtitle": "Manage role permissions and access levels",
       "legend": "Legend",
       "has_permission": "Has permission",
       "no_permission": "No permission",
@@ -1414,7 +1417,12 @@
       "permissions": "permissions",
       "category_permissions": "{count} permissions in this category",
       "summary": "Role Summary",
-      "summary_description": "Overview of all roles and their permission counts"
+      "summary_description": "Overview of all roles and their permission counts",
+      "click_to_toggle": "Click to toggle permissions",
+      "click_to_add": "Click to add permission",
+      "click_to_remove": "Click to remove permission",
+      "permission_added": "Permission added",
+      "permission_removed": "Permission removed"
     },
     "logs": {
       "title": "Audit Logs",
@@ -1495,6 +1503,42 @@
       "logo_uploaded": "Logo uploaded successfully",
       "logo_removed": "Logo removed",
       "error": "Error saving settings"
+    },
+    "invitations": {
+      "invite_user": "Invite User",
+      "dialog_title": "Invite New User",
+      "dialog_desc": "Send an invitation email to add a new user to the system.",
+      "invite_sent_title": "Invitation Sent",
+      "invite_sent_desc": "The invitation link has been generated. Share it with the user to complete their registration.",
+      "invite_link": "Invitation Link",
+      "link_expires": "This link expires in 7 days.",
+      "invite_another": "Invite Another",
+      "email": "Email",
+      "role": "Role",
+      "select_role": "Select a role (optional)",
+      "role_help": "The user will be assigned this role after accepting the invitation.",
+      "send_invitation": "Send Invitation",
+      "status": "Status",
+      "status_pending": "Pending",
+      "status_accepted": "Accepted",
+      "status_expired": "Expired",
+      "status_revoked": "Revoked",
+      "invited_by": "Invited By",
+      "expires": "Expires",
+      "accepted_at": "Accepted {date}",
+      "no_invitations": "No invitations",
+      "copy_link": "Copy Link",
+      "resend": "Resend",
+      "revoke": "Revoke",
+      "revoke_title": "Revoke Invitation",
+      "revoke_message": "Are you sure you want to revoke the invitation for {email}? They will no longer be able to use this link to sign up.",
+      "showing": "Showing {start} to {end} of {total}",
+      "toast": {
+        "created": "Invitation created successfully",
+        "resent": "Invitation resent successfully",
+        "revoked": "Invitation revoked",
+        "copied": "Link copied to clipboard"
+      }
     }
   }
 }

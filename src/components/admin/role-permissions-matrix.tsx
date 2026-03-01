@@ -1,7 +1,8 @@
 'use client'
 
+import { useState, useMemo, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { Check, X, Info } from 'lucide-react'
+import { Check, X, Info, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -18,6 +19,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { Badge } from '@/components/ui/badge'
+import { toast } from 'sonner'
+import { toggleRolePermission } from '@/app/(protected)/admin/actions'
 import type { RoleWithPermissions } from '@/app/(protected)/admin/actions'
 
 interface RolePermissionsMatrixProps {
@@ -30,18 +33,76 @@ export function RolePermissionsMatrix({
   permissionsByCategory,
 }: RolePermissionsMatrixProps) {
   const t = useTranslations('admin')
+  const tCommon = useTranslations('common')
+  const [pendingToggle, setPendingToggle] = useState<string | null>(null)
+  const [localRoles, setLocalRoles] = useState(roles)
 
   // Build a map of role -> permission codes for quick lookup
-  const rolePermissionMap = new Map<string, Set<string>>()
-  for (const role of roles) {
-    rolePermissionMap.set(
-      role.id,
-      new Set(role.permissions.map((p) => p.code))
-    )
-  }
+  const rolePermissionMap = useMemo(() => {
+    const map = new Map<string, Set<string>>()
+    for (const role of localRoles) {
+      map.set(
+        role.id,
+        new Set(role.permissions.map((p) => p.id))
+      )
+    }
+    return map
+  }, [localRoles])
 
-  const hasPermission = (roleId: string, permissionCode: string): boolean => {
-    return rolePermissionMap.get(roleId)?.has(permissionCode) ?? false
+  const hasPermission = useCallback(
+    (roleId: string, permissionId: string): boolean => {
+      return rolePermissionMap.get(roleId)?.has(permissionId) ?? false
+    },
+    [rolePermissionMap]
+  )
+
+  const handleToggle = async (roleId: string, permissionId: string, permissionCode: string) => {
+    const toggleKey = `${roleId}-${permissionId}`
+    if (pendingToggle) return // Prevent double-click
+
+    setPendingToggle(toggleKey)
+
+    try {
+      const result = await toggleRolePermission(roleId, permissionId)
+
+      if (result.error) {
+        toast.error(result.error)
+      } else {
+        // Optimistically update local state
+        setLocalRoles((prevRoles) =>
+          prevRoles.map((role) => {
+            if (role.id !== roleId) return role
+
+            if (result.added) {
+              // Add the permission
+              return {
+                ...role,
+                permissions: [
+                  ...role.permissions,
+                  { id: permissionId, code: permissionCode, description: null, category: null },
+                ],
+              }
+            } else {
+              // Remove the permission
+              return {
+                ...role,
+                permissions: role.permissions.filter((p) => p.id !== permissionId),
+              }
+            }
+          })
+        )
+
+        toast.success(
+          result.added
+            ? t('roles.permission_added')
+            : t('roles.permission_removed')
+        )
+      }
+    } catch {
+      toast.error(tCommon('errors.generic'))
+    } finally {
+      setPendingToggle(null)
+    }
   }
 
   const categories = Object.keys(permissionsByCategory).sort()
@@ -68,6 +129,9 @@ export function RolePermissionsMatrix({
                 </div>
                 <span className="text-sm">{t('roles.no_permission')}</span>
               </div>
+              <div className="flex items-center gap-2 ml-4 text-sm text-muted-foreground">
+                {t('roles.click_to_toggle')}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -91,7 +155,7 @@ export function RolePermissionsMatrix({
                   <TableHeader>
                     <TableRow>
                       <TableHead className="min-w-[200px]">{t('roles.permission')}</TableHead>
-                      {roles.map((role) => (
+                      {localRoles.map((role) => (
                         <TableHead key={role.id} className="text-center min-w-[100px]">
                           {role.name}
                         </TableHead>
@@ -118,23 +182,43 @@ export function RolePermissionsMatrix({
                             )}
                           </div>
                         </TableCell>
-                        {roles.map((role) => (
-                          <TableCell key={role.id} className="text-center">
-                            {hasPermission(role.id, permission.code) ? (
-                              <div className="flex justify-center">
-                                <div className="flex h-6 w-6 items-center justify-center rounded bg-green-100 dark:bg-green-900">
-                                  <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex justify-center">
-                                <div className="flex h-6 w-6 items-center justify-center rounded bg-muted">
-                                  <X className="h-4 w-4 text-muted-foreground/30" />
-                                </div>
-                              </div>
-                            )}
-                          </TableCell>
-                        ))}
+                        {localRoles.map((role) => {
+                          const toggleKey = `${role.id}-${permission.id}`
+                          const isPending = pendingToggle === toggleKey
+                          const hasPerm = hasPermission(role.id, permission.id)
+
+                          return (
+                            <TableCell key={role.id} className="text-center">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleToggle(role.id, permission.id, permission.code)
+                                }
+                                disabled={!!pendingToggle}
+                                className="flex justify-center mx-auto cursor-pointer transition-transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title={
+                                  hasPerm
+                                    ? t('roles.click_to_remove')
+                                    : t('roles.click_to_add')
+                                }
+                              >
+                                {isPending ? (
+                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-muted">
+                                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                                  </div>
+                                ) : hasPerm ? (
+                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800">
+                                    <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                  </div>
+                                ) : (
+                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-muted hover:bg-muted/80">
+                                    <X className="h-4 w-4 text-muted-foreground/30" />
+                                  </div>
+                                )}
+                              </button>
+                            </TableCell>
+                          )
+                        })}
                       </TableRow>
                     ))}
                   </TableBody>
@@ -152,7 +236,7 @@ export function RolePermissionsMatrix({
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {roles.map((role) => (
+              {localRoles.map((role) => (
                 <div
                   key={role.id}
                   className="rounded-lg border p-4 space-y-2"
