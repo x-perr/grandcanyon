@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { MapPin } from 'lucide-react'
+import { MapPin, Loader2 } from 'lucide-react'
 import type { ProjectMapPin, EmployeeMapPin } from '@/app/(protected)/dashboard/actions'
+import type { Icon } from 'leaflet'
 
 interface MontrealMapProps {
   projects: ProjectMapPin[]
@@ -19,7 +20,7 @@ const DEFAULT_ZOOM = 11
 // Dynamically import the map to avoid SSR issues
 const MapContainer = dynamic(
   () => import('react-leaflet').then((mod) => mod.MapContainer),
-  { ssr: false }
+  { ssr: false, loading: () => <MapLoading /> }
 )
 
 const TileLayer = dynamic(
@@ -37,10 +38,21 @@ const Popup = dynamic(
   { ssr: false }
 )
 
-// Custom marker icons
+function MapLoading() {
+  return (
+    <div className="h-[400px] w-full rounded-lg bg-muted flex items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+    </div>
+  )
+}
+
+// Custom marker icons - use useState + useEffect for proper client-side initialization
 function useCustomIcons() {
-  return useMemo(() => {
-    if (typeof window === 'undefined') return { projectIcon: null, employeeIcon: null }
+  const [icons, setIcons] = useState<{ projectIcon: Icon; employeeIcon: Icon } | null>(null)
+
+  useEffect(() => {
+    // Only run on client
+    if (typeof window === 'undefined') return
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const L = require('leaflet')
@@ -63,12 +75,14 @@ function useCustomIcons() {
       shadowSize: [41, 41],
     })
 
-    return { projectIcon, employeeIcon }
+    setIcons({ projectIcon, employeeIcon })
   }, [])
+
+  return icons
 }
 
 function MapContent({ projects, employees }: MontrealMapProps) {
-  const { projectIcon, employeeIcon } = useCustomIcons()
+  const icons = useCustomIcons()
 
   // Add Leaflet CSS on client side
   useEffect(() => {
@@ -84,8 +98,8 @@ function MapContent({ projects, employees }: MontrealMapProps) {
     }
   }, [])
 
-  if (!projectIcon || !employeeIcon) {
-    return null
+  if (!icons) {
+    return <MapLoading />
   }
 
   return (
@@ -105,7 +119,7 @@ function MapContent({ projects, employees }: MontrealMapProps) {
         <Marker
           key={`project-${project.id}`}
           position={[project.lat, project.lng]}
-          icon={projectIcon}
+          icon={icons.projectIcon}
         >
           <Popup>
             <div className="min-w-[150px]">
@@ -125,7 +139,7 @@ function MapContent({ projects, employees }: MontrealMapProps) {
         <Marker
           key={`employee-${employee.id}`}
           position={[employee.lat, employee.lng]}
-          icon={employeeIcon}
+          icon={icons.employeeIcon}
         >
           <Popup>
             <div className="min-w-[120px]">
