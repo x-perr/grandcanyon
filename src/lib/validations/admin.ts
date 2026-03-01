@@ -39,7 +39,7 @@ export const DEFAULT_COMPANY_INFO: CompanyInfo = {
   province: 'QC',
   postalCode: 'H2X 1Y1',
   phone: '514-555-1234',
-  email: 'info@grandcanyon.ca',
+  email: 'info@grandcanyon.cc',
   gstNumber: '123456789 RT0001',
   qstNumber: '1234567890 TQ0001',
   logoUrl: null,

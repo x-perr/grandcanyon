@@ -187,7 +187,7 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams): Promise<
     pdfBuffer,
     customMessage,
     companyName = 'Systèmes Intérieurs Grand Canyon',
-    companyEmail = 'comptabilite@grandcanyon.ca',
+    companyEmail = 'comptabilite@grandcanyon.cc',
     sentBy,
   } = params
 
@@ -204,7 +204,7 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams): Promise<
 
   try {
     const result = await getResend().emails.send({
-      from: `${companyName} <invoices@grandcanyon.ca>`,
+      from: `${companyName} <invoices@grandcanyon.cc>`,
       to,
       replyTo: companyEmail,
       subject,
@@ -317,7 +317,7 @@ export async function sendTimesheetReminder(params: SendTimesheetReminderParams)
     weekStart,
     dueDate,
     companyName = 'Systèmes Intérieurs Grand Canyon',
-    companyEmail = 'admin@grandcanyon.ca',
+    companyEmail = 'admin@grandcanyon.cc',
     sentBy,
   } = params
 
@@ -332,7 +332,7 @@ export async function sendTimesheetReminder(params: SendTimesheetReminderParams)
 
   try {
     const result = await getResend().emails.send({
-      from: `${companyName} <timesheets@grandcanyon.ca>`,
+      from: `${companyName} <timesheets@grandcanyon.cc>`,
       to,
       replyTo: companyEmail,
       subject,
