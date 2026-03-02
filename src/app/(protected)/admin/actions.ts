@@ -202,9 +202,20 @@ type UserQueryResult = {
   is_active: boolean | null
   role_id: string | null
   manager_id: string | null
+  person_id: string | null
   created_at: string | null
   role: { id: string; name: string }[] | null
   manager: { id: string; first_name: string; last_name: string }[] | null
+  person: { id: string; address: string | null; city: string | null; lat: number | null; lng: number | null }[] | null
+}
+
+// Person address data
+export type PersonAddress = {
+  id: string
+  address: string | null
+  city: string | null
+  lat: number | null
+  lng: number | null
 }
 
 // Normalized type for use in components
@@ -217,9 +228,11 @@ export type UserWithRole = {
   is_active: boolean | null
   role_id: string | null
   manager_id: string | null
+  person_id: string | null
   created_at: string | null
   role: { id: string; name: string } | null
   manager: { id: string; first_name: string; last_name: string } | null
+  person: PersonAddress | null
 }
 
 // Helper to normalize query result to UserWithRole
@@ -228,6 +241,7 @@ function normalizeUser(raw: UserQueryResult): UserWithRole {
     ...raw,
     role: raw.role?.[0] ?? null,
     manager: raw.manager?.[0] ?? null,
+    person: raw.person?.[0] ?? null,
   }
 }
 
@@ -269,9 +283,11 @@ export async function getUsers(options?: {
       is_active,
       role_id,
       manager_id,
+      person_id,
       created_at,
       role:roles(id, name),
-      manager:profiles!profiles_manager_id_fkey(id, first_name, last_name)
+      manager:profiles!profiles_manager_id_fkey(id, first_name, last_name),
+      person:people!profiles_person_id_fkey(id, address, city, lat, lng)
     `,
       { count: 'exact' }
     )
@@ -331,9 +347,11 @@ export async function getUser(id: string): Promise<UserWithRole | null> {
       is_active,
       role_id,
       manager_id,
+      person_id,
       created_at,
       role:roles(id, name),
-      manager:profiles!profiles_manager_id_fkey(id, first_name, last_name)
+      manager:profiles!profiles_manager_id_fkey(id, first_name, last_name),
+      person:people!profiles_person_id_fkey(id, address, city, lat, lng)
     `
     )
     .eq('id', id)
@@ -359,10 +377,13 @@ export async function updateUser(id: string, formData: FormData) {
     return { error: 'You do not have permission to update users' }
   }
 
-  // Get old values for audit log
+  // Get old values for audit log (including person data)
   const { data: oldUser } = await supabase
     .from('profiles')
-    .select('first_name, last_name, phone, role_id, manager_id, is_active')
+    .select(`
+      first_name, last_name, phone, role_id, manager_id, is_active, person_id,
+      person:people!profiles_person_id_fkey(address, city)
+    `)
     .eq('id', id)
     .single()
 
@@ -374,6 +395,12 @@ export async function updateUser(id: string, formData: FormData) {
     role_id: (formData.get('role_id') as string) || null,
     manager_id: (formData.get('manager_id') as string) || null,
     is_active: formData.get('is_active') === 'on',
+  }
+
+  // Address data (separate from profile)
+  const addressData = {
+    address: (formData.get('address') as string) || null,
+    city: (formData.get('city') as string) || null,
   }
 
   // Validate
@@ -393,13 +420,50 @@ export async function updateUser(id: string, formData: FormData) {
     return { error: 'Failed to update user' }
   }
 
+  // Update or create person record for address
+  const personId = oldUser?.person_id
+  if (personId) {
+    // Update existing person record
+    const { error: personError } = await supabase
+      .from('people')
+      .update(addressData)
+      .eq('id', personId)
+
+    if (personError) {
+      console.error('Error updating person address:', personError)
+      // Don't fail the whole operation, just log
+    }
+  } else if (addressData.address || addressData.city) {
+    // Create a new person record and link it
+    const { data: newPerson, error: createError } = await supabase
+      .from('people')
+      .insert({
+        first_name: rawData.first_name,
+        last_name: rawData.last_name,
+        ...addressData,
+      })
+      .select('id')
+      .single()
+
+    if (createError) {
+      console.error('Error creating person record:', createError)
+    } else if (newPerson) {
+      // Link the new person to the profile
+      await supabase
+        .from('profiles')
+        .update({ person_id: newPerson.id })
+        .eq('id', id)
+    }
+  }
+
   // Log audit
+  const oldPerson = Array.isArray(oldUser?.person) ? oldUser.person[0] : oldUser?.person
   await logAudit({
     action: 'update',
     entityType: 'user',
     entityId: id,
-    oldValues: oldUser ?? {},
-    newValues: validation.data,
+    oldValues: oldUser ? { ...oldUser, person: oldPerson } : {},
+    newValues: { ...validation.data, ...addressData },
   })
 
   revalidatePath('/admin/users')

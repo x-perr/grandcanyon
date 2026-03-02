@@ -139,6 +139,36 @@ export function UserForm({ user, roles, potentialManagers }: UserFormProps) {
         </CardContent>
       </Card>
 
+      {/* Address */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('users.address_info')}</CardTitle>
+          <CardDescription>{t('users.address_info_description')}</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6 sm:grid-cols-2">
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="address">{tCommon('labels.address')}</Label>
+            <Input
+              id="address"
+              name="address"
+              defaultValue={user.person?.address ?? ''}
+              maxLength={200}
+              placeholder={t('users.address_placeholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="city">{tCommon('labels.city')}</Label>
+            <Input
+              id="city"
+              name="city"
+              defaultValue={user.person?.city ?? ''}
+              maxLength={100}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Role & Manager */}
       <Card>
         <CardHeader>
