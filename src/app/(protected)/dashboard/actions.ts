@@ -334,8 +334,8 @@ export type ProjectMapPin = {
   id: string
   name: string
   code: string
-  lat: number
-  lng: number
+  lat: number | null
+  lng: number | null
   address: string | null
   clientName: string
 }
@@ -343,8 +343,8 @@ export type ProjectMapPin = {
 export type EmployeeMapPin = {
   id: string
   name: string
-  lat: number
-  lng: number
+  lat: number | null
+  lng: number | null
   address: string | null
 }
 
@@ -361,8 +361,9 @@ export async function getMapData(): Promise<MapData> {
   const supabase = await createClient()
 
   // Run queries in parallel
+  // Fetch records with coordinates OR addresses (for geocoding)
   const [projectsResult, employeesResult] = await Promise.all([
-    // Active projects with coordinates
+    // Active projects with coordinates or addresses
     supabase
       .from('projects')
       .select(`
@@ -376,11 +377,9 @@ export async function getMapData(): Promise<MapData> {
         client:clients!projects_client_id_fkey(short_name)
       `)
       .eq('status', 'active')
-      .is('deleted_at', null)
-      .not('lat', 'is', null)
-      .not('lng', 'is', null),
+      .is('deleted_at', null),
 
-    // Active employees with coordinates (via people table)
+    // Active employees (via people table)
     supabase
       .from('profiles')
       .select(`
@@ -397,11 +396,16 @@ export async function getMapData(): Promise<MapData> {
       .eq('is_active', true),
   ])
 
-  // Transform projects
+  // Transform projects - include those with coordinates OR addresses
   const projects: ProjectMapPin[] = []
   if (projectsResult.data) {
     for (const p of projectsResult.data) {
-      if (p.lat !== null && p.lng !== null) {
+      const hasCoords = p.lat !== null && p.lng !== null
+      const fullAddress = p.address ? `${p.address}${p.city ? `, ${p.city}` : ''}` : null
+      const hasAddress = fullAddress !== null
+
+      // Include if has coordinates or an address (for geocoding)
+      if (hasCoords || hasAddress) {
         const client = Array.isArray(p.client) ? p.client[0] : p.client
         projects.push({
           id: p.id,
@@ -409,25 +413,30 @@ export async function getMapData(): Promise<MapData> {
           code: p.code,
           lat: p.lat,
           lng: p.lng,
-          address: p.address ? `${p.address}${p.city ? `, ${p.city}` : ''}` : null,
+          address: fullAddress,
           clientName: client?.short_name ?? 'Unknown',
         })
       }
     }
   }
 
-  // Transform employees
+  // Transform employees - include those with coordinates OR addresses
   const employees: EmployeeMapPin[] = []
   if (employeesResult.data) {
     for (const e of employeesResult.data) {
       const person = Array.isArray(e.person) ? e.person[0] : e.person
-      if (person?.lat !== null && person?.lng !== null && person?.lat !== undefined && person?.lng !== undefined) {
+      const hasCoords = person?.lat != null && person?.lng != null
+      const fullAddress = person?.address ? `${person.address}${person.city ? `, ${person.city}` : ''}` : null
+      const hasAddress = fullAddress !== null
+
+      // Include if has coordinates or an address (for geocoding)
+      if (hasCoords || hasAddress) {
         employees.push({
           id: e.id,
           name: `${e.first_name} ${e.last_name}`,
-          lat: person.lat,
-          lng: person.lng,
-          address: person.address ? `${person.address}${person.city ? `, ${person.city}` : ''}` : null,
+          lat: person?.lat ?? null,
+          lng: person?.lng ?? null,
+          address: fullAddress,
         })
       }
     }

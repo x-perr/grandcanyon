@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,6 +16,48 @@ interface MontrealMapProps {
 // Montreal center and bounds
 const MONTREAL_CENTER: [number, number] = [45.5017, -73.5673]
 const DEFAULT_ZOOM = 11
+
+// Geocoding cache to avoid repeated API calls
+const geocodeCache = new Map<string, { lat: number; lng: number } | null>()
+
+// Geocode an address using OpenStreetMap Nominatim
+async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
+  // Check cache first
+  if (geocodeCache.has(address)) {
+    return geocodeCache.get(address) ?? null
+  }
+
+  try {
+    // Add Montreal/Quebec context for better results
+    const searchAddress = `${address}, Quebec, Canada`
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1`
+
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'GrandCanyonApp/1.0'
+      }
+    })
+
+    if (!response.ok) {
+      geocodeCache.set(address, null)
+      return null
+    }
+
+    const data = await response.json()
+
+    if (data && data.length > 0) {
+      const result = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) }
+      geocodeCache.set(address, result)
+      return result
+    }
+
+    geocodeCache.set(address, null)
+    return null
+  } catch {
+    geocodeCache.set(address, null)
+    return null
+  }
+}
 
 // Dynamically import the map to avoid SSR issues
 const MapContainer = dynamic(
@@ -81,8 +123,56 @@ function useCustomIcons() {
   return icons
 }
 
+// Type for pins with resolved coordinates
+type ResolvedProjectPin = ProjectMapPin & { resolvedLat: number; resolvedLng: number }
+type ResolvedEmployeePin = EmployeeMapPin & { resolvedLat: number; resolvedLng: number }
+
 function MapContent({ projects, employees }: MontrealMapProps) {
   const icons = useCustomIcons()
+  const [resolvedProjects, setResolvedProjects] = useState<ResolvedProjectPin[]>([])
+  const [resolvedEmployees, setResolvedEmployees] = useState<ResolvedEmployeePin[]>([])
+  const [isGeocoding, setIsGeocoding] = useState(true)
+  const geocodingDone = useRef(false)
+
+  // Geocode pins that don't have coordinates
+  const geocodePins = useCallback(async () => {
+    if (geocodingDone.current) return
+    geocodingDone.current = true
+
+    const resolvedP: ResolvedProjectPin[] = []
+    const resolvedE: ResolvedEmployeePin[] = []
+
+    // Process projects
+    for (const project of projects) {
+      if (project.lat !== null && project.lng !== null) {
+        resolvedP.push({ ...project, resolvedLat: project.lat, resolvedLng: project.lng })
+      } else if (project.address) {
+        const coords = await geocodeAddress(project.address)
+        if (coords) {
+          resolvedP.push({ ...project, resolvedLat: coords.lat, resolvedLng: coords.lng })
+        }
+        // Small delay to respect Nominatim rate limits
+        await new Promise(r => setTimeout(r, 200))
+      }
+    }
+
+    // Process employees
+    for (const employee of employees) {
+      if (employee.lat !== null && employee.lng !== null) {
+        resolvedE.push({ ...employee, resolvedLat: employee.lat, resolvedLng: employee.lng })
+      } else if (employee.address) {
+        const coords = await geocodeAddress(employee.address)
+        if (coords) {
+          resolvedE.push({ ...employee, resolvedLat: coords.lat, resolvedLng: coords.lng })
+        }
+        await new Promise(r => setTimeout(r, 200))
+      }
+    }
+
+    setResolvedProjects(resolvedP)
+    setResolvedEmployees(resolvedE)
+    setIsGeocoding(false)
+  }, [projects, employees])
 
   // Add Leaflet CSS on client side
   useEffect(() => {
@@ -98,7 +188,12 @@ function MapContent({ projects, employees }: MontrealMapProps) {
     }
   }, [])
 
-  if (!icons) {
+  // Geocode addresses on mount
+  useEffect(() => {
+    geocodePins()
+  }, [geocodePins])
+
+  if (!icons || isGeocoding) {
     return <MapLoading />
   }
 
@@ -115,10 +210,10 @@ function MapContent({ projects, employees }: MontrealMapProps) {
       />
 
       {/* Project markers (blue) */}
-      {projects.map((project) => (
+      {resolvedProjects.map((project) => (
         <Marker
           key={`project-${project.id}`}
-          position={[project.lat, project.lng]}
+          position={[project.resolvedLat, project.resolvedLng]}
           icon={icons.projectIcon}
         >
           <Popup>
@@ -135,10 +230,10 @@ function MapContent({ projects, employees }: MontrealMapProps) {
       ))}
 
       {/* Employee markers (green) */}
-      {employees.map((employee) => (
+      {resolvedEmployees.map((employee) => (
         <Marker
           key={`employee-${employee.id}`}
-          position={[employee.lat, employee.lng]}
+          position={[employee.resolvedLat, employee.resolvedLng]}
           icon={icons.employeeIcon}
         >
           <Popup>
@@ -158,7 +253,12 @@ function MapContent({ projects, employees }: MontrealMapProps) {
 export function MontrealMap({ projects, employees }: MontrealMapProps) {
   const t = useTranslations('dashboard.cards')
 
+  // Has data if any project/employee has coordinates or an address
   const hasData = projects.length > 0 || employees.length > 0
+
+  // Count items that can potentially be shown (have coords or address)
+  const projectCount = projects.filter(p => p.lat !== null || p.address !== null).length
+  const employeeCount = employees.filter(e => e.lat !== null || e.address !== null).length
 
   return (
     <Card>
@@ -172,11 +272,11 @@ export function MontrealMap({ projects, employees }: MontrealMapProps) {
             <div className="flex gap-4 mb-3 text-xs">
               <div className="flex items-center gap-1">
                 <span className="w-3 h-3 rounded-full bg-blue-500" />
-                <span>{t('projects_label', { count: projects.length })}</span>
+                <span>{t('projects_label', { count: projectCount })}</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="w-3 h-3 rounded-full bg-green-500" />
-                <span>{t('employees_label', { count: employees.length })}</span>
+                <span>{t('employees_label', { count: employeeCount })}</span>
               </div>
             </div>
             <MapContent projects={projects} employees={employees} />
