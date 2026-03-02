@@ -379,13 +379,14 @@ export async function getMapData(): Promise<MapData> {
       .eq('status', 'active')
       .is('deleted_at', null),
 
-    // Active employees (via people table)
+    // Active field employees only (exclude admins)
     supabase
       .from('profiles')
       .select(`
         id,
         first_name,
         last_name,
+        role:roles(name),
         person:people!profiles_person_id_fkey(
           lat,
           lng,
@@ -420,10 +421,16 @@ export async function getMapData(): Promise<MapData> {
     }
   }
 
-  // Transform employees - include those with coordinates OR addresses
+  // Transform employees - include field workers only (exclude admins)
   const employees: EmployeeMapPin[] = []
   if (employeesResult.data) {
     for (const e of employeesResult.data) {
+      // Skip admin/office users - only show field employees
+      const role = Array.isArray(e.role) ? e.role[0] : e.role
+      const roleName = role?.name?.toLowerCase() ?? ''
+      const isAdmin = roleName.includes('admin') || roleName.includes('manager') || roleName.includes('office')
+      if (isAdmin) continue
+
       const person = Array.isArray(e.person) ? e.person[0] : e.person
       const hasCoords = person?.lat != null && person?.lng != null
       const fullAddress = person?.address ? `${person.address}${person.city ? `, ${person.city}` : ''}` : null
