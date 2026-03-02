@@ -1338,6 +1338,8 @@
     "nav": {
       "users": "Utilisateurs",
       "users_description": "Gérer les comptes et rôles",
+      "employees": "Employés",
+      "employees_description": "Travailleurs terrain et adresses",
       "roles": "Rôles",
       "roles_description": "Voir les permissions des rôles",
       "logs": "Journal d'audit",
@@ -1414,6 +1416,21 @@
         "no_timesheets": "Aucune feuille de temps",
         "no_expenses": "Aucune dépense"
       }
+    },
+    "employees": {
+      "title": "Employés",
+      "subtitle": "Gérez les travailleurs terrain et leurs adresses",
+      "no_employees": "Aucun employé trouvé",
+      "no_employees_message": "Aucun travailleur terrain ne correspond aux filtres sélectionnés.",
+      "search_empty": "Essayez d'ajuster vos termes de recherche",
+      "search_placeholder": "Rechercher par nom...",
+      "show_inactive": "Afficher les inactifs",
+      "field_workers_only": "Travailleurs terrain seulement (exclut admin/bureau)",
+      "map_ready": "Carte",
+      "has_coords": "Prêt",
+      "needs_geocode": "Adresse seulement",
+      "no_address": "Pas d'adresse",
+      "edit_address": "Modifier l'adresse"
     },
     "roles": {
       "title": "Rôles et permissions",

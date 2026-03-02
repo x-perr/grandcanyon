@@ -1339,6 +1339,8 @@
     "nav": {
       "users": "Users",
       "users_description": "Manage user accounts and roles",
+      "employees": "Employees",
+      "employees_description": "Field workers and addresses",
       "roles": "Roles",
       "roles_description": "View role permissions",
       "logs": "Audit Logs",
@@ -1415,6 +1417,21 @@
         "no_timesheets": "No timesheets",
         "no_expenses": "No expenses"
       }
+    },
+    "employees": {
+      "title": "Employees",
+      "subtitle": "Manage field workers and their addresses",
+      "no_employees": "No employees found",
+      "no_employees_message": "No field workers match the selected filters.",
+      "search_empty": "Try adjusting your search terms",
+      "search_placeholder": "Search by name...",
+      "show_inactive": "Show inactive",
+      "field_workers_only": "Showing field workers only (excludes admin/office staff)",
+      "map_ready": "Map",
+      "has_coords": "Ready",
+      "needs_geocode": "Address only",
+      "no_address": "No address",
+      "edit_address": "Edit Address"
     },
     "roles": {
       "title": "Roles & Permissions",

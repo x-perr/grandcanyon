@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Settings, Users, Shield, Building2, ClipboardList } from 'lucide-react'
+import { Settings, Users, Shield, Building2, ClipboardList, HardHat } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
-import { getCompanySettings, getUsers, getRoles } from './actions'
+import { getCompanySettings, getUsers, getRoles, getEmployees } from './actions'
 import { CompanySettingsForm } from '@/components/admin/company-settings-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -16,9 +16,10 @@ export default async function AdminPage() {
     redirect('/dashboard')
   }
 
-  const [settings, { count: userCount }, roles] = await Promise.all([
+  const [settings, { count: userCount }, { count: employeeCount }, roles] = await Promise.all([
     getCompanySettings(),
     getUsers({ limit: 1 }),
+    getEmployees({ limit: 1 }),
     getRoles(),
   ])
 
@@ -48,6 +49,23 @@ export default async function AdminPage() {
               <div className="text-2xl font-bold">{userCount}</div>
               <p className="text-xs text-muted-foreground">
                 {t('nav.users_description')}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/admin/employees">
+          <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {t('nav.employees')}
+              </CardTitle>
+              <HardHat className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{employeeCount}</div>
+              <p className="text-xs text-muted-foreground">
+                {t('nav.employees_description')}
               </p>
             </CardContent>
           </Card>

@@ -323,6 +323,96 @@ export async function getUsers(options?: {
   return { users, count: count ?? 0 }
 }
 
+// Role names that indicate non-field workers (excluded from employees list)
+const EXCLUDED_ROLE_PATTERNS = ['admin', 'manager', 'office', 'accounting', 'hr']
+
+/**
+ * Check if a role name indicates a non-field worker
+ */
+function isExcludedRole(roleName: string | null | undefined): boolean {
+  if (!roleName) return false
+  const lower = roleName.toLowerCase()
+  return EXCLUDED_ROLE_PATTERNS.some((pattern) => lower.includes(pattern))
+}
+
+/**
+ * Get only employees (field workers - excludes admin, manager, office staff)
+ */
+export async function getEmployees(options?: {
+  search?: string
+  showInactive?: boolean
+  limit?: number
+  offset?: number
+}): Promise<{ employees: UserWithRole[]; count: number }> {
+  const supabase = await createClient()
+  const { search, showInactive = false, limit = 25, offset = 0 } = options ?? {}
+
+  // Check permission
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'admin.manage')) {
+    return { employees: [], count: 0 }
+  }
+
+  // First, get all roles to filter by excluded patterns
+  const { data: roles } = await supabase.from('roles').select('id, name')
+  const excludedRoleIds = (roles ?? [])
+    .filter((r) => isExcludedRole(r.name))
+    .map((r) => r.id)
+
+  let query = supabase
+    .from('profiles')
+    .select(
+      `
+      id,
+      email,
+      first_name,
+      last_name,
+      phone,
+      is_active,
+      role_id,
+      manager_id,
+      person_id,
+      created_at,
+      role:roles(id, name),
+      manager:profiles!profiles_manager_id_fkey(id, first_name, last_name),
+      person:people!profiles_person_id_fkey(id, address, city, lat, lng)
+    `,
+      { count: 'exact' }
+    )
+
+  // Filter inactive unless requested
+  if (!showInactive) {
+    query = query.eq('is_active', true)
+  }
+
+  // Filter out excluded roles (admin, manager, office, etc.)
+  if (excludedRoleIds.length > 0) {
+    // Include users who have a role AND that role is not excluded
+    // Also include users with no role assigned (they might be workers without role set)
+    query = query.not('role_id', 'in', `(${excludedRoleIds.join(',')})`)
+  }
+
+  // Search filter
+  if (search) {
+    query = query.or(
+      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%`
+    )
+  }
+
+  // Pagination & order
+  query = query.order('last_name').order('first_name').range(offset, offset + limit - 1)
+
+  const { data, count, error } = await query
+
+  if (error) {
+    console.error('Error fetching employees:', error)
+    return { employees: [], count: 0 }
+  }
+
+  const employees = (data as UserQueryResult[]).map(normalizeUser)
+  return { employees, count: count ?? 0 }
+}
+
 /**
  * Get a single user by ID
  */
