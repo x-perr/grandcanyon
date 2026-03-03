@@ -844,11 +844,11 @@ export async function getTeamTimesheetsByWeek(
   const weekStartISO = formatDateISO(monday)
 
   // Get all active users
+  // Note: profiles table doesn't have deleted_at column
   const { data: users, error: usersError } = await supabase
     .from('profiles')
     .select('id, first_name, last_name, email')
     .eq('is_active', true)
-    .is('deleted_at', null)
     .order('last_name')
     .order('first_name')
 
