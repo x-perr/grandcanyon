@@ -650,7 +650,7 @@ Code: 3151 → "9 Place du Commerce, Brossard" → display_title: "9 Place du Co
 
 | Issue | Status | Notes |
 |-------|--------|-------|
-| Project members not imported | PENDING | 5,036 team assignments in `project_members_final2.json` |
+| Project members not imported | ✅ DONE | 4,934 imported (102 duplicates skipped) |
 | 68 profiles not matched | KNOWN | Different import scope - these users not in DB |
 | Hours mismatch (157 hours) | KNOWN | Small discrepancy from initial import |
 | Orphan expense_entries | KNOWN | 300 records with invalid expense_id FK |
@@ -660,9 +660,10 @@ Code: 3151 → "9 Place du Commerce, Brossard" → display_title: "9 Place du Co
 
 **Database State After Updates:**
 ```
-Projects:  5,404 total (113 active, 5,290 completed, 1 on_hold)
-Clients:   365 total (230 active, 132 inactive)
-Profiles:  227 total (121 active, 106 inactive)
+Projects:        5,404 total (113 active, 5,290 completed, 1 on_hold)
+Clients:         365 total (230 active, 132 inactive)
+Profiles:        227 total (121 active, 106 inactive)
+Project Members: 4,934 team assignments
 ```
 
 **Address Parsing Results:**
@@ -676,6 +677,7 @@ Profiles:  227 total (121 active, 106 inactive)
 |--------|---------|
 | `update-projects-address.js` | Updates all projects with address fields and correct status |
 | `update-active-status.js` | Updates is_active for clients and profiles |
+| `import-project-members.js` | Imports project team assignments with duplicate handling |
 
 ---
 
