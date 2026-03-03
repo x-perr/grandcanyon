@@ -251,44 +251,92 @@ Projects inherit their client's address for map display.
 **Option C: Modify Map Query** (UI-side fix)
 Fetch address from client relation and use as fallback.
 
-### Issue 5: Project Transformation Has Wrong Field Names
+### Issue 5: Project Transformation - Complete Schema Comparison
 
-**Problem**: `transformProjects()` references fields that don't exist in the legacy data.
+**Current `projects` Table Schema:**
+| Column | Type | Required | Purpose |
+|--------|------|----------|---------|
+| `id` | UUID | Yes | Primary key |
+| `code` | string | Yes | Project code |
+| `name` | string | Yes | Project name |
+| `client_id` | UUID | Yes | Client FK |
+| `description` | text | No | Description |
+| `status` | enum | No | active/completed/on_hold/cancelled/draft |
+| `billing_type` | enum | No | hourly/fixed/per_unit |
+| `hourly_rate` | decimal | No | Hourly rate |
+| `per_unit_rate` | decimal | No | Rate per unit (sq ft) |
+| `fixed_price` | decimal | No | Fixed price amount |
+| `start_date` | date | No | Start date |
+| `end_date` | date | No | End date |
+| `address` | text | No | Street address |
+| `city` | text | No | City |
+| `postal_code` | text | No | Postal code |
+| `lat` | decimal | No | Latitude |
+| `lng` | decimal | No | Longitude |
+| `po_number` | text | No | Client PO reference |
+| `project_manager_id` | UUID | No | Project manager FK |
+| `default_billing_role_id` | UUID | No | Default billing role |
+| `work_type` | text | No | Type of work |
+| `is_active` | boolean | Yes | Active flag |
+| `is_global` | boolean | No | Global project flag |
 
-**Field Name Mismatches:**
-| Script Uses | Actual Legacy Field | Notes |
-|-------------|---------------------|-------|
-| `proj_status` | `proj_statut` | Integer (2/3/4), not string |
-| `proj_rate` | `proj_txhoraire` | Hourly rate |
-| `proj_address` | (doesn't exist) | Address is in `proj_name` |
-| `proj_active` | `proj_statut` | No boolean field, use status |
+**Legacy Fields → Current Schema Mapping:**
+| Legacy Field | Type | Current Column | Import Status |
+|--------------|------|----------------|---------------|
+| `proj_id` | int | `id` | ✅ Mapped to UUID |
+| `proj_code` | string | `code` | ✅ Working |
+| `proj_clientid` | int | `client_id` | ✅ Mapped to UUID |
+| `proj_contactid` | int | (no column) | ❌ Need to add? |
+| `proj_name` | string | `name` | ✅ Working (needs address parsing) |
+| `proj_shortname` | string | (no column) | ❌ Not imported |
+| `proj_name2` | string | `work_type` | ❌ Should map to work_type |
+| `proj_name3` | string | (no column) | ❌ Not imported |
+| `proj_desc` | string | `description` | ✅ Working |
+| `proj_pm` | int | `project_manager_id` | ❌ **COLUMN EXISTS** - not mapped |
+| `proj_type` | string | `billing_type` | ❌ Should map: 'H'→'hourly' |
+| `proj_statut` | int | `status` | ⚠️ **WRONG MAPPING** - uses proj_status |
+| `proj_porecu` | string | `po_number` | ❌ **COLUMN EXISTS** - not mapped |
+| `proj_start` | date | `start_date` | ✅ Working |
+| `proj_end` | date | `end_date` | ✅ Working |
+| `proj_txhoraire` | decimal | `hourly_rate` | ❌ **COLUMN EXISTS** - wrong field name |
+| `proj_txpieds` | decimal | `per_unit_rate` | ❌ **COLUMN EXISTS** - not mapped |
+| `proj_forfait` | decimal | `fixed_price` | ❌ **COLUMN EXISTS** - not mapped |
+| `proj_owner` | int | (no column) | ❌ Not imported |
+| `proj_globalpart` | string | `is_global` | ❌ Should map: '1'→true |
+| `proj_defaultprid` | int | `default_billing_role_id` | ❌ Should map to billing role UUID |
 
-**All Legacy Project Fields (from raw data):**
-| Legacy Field | Type | Description | Currently Imported? |
-|--------------|------|-------------|---------------------|
-| `proj_id` | int | Primary key | Yes (mapped to UUID) |
-| `proj_code` | string | Project code | Yes |
-| `proj_clientid` | int | Client FK | Yes |
-| `proj_contactid` | int | Contact FK | **NO** |
-| `proj_name` | string | Name (often = address) | Yes |
-| `proj_shortname` | string | Short name | **NO** |
-| `proj_name2` | string | Service type | **NO** |
-| `proj_name3` | string | Additional info | **NO** |
-| `proj_desc` | string | Description | Yes |
-| `proj_pm` | int | Project manager user ID | **NO** |
-| `proj_type` | string | 'H' = hourly | **NO** |
-| `proj_statut` | int | 2=active, 3=completed, 4=on_hold | **WRONG MAPPING** |
-| `proj_porecu` | string | Client PO/Reference | **NO** |
-| `proj_start` | date | Start date | Yes |
-| `proj_end` | date | End date | Yes |
-| `proj_txhoraire` | decimal | Hourly rate | **NO** (script looks for proj_rate) |
-| `proj_txpieds` | decimal | Rate per sq ft | **NO** |
-| `proj_forfait` | decimal | Fixed price amount | **NO** |
-| `proj_owner` | int | Owner user ID | **NO** |
-| `proj_globalpart` | string | Global flag? | **NO** |
-| `proj_defaultprid` | int | Default billing role | **NO** |
+**Key Finding**: Most columns ALREADY EXIST in the schema but the transformation script has wrong field names or doesn't map them!
 
-**Fix Required**: Rewrite `transformProjects()` with correct field mappings.
+**Fix Required**: Update `transformProjects()` with correct field mappings:
+```javascript
+// Status mapping (proj_statut is INT, not string!)
+const STATUS_MAP = { 2: 'active', 3: 'completed', 4: 'on_hold' }
+
+// Billing type mapping
+const BILLING_TYPE_MAP = { 'H': 'hourly', 'F': 'fixed', 'P': 'per_unit' }
+
+return {
+  id: newId,
+  code: proj.proj_code,
+  name: proj.proj_name,
+  client_id: idMaps.clients.get(proj.proj_clientid),
+  description: proj.proj_desc,
+  status: STATUS_MAP[proj.proj_statut] || 'active',
+  billing_type: BILLING_TYPE_MAP[proj.proj_type] || 'hourly',
+  hourly_rate: parseDecimal(proj.proj_txhoraire),      // FIX: was proj_rate
+  per_unit_rate: parseDecimal(proj.proj_txpieds),      // NEW
+  fixed_price: parseDecimal(proj.proj_forfait),        // NEW
+  po_number: proj.proj_porecu || null,                 // NEW
+  project_manager_id: idMaps.users.get(proj.proj_pm),  // NEW
+  work_type: proj.proj_name2 || null,                  // NEW
+  is_global: proj.proj_globalpart === '1',             // NEW
+  start_date: parseDate(proj.proj_start),
+  end_date: parseDate(proj.proj_end),
+  // Address fields - need parsing from proj_name
+  address: extractAddressFromName(proj.proj_name),
+  city: null, // Will need separate extraction
+}
+```
 
 ---
 
@@ -428,39 +476,86 @@ CREATE TABLE project_members (
 
 ## 7. Design Decisions (In Progress)
 
-### Project Name vs Address Display
+### 7.1 Project Address Auto-Classification
+
+**Goal**: Automatically parse project names into structured address components.
 
 **Context**:
-- Legacy project names often ARE the address (e.g., "7101, Notre-Dame est")
+- Legacy `proj_name` often IS the address (e.g., "7101, Notre-Dame est")
 - Projects sometimes don't have civic addresses (construction sites)
 - At minimum: city + name/address
 - Internally, projects are identified by CODE
 
 **Legacy Examples:**
 ```
-proj_name: "Salle d'entraînement - rue Paré"
-proj_name: "7101, Notre-Dame est"  ← This IS the address
-proj_name: "Projet générique"
+proj_name: "Salle d'entraînement - rue Paré"  → address: "rue Paré"
+proj_name: "7101, Notre-Dame est"             → address: "7101, Notre-Dame est"
+proj_name: "Projet générique"                 → name only, no address
+proj_name: "Condos Montréal"                  → city: "Montréal"?
 ```
 
-**Current Fields (partially imported):**
-- `proj_code` - Project code (e.g., "3138") - PRIMARY IDENTIFIER
-- `proj_name` - Name/address
-- `proj_porecu` - Client PO reference ← **NOT IMPORTED**
-- `proj_txhoraire` - Hourly rate ← **NOT IMPORTED (wrong field name)**
+**Proposed Address Parsing Logic:**
+```javascript
+function parseProjectAddress(projName, projCity) {
+  const result = {
+    name: null,       // Project name (if not an address)
+    civic_number: null,
+    street: null,
+    city: projCity || null,
+    is_address: false
+  }
 
-**Proposed Schema Changes:**
-1. Make `projects.name` optional
-2. If `name` is empty, display `address` as title
-3. Add `projects.client_po` field for client reference
-4. Try to extract addresses from `proj_name` during migration
+  // Pattern 1: Starts with civic number (e.g., "7101, Notre-Dame est")
+  const civicMatch = projName.match(/^(\d+)[,\s]+(.+)$/i)
+  if (civicMatch) {
+    result.civic_number = civicMatch[1]
+    result.street = civicMatch[2].trim()
+    result.is_address = true
+    return result
+  }
 
-**Address Extraction Pattern:**
-- Civic numbers: `^\d+[,\s]` (starts with number)
-- Street types: `rue`, `avenue`, `boulevard`, `boul.`, `chemin`
-- If pattern matches → extract to `address` field, leave `name` empty
+  // Pattern 2: Contains street type (e.g., "Salle d'entraînement - rue Paré")
+  const streetTypes = /\b(rue|avenue|av\.|boulevard|boul\.|chemin|ch\.|place|route)\s+[\w\s-]+/i
+  const streetMatch = projName.match(streetTypes)
+  if (streetMatch) {
+    result.street = streetMatch[0].trim()
+    // Name is everything before the street
+    const beforeStreet = projName.substring(0, streetMatch.index).replace(/[-–]\s*$/, '').trim()
+    result.name = beforeStreet || null
+    result.is_address = true
+    return result
+  }
 
-**Status**: PENDING - Need to decide extraction approach and schema changes
+  // Pattern 3: No address pattern found - keep as name
+  result.name = projName
+  return result
+}
+```
+
+**Schema Implications:**
+- Current schema ALREADY has: `address`, `city`, `postal_code`, `lat`, `lng`
+- Need to add: `civic_number` and `street` for structured parsing? OR
+- Keep simple: just populate `address` + `city` fields
+
+**Display Logic:**
+- If `name` is empty, display `address` as title
+- If both exist, show `name` with `address` as secondary info
+
+### 7.2 Missing Field Mappings (Schema Exists, Transform Broken)
+
+**Fields that EXIST in schema but NOT being imported:**
+| Legacy Field | Current Column | Fix Required |
+|--------------|----------------|--------------|
+| `proj_porecu` | `po_number` | Add to transform |
+| `proj_pm` | `project_manager_id` | Add to transform + UUID mapping |
+| `proj_txhoraire` | `hourly_rate` | Fix field name |
+| `proj_txpieds` | `per_unit_rate` | Add to transform |
+| `proj_forfait` | `fixed_price` | Add to transform |
+| `proj_name2` | `work_type` | Add to transform |
+| `proj_globalpart` | `is_global` | Add to transform |
+| `proj_statut` | `status` | Fix mapping (int → enum) |
+
+**Status**: Ready to implement fixes
 
 ---
 
