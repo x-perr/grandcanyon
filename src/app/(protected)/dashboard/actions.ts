@@ -421,15 +421,14 @@ export async function getMapData(): Promise<MapData> {
     }
   }
 
-  // Transform employees - include field workers only (exclude admins)
+  // Transform employees - exclude super_admin only (all others are field workers)
   const employees: EmployeeMapPin[] = []
   if (employeesResult.data) {
     for (const e of employeesResult.data) {
-      // Skip admin/office users - only show field employees
+      // Skip super_admin users only
       const role = Array.isArray(e.role) ? e.role[0] : e.role
       const roleName = role?.name?.toLowerCase() ?? ''
-      const isAdmin = roleName.includes('admin') || roleName.includes('manager') || roleName.includes('office')
-      if (isAdmin) continue
+      if (roleName === 'super_admin') continue
 
       const person = Array.isArray(e.person) ? e.person[0] : e.person
       const hasCoords = person?.lat != null && person?.lng != null
