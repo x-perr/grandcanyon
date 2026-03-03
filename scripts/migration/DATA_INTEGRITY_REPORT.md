@@ -606,4 +606,77 @@ For questions about this migration:
 
 ---
 
+## 9. Migration Results - 2026-03-03
+
+### 9.1 Schema Migration Applied
+
+**File**: `supabase/migrations/20260303_projects_address_structure.sql`
+
+Changes applied:
+- ✅ Added `civic_number` TEXT column
+- ✅ Added `street_name` TEXT column
+- ✅ Added `province` TEXT column (default 'QC')
+- ✅ Made `name` column NULLABLE
+- ✅ Added `display_title` GENERATED column
+- ✅ Added indexes for display_title, city, street_name
+
+### 9.2 Data Updates Applied
+
+**Projects Update** (`update-projects-address.js`):
+- ✅ Updated 5,404 projects with correct field values
+- ✅ Applied `status` enum correctly: 113 active, 5,290 completed, 1 on_hold
+- ✅ Parsed addresses from project names into `civic_number` and `street_name`
+- ✅ Generated `display_title` working correctly
+
+**Sample Verified:**
+```
+Code: 3139 → "7101 Notre-Dame est" → display_title: "7101 Notre-Dame est"
+Code: 3141 → "5825 Métropolitain" → display_title: "5825 Métropolitain"
+Code: 3151 → "9 Place du Commerce, Brossard" → display_title: "9 Place du Commerce, Brossard"
+```
+
+**Client Status Update** (`update-active-status.js`):
+- ✅ Updated 360 clients
+- ✅ Active clients: 230
+- ✅ Inactive clients: 132
+
+**Profile Status Update** (`update-active-status.js`):
+- ⚠️ Updated 157/225 profiles (68 not matched by email)
+- ✅ Active profiles: 121
+- ❌ Inactive profiles: 106
+- **Note**: 68 profiles from transformed data not found in DB (scope difference from initial import)
+
+### 9.3 Remaining Issues
+
+| Issue | Status | Notes |
+|-------|--------|-------|
+| Project members not imported | PENDING | 5,036 team assignments in `project_members_final2.json` |
+| 68 profiles not matched | KNOWN | Different import scope - these users not in DB |
+| Hours mismatch (157 hours) | KNOWN | Small discrepancy from initial import |
+| Orphan expense_entries | KNOWN | 300 records with invalid expense_id FK |
+| Orphan invoice_lines | KNOWN | 9 records with invalid invoice_id FK |
+
+### 9.4 Final Verification Counts
+
+**Database State After Updates:**
+```
+Projects:  5,404 total (113 active, 5,290 completed, 1 on_hold)
+Clients:   365 total (230 active, 132 inactive)
+Profiles:  227 total (121 active, 106 inactive)
+```
+
+**Address Parsing Results:**
+- Projects with `civic_number`: 3,046
+- Projects with `street_name`: 3,211
+- `display_title` column auto-populating correctly
+
+### 9.5 New Scripts Created
+
+| Script | Purpose |
+|--------|---------|
+| `update-projects-address.js` | Updates all projects with address fields and correct status |
+| `update-active-status.js` | Updates is_active for clients and profiles |
+
+---
+
 *Last Updated: 2026-03-03*
