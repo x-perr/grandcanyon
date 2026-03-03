@@ -24,9 +24,19 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { ContactDialog } from './contact-dialog'
 import { deleteContactAction } from '@/app/(protected)/clients/[id]/contacts/actions'
-import type { Tables } from '@/types/database'
 
-type Contact = Tables<'client_contacts'>
+// Client contact type (subset of people table for client_contact type)
+type Contact = {
+  id: string
+  first_name: string
+  last_name: string
+  email: string | null
+  phone: string | null
+  title: string | null
+  is_primary: boolean | null
+  is_active: boolean | null
+  created_at: string | null
+}
 
 interface ContactListProps {
   clientId: string

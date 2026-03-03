@@ -133,14 +133,33 @@ function transformRolePermissions() {
   return transformed
 }
 
+function loadTransformedJson(filename) {
+  const filepath = path.join(TRANSFORMED_DIR, filename)
+  if (!fs.existsSync(filepath)) {
+    console.warn(`Warning: ${filename} not found in transformed dir, returning empty array`)
+    return []
+  }
+  return JSON.parse(fs.readFileSync(filepath, 'utf8'))
+}
+
 function transformUsers() {
-  console.log('\n--- Transforming Users → Profiles ---')
+  console.log('\n--- Transforming Users → Profiles + People (employees) ---')
   const legacy = loadJson('users.json')
+  const roles = loadTransformedJson('roles.json') // Load from transformed dir
+
+  // Build a lookup for super_admin role ID
+  const superAdminRoleId = roles.find(r => r.name === 'super_admin')?.id
 
   // First pass: create profiles with UUID mapping
   const profiles = legacy.map(user => {
     const newId = uuidv4()
     idMaps.users.set(user.user_id, newId)
+
+    const roleId = idMaps.roles.get(user.user_utid) || null
+
+    // Determine user_type based on role
+    // super_admin → 'admin', all others → 'employee'
+    const userType = roleId === superAdminRoleId ? 'admin' : 'employee'
 
     return {
       id: newId,
@@ -148,12 +167,15 @@ function transformUsers() {
       first_name: user.user_fname?.trim() || '',
       last_name: user.user_lname?.trim() || '',
       phone: null,
-      role_id: idMaps.roles.get(user.user_utid) || null,
+      role_id: roleId,
       manager_id: null, // Resolved in second pass
+      user_type: userType,
       is_active: parseBoolean(user.user_active),
       created_at: new Date().toISOString(),
       // Keep legacy reference for manager resolution
       _legacy_manager_id: user.user_managerid,
+      // Keep reference for people record creation
+      _person_id: uuidv4(),
     }
   })
 
@@ -165,7 +187,42 @@ function transformUsers() {
     delete profile._legacy_manager_id
   })
 
-  saveJson('profiles.json', profiles)
+  // Create people records for all employees
+  const peopleEmployees = profiles.map(profile => ({
+    id: profile._person_id,
+    first_name: profile.first_name,
+    last_name: profile.last_name,
+    email: profile.email,
+    phone: profile.phone,
+    address: null,
+    city: null,
+    province: null,
+    postal_code: null,
+    country: 'Canada',
+    classification: null,
+    contact_type: 'employee',
+    client_id: null,
+    title: null,
+    is_primary: false,
+    is_active: profile.is_active,
+    lat: null,
+    lng: null,
+    created_at: profile.created_at,
+    updated_at: profile.created_at,
+  }))
+
+  // Add person_id to profiles for linking
+  const profilesWithPersonId = profiles.map(profile => {
+    const personId = profile._person_id
+    delete profile._person_id
+    return {
+      ...profile,
+      person_id: personId,
+    }
+  })
+
+  saveJson('profiles.json', profilesWithPersonId)
+  saveJson('people_employees.json', peopleEmployees)
 
   // Create auth user records (for import script to use)
   const authUsers = legacy
@@ -179,7 +236,7 @@ function transformUsers() {
     }))
 
   saveJson('auth_users.json', authUsers)
-  return profiles
+  return profilesWithPersonId
 }
 
 function transformClients() {
@@ -225,6 +282,7 @@ function transformClients() {
       charges_qst: client.client_paietvq === 'O' || parseBoolean(client.client_qst),
       notes: null,
       website: null,
+      is_active: parseBoolean(client.client_actif) !== false,
       deleted_at: parseBoolean(client.client_actif) === false ? new Date().toISOString() : null,
       created_at: new Date().toISOString(),
     }
@@ -235,27 +293,32 @@ function transformClients() {
 }
 
 function transformContacts() {
-  console.log('\n--- Transforming Contacts → Client Contacts ---')
+  console.log('\n--- Transforming Contacts → People (client_contact type) ---')
   const legacy = loadJson('contacts.json')
 
+  // Transform contacts to people table with contact_type = 'client_contact'
   const transformed = legacy.map(contact => {
     const newId = uuidv4()
     idMaps.contacts.set(contact.contact_id, newId)
 
     return {
       id: newId,
-      client_id: idMaps.clients.get(contact.contact_client_id) || null,
       first_name: contact.contact_fname || '',
       last_name: contact.contact_lname || '',
-      title: contact.contact_title || null,
       email: contact.contact_email || null,
       phone: contact.contact_phone || contact.contact_mobile || null,
+      title: contact.contact_title || null,
+      client_id: idMaps.clients.get(contact.contact_client_id) || null,
+      contact_type: 'client_contact',
       is_primary: false,
+      is_active: true,
       created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     }
   }).filter(c => c.client_id)
 
-  saveJson('client_contacts.json', transformed)
+  // Save as people_client_contacts.json (to be merged with employee people records)
+  saveJson('people_client_contacts.json', transformed)
   return transformed
 }
 
@@ -293,6 +356,7 @@ function transformProjects() {
       end_date: parseDate(proj.proj_end) || null,
       address: proj.proj_address || null,
       is_global: false,
+      is_active: parseBoolean(proj.proj_active) !== false,
       deleted_at: parseBoolean(proj.proj_active) === false ? new Date().toISOString() : null,
       created_at: new Date().toISOString(),
     }
@@ -529,6 +593,22 @@ function transformExpenseEntries() {
   return transformed
 }
 
+function mergePeopleRecords() {
+  console.log('\n--- Merging People Records (employees + client contacts) ---')
+
+  // Load both people files from transformed directory
+  const employees = loadTransformedJson('people_employees.json')
+  const clientContacts = loadTransformedJson('people_client_contacts.json')
+
+  // Merge them
+  const allPeople = [...employees, ...clientContacts]
+
+  saveJson('people.json', allPeople)
+  console.log(`  → ${employees.length} employees + ${clientContacts.length} client contacts = ${allPeople.length} total`)
+
+  return allPeople
+}
+
 function transformInvoices() {
   console.log('\n--- Transforming Invoices ---')
   const legacy = loadJson('invoices.json')
@@ -663,10 +743,11 @@ async function main() {
   transformRoles()
   transformPermissions()
   transformRolePermissions()
-  transformUsers()
+  transformUsers()          // Creates profiles + people_employees.json
   transformExpenseTypes()
   transformClients()
-  transformContacts()
+  transformContacts()       // Creates people_client_contacts.json
+  mergePeopleRecords()      // Combines into people.json
   transformProjects()
   transformTasks()
   transformBillingRoles()

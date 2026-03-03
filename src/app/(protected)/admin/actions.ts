@@ -323,20 +323,9 @@ export async function getUsers(options?: {
   return { users, count: count ?? 0 }
 }
 
-// Role names that indicate non-field workers (excluded from employees list)
-const EXCLUDED_ROLE_PATTERNS = ['admin', 'manager', 'office', 'accounting', 'hr']
-
 /**
- * Check if a role name indicates a non-field worker
- */
-function isExcludedRole(roleName: string | null | undefined): boolean {
-  if (!roleName) return false
-  const lower = roleName.toLowerCase()
-  return EXCLUDED_ROLE_PATTERNS.some((pattern) => lower.includes(pattern))
-}
-
-/**
- * Get only employees (field workers - excludes admin, manager, office staff)
+ * Get employees (field workers)
+ * Filters by user_type = 'employee' (not admin, client, or subcontractor)
  */
 export async function getEmployees(options?: {
   search?: string
@@ -352,12 +341,6 @@ export async function getEmployees(options?: {
   if (!hasPermission(permissions, 'admin.manage')) {
     return { employees: [], count: 0 }
   }
-
-  // First, get all roles to filter by excluded patterns
-  const { data: roles } = await supabase.from('roles').select('id, name')
-  const excludedRoleIds = (roles ?? [])
-    .filter((r) => isExcludedRole(r.name))
-    .map((r) => r.id)
 
   let query = supabase
     .from('profiles')
@@ -380,16 +363,12 @@ export async function getEmployees(options?: {
       { count: 'exact' }
     )
 
+  // Filter by user_type = 'employee' (or null, treated as employee for legacy data)
+  query = query.or('user_type.eq.employee,user_type.is.null')
+
   // Filter inactive unless requested
   if (!showInactive) {
     query = query.eq('is_active', true)
-  }
-
-  // Filter out excluded roles (admin, manager, office, etc.)
-  if (excludedRoleIds.length > 0) {
-    // Include users who have a role AND that role is not excluded
-    // Also include users with no role assigned (they might be workers without role set)
-    query = query.not('role_id', 'in', `(${excludedRoleIds.join(',')})`)
   }
 
   // Search filter
@@ -411,6 +390,135 @@ export async function getEmployees(options?: {
 
   const employees = (data as UserQueryResult[]).map(normalizeUser)
   return { employees, count: count ?? 0 }
+}
+
+// ============================================
+// CONTACTS (Unified view of all people)
+// ============================================
+
+// Contact type from people table
+export type ContactType = 'employee' | 'client_contact' | 'subcontractor' | 'external'
+
+// Contact data returned from getContacts
+export type Contact = {
+  id: string
+  first_name: string
+  last_name: string
+  email: string | null
+  phone: string | null
+  title: string | null
+  contact_type: ContactType | null
+  is_primary: boolean | null
+  is_active: boolean | null
+  created_at: string | null
+  // For client contacts - the linked client
+  client: { id: string; code: string; name: string } | null
+}
+
+// Raw type from Supabase query
+type ContactQueryResult = {
+  id: string
+  first_name: string
+  last_name: string
+  email: string | null
+  phone: string | null
+  title: string | null
+  contact_type: ContactType | null
+  is_primary: boolean | null
+  is_active: boolean | null
+  created_at: string | null
+  client: { id: string; code: string; name: string }[] | null
+}
+
+// Helper to normalize contact query result
+function normalizeContact(raw: ContactQueryResult): Contact {
+  return {
+    ...raw,
+    client: raw.client?.[0] ?? null,
+  }
+}
+
+/**
+ * Get all contacts from people table
+ * Filters by contact_type (employee, client_contact, subcontractor, external)
+ */
+export async function getContacts(options?: {
+  search?: string
+  contactType?: ContactType
+  showInactive?: boolean
+  clientId?: string
+  limit?: number
+  offset?: number
+}): Promise<{ contacts: Contact[]; count: number }> {
+  const supabase = await createClient()
+  const {
+    search,
+    contactType,
+    showInactive = false,
+    clientId,
+    limit = 25,
+    offset = 0,
+  } = options ?? {}
+
+  // Check permission
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'admin.manage')) {
+    return { contacts: [], count: 0 }
+  }
+
+  let query = supabase
+    .from('people')
+    .select(
+      `
+      id,
+      first_name,
+      last_name,
+      email,
+      phone,
+      title,
+      contact_type,
+      is_primary,
+      is_active,
+      created_at,
+      client:clients!people_client_id_fkey(id, code, name)
+    `,
+      { count: 'exact' }
+    )
+
+  // Filter by contact_type
+  if (contactType) {
+    query = query.eq('contact_type', contactType)
+  }
+
+  // Filter by client (for client contacts)
+  if (clientId) {
+    query = query.eq('client_id', clientId)
+  }
+
+  // Filter inactive unless requested
+  if (!showInactive) {
+    query = query.eq('is_active', true)
+  }
+
+  // Search filter
+  if (search) {
+    query = query.or(
+      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%`
+    )
+  }
+
+  // Pagination & order
+  query = query.order('last_name').order('first_name').range(offset, offset + limit - 1)
+
+  const { data, count, error } = await query
+
+  if (error) {
+    console.error('Error fetching contacts:', error)
+    return { contacts: [], count: 0 }
+  }
+
+  const contacts = (data as ContactQueryResult[]).map(normalizeContact)
+  return { contacts, count: count ?? 0 }
 }
 
 /**
@@ -530,6 +638,8 @@ export async function updateUser(id: string, formData: FormData) {
       .insert({
         first_name: rawData.first_name,
         last_name: rawData.last_name,
+        contact_type: 'employee',
+        is_active: true,
         ...addressData,
       })
       .select('id')

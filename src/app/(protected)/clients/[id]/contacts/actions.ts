@@ -5,6 +5,9 @@ import { revalidatePath } from 'next/cache'
 import { contactSchema, type ContactFormData } from '@/lib/validations/client'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
 
+/**
+ * Create a new client contact (stored in people table with contact_type = 'client_contact')
+ */
 export async function createContactAction(clientId: string, formData: FormData) {
   const supabase = await createClient()
 
@@ -35,14 +38,17 @@ export async function createContactAction(clientId: string, formData: FormData) 
   // If setting as primary, unset others first
   if (data.is_primary) {
     await supabase
-      .from('client_contacts')
+      .from('people')
       .update({ is_primary: false })
       .eq('client_id', clientId)
+      .eq('contact_type', 'client_contact')
   }
 
-  // Insert
-  const { error } = await supabase.from('client_contacts').insert({
+  // Insert into people table with contact_type = 'client_contact'
+  const { error } = await supabase.from('people').insert({
     client_id: clientId,
+    contact_type: 'client_contact',
+    is_active: true,
     ...data,
   })
 
@@ -55,6 +61,9 @@ export async function createContactAction(clientId: string, formData: FormData) 
   return { success: true }
 }
 
+/**
+ * Update an existing client contact
+ */
 export async function updateContactAction(
   clientId: string,
   contactId: string,
@@ -89,18 +98,20 @@ export async function updateContactAction(
   // If setting as primary, unset others first
   if (data.is_primary) {
     await supabase
-      .from('client_contacts')
+      .from('people')
       .update({ is_primary: false })
       .eq('client_id', clientId)
+      .eq('contact_type', 'client_contact')
       .neq('id', contactId)
   }
 
-  // Update
+  // Update in people table
   const { error } = await supabase
-    .from('client_contacts')
+    .from('people')
     .update(data)
     .eq('id', contactId)
     .eq('client_id', clientId)
+    .eq('contact_type', 'client_contact')
 
   if (error) {
     console.error('Error updating contact:', error)
@@ -111,6 +122,9 @@ export async function updateContactAction(
   return { success: true }
 }
 
+/**
+ * Delete a client contact
+ */
 export async function deleteContactAction(clientId: string, contactId: string) {
   const supabase = await createClient()
 
@@ -121,10 +135,11 @@ export async function deleteContactAction(clientId: string, contactId: string) {
   }
 
   const { error } = await supabase
-    .from('client_contacts')
+    .from('people')
     .delete()
     .eq('id', contactId)
     .eq('client_id', clientId)
+    .eq('contact_type', 'client_contact')
 
   if (error) {
     console.error('Error deleting contact:', error)

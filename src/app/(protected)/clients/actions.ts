@@ -97,24 +97,40 @@ export async function getClients(options?: {
 export async function getClient(id: string) {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
+  // Fetch client with projects
+  const { data: client, error: clientError } = await supabase
     .from('clients')
     .select(
       `
       *,
-      contacts:client_contacts(*),
       projects:projects(id, code, name, status)
     `
     )
     .eq('id', id)
     .single()
 
-  if (error) {
-    console.error('Error fetching client:', error)
+  if (clientError) {
+    console.error('Error fetching client:', clientError)
     return null
   }
 
-  return data
+  // Fetch contacts from people table with contact_type filter
+  const { data: contacts, error: contactsError } = await supabase
+    .from('people')
+    .select('id, first_name, last_name, email, phone, title, is_primary, is_active, created_at')
+    .eq('client_id', id)
+    .eq('contact_type', 'client_contact')
+    .order('is_primary', { ascending: false })
+    .order('last_name', { ascending: true })
+
+  if (contactsError) {
+    console.error('Error fetching contacts:', contactsError)
+  }
+
+  return {
+    ...client,
+    contacts: contacts ?? [],
+  }
 }
 
 // Types for 360° client view
@@ -156,22 +172,39 @@ export type Client360Data = {
 export async function getClient360(id: string): Promise<Client360Data | null> {
   const supabase = await createClient()
 
-  // Fetch client with contacts and projects
-  const { data: client, error: clientError } = await supabase
+  // Fetch client with projects
+  const { data: clientData, error: clientError } = await supabase
     .from('clients')
     .select(
       `
       *,
-      contacts:client_contacts(*),
       projects:projects(id, code, name, status, is_active)
     `
     )
     .eq('id', id)
     .single()
 
-  if (clientError || !client) {
+  if (clientError || !clientData) {
     console.error('Error fetching client:', clientError)
     return null
+  }
+
+  // Fetch contacts from people table
+  const { data: contacts, error: contactsError } = await supabase
+    .from('people')
+    .select('id, first_name, last_name, email, phone, title, is_primary, is_active, created_at')
+    .eq('client_id', id)
+    .eq('contact_type', 'client_contact')
+    .order('is_primary', { ascending: false })
+    .order('last_name', { ascending: true })
+
+  if (contactsError) {
+    console.error('Error fetching contacts:', contactsError)
+  }
+
+  const client = {
+    ...clientData,
+    contacts: contacts ?? [],
   }
 
   // Fetch invoices for this client
