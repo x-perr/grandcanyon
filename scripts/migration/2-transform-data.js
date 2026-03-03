@@ -322,6 +322,60 @@ function transformContacts() {
   return transformed
 }
 
+// Status mapping: proj_statut is INT (2=active, 3=completed, 4=on_hold)
+const PROJECT_STATUS_MAP = {
+  2: 'active',
+  3: 'completed',
+  4: 'on_hold',
+}
+
+// Billing type mapping: proj_type is string ('H'=hourly, 'F'=fixed, 'P'=per_unit)
+const BILLING_TYPE_MAP = {
+  'H': 'hourly',
+  'F': 'fixed',
+  'P': 'per_unit',
+}
+
+/**
+ * Parse project name to extract address components
+ * Many legacy project names ARE the address (e.g., "7101, Notre-Dame est")
+ */
+function parseProjectAddress(projName) {
+  if (!projName) return { name: null, civic_number: null, street_name: null, address: null }
+
+  const result = {
+    name: null,
+    civic_number: null,
+    street_name: null,
+    address: null,
+  }
+
+  // Pattern 1: Starts with civic number (e.g., "7101, Notre-Dame est" or "10 305, rue Grande-Allée")
+  const civicMatch = projName.match(/^(\d+(?:\s+\d+)?)[,\s]+(.+)$/i)
+  if (civicMatch) {
+    result.civic_number = civicMatch[1].trim()
+    result.street_name = civicMatch[2].trim()
+    result.address = projName // Keep full address for geocoding
+    return result
+  }
+
+  // Pattern 2: Contains street type (e.g., "Salle d'entraînement - rue Paré")
+  const streetTypes = /\b(rue|avenue|av\.|boulevard|boul\.|chemin|ch\.|place|route)\s+[\w\s\-'àâäéèêëïîôùûüç]+/i
+  const streetMatch = projName.match(streetTypes)
+  if (streetMatch) {
+    result.street_name = streetMatch[0].trim()
+    // Name is everything before the street indicator
+    const beforeStreet = projName.substring(0, streetMatch.index).replace(/[-–]\s*$/, '').trim()
+    result.name = beforeStreet || null
+    result.address = streetMatch[0].trim() // Just the street part for geocoding
+    return result
+  }
+
+  // Pattern 3: No address pattern found - keep as name only
+  result.name = projName
+  return result
+}
+
 function transformProjects() {
   console.log('\n--- Transforming Projects ---')
   const legacy = loadJson('projects.json')
@@ -330,39 +384,70 @@ function transformProjects() {
     const newId = uuidv4()
     idMaps.projects.set(proj.proj_id, newId)
 
-    // Map status
-    let status = 'active'
-    const legacyStatus = proj.proj_status?.toLowerCase()
-    if (legacyStatus === 'completed' || legacyStatus === 'termine' || legacyStatus === 'terminé') {
-      status = 'completed'
-    } else if (legacyStatus === 'on hold' || legacyStatus === 'en attente') {
-      status = 'on_hold'
-    } else if (legacyStatus === 'cancelled' || legacyStatus === 'annule' || legacyStatus === 'annulé') {
-      status = 'cancelled'
-    } else if (legacyStatus === 'draft' || legacyStatus === 'brouillon') {
-      status = 'draft'
-    }
+    // Map status from proj_statut (INT: 2, 3, 4)
+    const status = PROJECT_STATUS_MAP[proj.proj_statut] || 'active'
+
+    // Map billing type from proj_type ('H', 'F', 'P')
+    const billingType = BILLING_TYPE_MAP[proj.proj_type] || 'hourly'
+
+    // Parse address from project name
+    const addressParsed = parseProjectAddress(proj.proj_name)
+
+    // Determine is_active based on status (completed/on_hold are not "active" for display)
+    const isActive = status === 'active'
 
     return {
       id: newId,
       client_id: idMaps.clients.get(proj.proj_clientid) || null,
       code: proj.proj_code || `PROJ${proj.proj_id}`,
-      name: proj.proj_name || `Project ${proj.proj_id}`,
+      // Name: use parsed name, or if it was an address, set to null (display_title will handle it)
+      name: addressParsed.name,
       description: proj.proj_desc || null,
       status: status,
-      billing_type: 'hourly',
-      hourly_rate: parseDecimal(proj.proj_rate) || null,
+      billing_type: billingType,
+      // Rates - FIXED: use correct field names
+      hourly_rate: parseDecimal(proj.proj_txhoraire) || null,
+      per_unit_rate: parseDecimal(proj.proj_txpieds) || null,
+      fixed_price: parseDecimal(proj.proj_forfait) || null,
+      // Dates
       start_date: parseDate(proj.proj_start) || null,
       end_date: parseDate(proj.proj_end) || null,
-      address: proj.proj_address || null,
-      is_global: false,
-      is_active: parseBoolean(proj.proj_active) !== false,
-      deleted_at: parseBoolean(proj.proj_active) === false ? new Date().toISOString() : null,
+      // Address fields - NEW structured parsing
+      civic_number: addressParsed.civic_number,
+      street_name: addressParsed.street_name,
+      address: addressParsed.address,
+      city: null, // Not in legacy data - will need manual entry or client inheritance
+      province: 'QC',
+      // References - NEW fields
+      po_number: proj.proj_porecu || null,
+      project_manager_id: idMaps.users.get(proj.proj_pm) || null,
+      work_type: proj.proj_name2 || null,
+      is_global: proj.proj_globalpart === '1',
+      default_billing_role_id: idMaps.billing_roles?.get(proj.proj_defaultprid) || null,
+      // Status flags
+      is_active: isActive,
+      deleted_at: null, // Don't soft-delete, use status instead
       created_at: new Date().toISOString(),
     }
   }).filter(p => p.client_id)
 
   saveJson('projects.json', transformed)
+
+  // Log summary
+  const statusCounts = transformed.reduce((acc, p) => {
+    acc[p.status] = (acc[p.status] || 0) + 1
+    return acc
+  }, {})
+  console.log('  Status counts:', statusCounts)
+
+  const addressCounts = transformed.reduce((acc, p) => {
+    if (p.civic_number) acc.withCivic = (acc.withCivic || 0) + 1
+    if (p.street_name) acc.withStreet = (acc.withStreet || 0) + 1
+    if (p.name) acc.withName = (acc.withName || 0) + 1
+    return acc
+  }, {})
+  console.log('  Address parsing:', addressCounts)
+
   return transformed
 }
 
