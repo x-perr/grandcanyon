@@ -43,16 +43,40 @@ The current migration has several data integrity gaps that need to be addressed 
 - Active users (`user_active = '1'`): 45
 - Inactive users (`user_active = '0'`): 180
 
-### Clients (`legacy_clients.json`)
-| Legacy Field | Legacy Values | Target Field | Target Type |
-|--------------|---------------|--------------|-------------|
-| `client_actif` | `'O'` (active), `'N'` (inactive) | `clients.is_active` | boolean |
-| `client_nom` | string | `clients.name` | text |
-| `client_adresse` | string | `clients.address` | text |
-| `client_ville` | string | `clients.city` | text |
-| `client_province` | string | `clients.state` | text |
-| `client_codepostal` | string | `clients.postal_code` | text |
-| `client_tel` | string | `clients.phone` | text |
+### Clients (`clients.json`)
+
+**All Legacy Client Fields:**
+| Legacy Field | Type | Description | Imported? |
+|--------------|------|-------------|-----------|
+| `client_id` | int | Primary key | Yes |
+| `client_code` | string | Client code | Yes |
+| `client_nextprj` | int | Next project number | **NO** |
+| `client_name` | string | Full name | Yes |
+| `client_shortname` | string | Short name | Yes |
+| `client_primarycontact` | string | Primary contact name | Yes |
+| `client_primaryemail` | string | Primary contact email | Yes |
+| `client_primaryphone` | string | Primary contact phone | Yes |
+| `client_post_adrl1` | string | Postal address line 1 | Yes |
+| `client_post_adrl2` | string | Postal address line 2 | Yes |
+| `client_post_city` | string | Postal city | Yes |
+| `client_post_prov` | string | Postal province | Yes |
+| `client_post_country` | string | Postal country | Yes |
+| `client_post_pc` | string | Postal code | Yes |
+| `client_invo_adrl1` | string | Billing address line 1 | Yes |
+| `client_invo_adrl2` | string | Billing address line 2 | Yes |
+| `client_invo_city` | string | Billing city | Yes |
+| `client_invo_prov` | string | Billing province | Yes |
+| `client_invo_country` | string | Billing country | Yes |
+| `client_invo_pc` | string | Billing postal code | Yes |
+| `client_website` | string | Website URL | **NO** |
+| `client_general_email` | string | General email | **NO** |
+| `client_invoice_email` | string | Invoice email | **NO** |
+| `client_phone` | string | Phone | Yes |
+| `client_fax` | string | Fax | **NO** |
+| `client_comment` | string | Notes | **NO** |
+| `client_paietps` | string | Charges GST ('O'/'N') | Yes |
+| `client_paietvq` | string | Charges QST ('O'/'N') | Yes |
+| `client_actif` | string | Active ('O'/'N') | Yes |
 
 **Data Counts:**
 - Total clients in raw data: 360
@@ -227,30 +251,44 @@ Projects inherit their client's address for map display.
 **Option C: Modify Map Query** (UI-side fix)
 Fetch address from client relation and use as fallback.
 
-### Issue 5: Project Status Mapping
+### Issue 5: Project Transformation Has Wrong Field Names
 
-**Problem**: Projects may not be correctly mapped to active/completed/on_hold status.
+**Problem**: `transformProjects()` references fields that don't exist in the legacy data.
 
-**Legacy Data Analysis:**
-- `proj_statut = 2`: 113 projects (likely active)
-- `proj_statut = 3`: 5,290 projects (likely completed)
-- `proj_statut = 4`: 1 project (likely on_hold or cancelled)
+**Field Name Mismatches:**
+| Script Uses | Actual Legacy Field | Notes |
+|-------------|---------------------|-------|
+| `proj_status` | `proj_statut` | Integer (2/3/4), not string |
+| `proj_rate` | `proj_txhoraire` | Hourly rate |
+| `proj_address` | (doesn't exist) | Address is in `proj_name` |
+| `proj_active` | `proj_statut` | No boolean field, use status |
 
-**Fix Required**: Update `transformProjects()` in `2-transform-data.js`:
-```javascript
-const STATUS_MAP = {
-  2: 'active',
-  3: 'completed',
-  4: 'on_hold'
-};
+**All Legacy Project Fields (from raw data):**
+| Legacy Field | Type | Description | Currently Imported? |
+|--------------|------|-------------|---------------------|
+| `proj_id` | int | Primary key | Yes (mapped to UUID) |
+| `proj_code` | string | Project code | Yes |
+| `proj_clientid` | int | Client FK | Yes |
+| `proj_contactid` | int | Contact FK | **NO** |
+| `proj_name` | string | Name (often = address) | Yes |
+| `proj_shortname` | string | Short name | **NO** |
+| `proj_name2` | string | Service type | **NO** |
+| `proj_name3` | string | Additional info | **NO** |
+| `proj_desc` | string | Description | Yes |
+| `proj_pm` | int | Project manager user ID | **NO** |
+| `proj_type` | string | 'H' = hourly | **NO** |
+| `proj_statut` | int | 2=active, 3=completed, 4=on_hold | **WRONG MAPPING** |
+| `proj_porecu` | string | Client PO/Reference | **NO** |
+| `proj_start` | date | Start date | Yes |
+| `proj_end` | date | End date | Yes |
+| `proj_txhoraire` | decimal | Hourly rate | **NO** (script looks for proj_rate) |
+| `proj_txpieds` | decimal | Rate per sq ft | **NO** |
+| `proj_forfait` | decimal | Fixed price amount | **NO** |
+| `proj_owner` | int | Owner user ID | **NO** |
+| `proj_globalpart` | string | Global flag? | **NO** |
+| `proj_defaultprid` | int | Default billing role | **NO** |
 
-function transformProject(legacy) {
-  return {
-    ...other_fields,
-    status: STATUS_MAP[legacy.proj_statut] || 'active'
-  };
-}
-```
+**Fix Required**: Rewrite `transformProjects()` with correct field mappings.
 
 ---
 
@@ -388,29 +426,41 @@ CREATE TABLE project_members (
 
 ---
 
-## 7. Design Decisions (Pending)
+## 7. Design Decisions (In Progress)
 
 ### Project Name vs Address Display
 
-**Context**: Legacy project names often contain the address (e.g., "Salle d'entraînement - rue Paré").
+**Context**:
+- Legacy project names often ARE the address (e.g., "7101, Notre-Dame est")
+- Projects sometimes don't have civic addresses (construction sites)
+- At minimum: city + name/address
+- Internally, projects are identified by CODE
 
-**Current Behavior**:
-- Project `name` is required
-- Project `address` is optional
-- Map shows projects with `address` + `city` fields
+**Legacy Examples:**
+```
+proj_name: "Salle d'entraînement - rue Paré"
+proj_name: "7101, Notre-Dame est"  ← This IS the address
+proj_name: "Projet générique"
+```
 
-**Proposed Change** (To be designed):
-- Make project `name` optional
-- If `name` is empty, display `address` as the project title
-- Migration script should extract addresses from project names where patterns match
+**Current Fields (partially imported):**
+- `proj_code` - Project code (e.g., "3138") - PRIMARY IDENTIFIER
+- `proj_name` - Name/address
+- `proj_porecu` - Client PO reference ← **NOT IMPORTED**
+- `proj_txhoraire` - Hourly rate ← **NOT IMPORTED (wrong field name)**
 
-**Questions to Resolve**:
-1. What pattern identifies addresses in project names? (rue, avenue, boulevard, etc.)
-2. Should address extraction be automatic or manual review?
-3. How does the client address relate to project address?
-4. What happens when both name and address are empty?
+**Proposed Schema Changes:**
+1. Make `projects.name` optional
+2. If `name` is empty, display `address` as title
+3. Add `projects.client_po` field for client reference
+4. Try to extract addresses from `proj_name` during migration
 
-**Status**: PENDING DESIGN DISCUSSION
+**Address Extraction Pattern:**
+- Civic numbers: `^\d+[,\s]` (starts with number)
+- Street types: `rue`, `avenue`, `boulevard`, `boul.`, `chemin`
+- If pattern matches → extract to `address` field, leave `name` empty
+
+**Status**: PENDING - Need to decide extraction approach and schema changes
 
 ---
 
