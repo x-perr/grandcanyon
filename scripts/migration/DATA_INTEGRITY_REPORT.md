@@ -474,24 +474,62 @@ CREATE TABLE project_members (
 
 ---
 
-## 7. Design Decisions (In Progress)
+## 7. Design Decisions (APPROVED)
 
-### 7.1 Project Address Auto-Classification
+### 7.1 Project Address Schema Changes
 
-**Goal**: Automatically parse project names into structured address components.
+**Migration File**: `supabase/migrations/20260303_projects_address_structure.sql`
 
-**Context**:
-- Legacy `proj_name` often IS the address (e.g., "7101, Notre-Dame est")
-- Projects sometimes don't have civic addresses (construction sites)
-- At minimum: city + name/address
-- Internally, projects are identified by CODE
+**New Columns Added:**
+| Column | Type | Purpose |
+|--------|------|---------|
+| `civic_number` | TEXT | Street number (e.g., "7101", "10 305") |
+| `street_name` | TEXT | Street name (e.g., "Notre-Dame est") |
+| `province` | TEXT | Province (default: 'QC') |
+| `display_title` | TEXT (GENERATED) | Auto-computed display name |
+
+**Schema Change:**
+- `name` column is now **NULLABLE** (was required)
+
+**Display Title Logic (PostgreSQL Generated Column):**
+```sql
+display_title = COALESCE(
+  name,                              -- 1st: Use name if set
+  civic_number || ' ' || street_name, -- 2nd: Use structured address
+  address,                            -- 3rd: Use full address field
+  code                                -- 4th: Fall back to code
+)
+```
+
+**Final Address Fields in `projects` Table:**
+| Column | Example | Notes |
+|--------|---------|-------|
+| `civic_number` | "7101" | Parsed from proj_name |
+| `street_name` | "Notre-Dame est" | Parsed from proj_name |
+| `address` | "7101, Notre-Dame est" | Full address for geocoding |
+| `city` | "Montréal" | City |
+| `province` | "QC" | Province |
+| `postal_code` | "H2Y 1C6" | Postal code |
+| `lat` / `lng` | 45.5017 / -73.5673 | Geocoded coordinates |
+| `display_title` | "7101 Notre-Dame est" | Auto-computed |
+
+### 7.2 Address Parsing Examples
 
 **Legacy Examples:**
 ```
-proj_name: "Salle d'entraînement - rue Paré"  → address: "rue Paré"
-proj_name: "7101, Notre-Dame est"             → address: "7101, Notre-Dame est"
-proj_name: "Projet générique"                 → name only, no address
-proj_name: "Condos Montréal"                  → city: "Montréal"?
+proj_name: "7101, Notre-Dame est"
+  → civic_number: "7101"
+  → street_name: "Notre-Dame est"
+  → display_title: "7101 Notre-Dame est"
+
+proj_name: "Salle d'entraînement - rue Paré"
+  → name: "Salle d'entraînement"
+  → street_name: "rue Paré"
+  → display_title: "Salle d'entraînement"
+
+proj_name: "Projet générique"
+  → name: "Projet générique"
+  → display_title: "Projet générique"
 ```
 
 **Proposed Address Parsing Logic:**
