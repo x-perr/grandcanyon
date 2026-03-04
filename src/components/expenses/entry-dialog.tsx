@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useState, useTransition, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Dialog,
@@ -22,7 +22,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { saveExpenseEntry } from '@/app/(protected)/expenses/actions'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { Upload, Trash2, FileImage, Loader2 } from 'lucide-react'
+import { saveExpenseEntry, uploadExpenseReceipt, deleteExpenseReceipt } from '@/app/(protected)/expenses/actions'
 import { calculateExpenseTotals, formatCurrency } from '@/lib/validations/expense'
 import { toast } from 'sonner'
 import type { ExpenseEntryWithRelations, ExpenseType, ProjectForExpense } from '@/app/(protected)/expenses/actions'
@@ -49,6 +61,9 @@ export function ExpenseEntryDialog({
 }: ExpenseEntryDialogProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [isUploading, startUpload] = useTransition()
+  const [isDeleting, startDelete] = useTransition()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const t = useTranslations('expenses')
 
   // Form state
@@ -61,6 +76,7 @@ export function ExpenseEntryDialog({
   const [quantity, setQuantity] = useState('1')
   const [unitPrice, setUnitPrice] = useState('0')
   const [isBillable, setIsBillable] = useState(false)
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(null)
 
   // Reset form when dialog opens/closes or entry changes
   useEffect(() => {
@@ -75,6 +91,7 @@ export function ExpenseEntryDialog({
         setQuantity(String(entry.quantity ?? 1))
         setUnitPrice(String(entry.unit_price ?? 0))
         setIsBillable(entry.is_billable ?? false)
+        setReceiptUrl(entry.receipt_url ?? null)
       } else {
         setExpenseTypeId('')
         setProjectId('')
@@ -85,9 +102,65 @@ export function ExpenseEntryDialog({
         setQuantity('1')
         setUnitPrice('0')
         setIsBillable(false)
+        setReceiptUrl(null)
       }
     }
   }, [open, entry, weekStart])
+
+  // Handle receipt upload
+  const handleReceiptSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !entry?.id) return
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+    if (!validTypes.includes(file.type)) {
+      toast.error(t('receipt.invalid_file_type'))
+      return
+    }
+
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error(t('receipt.file_too_large'))
+      return
+    }
+
+    // Upload
+    const formData = new FormData()
+    formData.append('file', file)
+
+    startUpload(async () => {
+      const result = await uploadExpenseReceipt(entry.id, formData)
+      if (result.error) {
+        toast.error(result.error)
+      } else {
+        setReceiptUrl(result.url ?? null)
+        toast.success(t('receipt.upload_success'))
+        router.refresh()
+      }
+    })
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  // Handle receipt delete
+  const handleReceiptDelete = () => {
+    if (!entry?.id) return
+
+    startDelete(async () => {
+      const result = await deleteExpenseReceipt(entry.id)
+      if (result.error) {
+        toast.error(result.error)
+      } else {
+        setReceiptUrl(null)
+        toast.success(t('receipt.delete_success'))
+        router.refresh()
+      }
+    })
+  }
 
   // Get tasks for selected project
   const selectedProject = projects.find((p) => p.id === projectId)
@@ -245,6 +318,87 @@ export function ExpenseEntryDialog({
                 placeholder={t('entry.receipt_number_placeholder')}
               />
             </div>
+
+            {/* Receipt Image - only show for existing entries */}
+            {entry?.id && (
+              <div className="grid gap-2">
+                <Label>{t('receipt.image')}</Label>
+                <div className="flex items-start gap-4">
+                  {receiptUrl ? (
+                    <div className="relative">
+                      <img
+                        src={receiptUrl}
+                        alt="Receipt"
+                        className="h-24 w-auto rounded-lg border object-cover"
+                      />
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute -right-2 -top-2 h-6 w-6"
+                            disabled={isDeleting}
+                          >
+                            {isDeleting ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{t('receipt.delete_confirm_title')}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {t('receipt.delete_confirm_message')}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{t('entry.cancel')}</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleReceiptDelete}>
+                              {t('receipt.delete_confirm')}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  ) : (
+                    <div className="flex h-24 w-32 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25">
+                      <FileImage className="h-6 w-6 text-muted-foreground/50" />
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,application/pdf"
+                      className="hidden"
+                      onChange={handleReceiptSelect}
+                      disabled={isUploading}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                    >
+                      {isUploading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="mr-2 h-4 w-4" />
+                      )}
+                      {receiptUrl ? t('receipt.replace_image') : t('receipt.upload_image')}
+                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      {t('receipt.file_requirements')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Quantity and Unit Price */}
             <div className="grid grid-cols-2 gap-4">

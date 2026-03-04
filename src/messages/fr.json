@@ -705,6 +705,20 @@
       "approve_failed": "Échec de l'approbation",
       "reject_failed": "Échec du refus"
     },
+    "receipt": {
+      "title": "Pièce jointe",
+      "attach": "Joindre un reçu",
+      "view": "Voir le reçu",
+      "upload": "Téléverser le reçu",
+      "upload_success": "Reçu téléversé",
+      "delete_success": "Reçu supprimé",
+      "note_placeholder": "Note (ex: Stationnement)",
+      "note_saved": "Note enregistrée",
+      "save_note": "Enregistrer",
+      "invalid_file_type": "Type de fichier invalide. Utilisez JPG, PNG, WebP ou PDF.",
+      "file_too_large": "Fichier trop volumineux. Maximum 10 Mo.",
+      "file_requirements": "JPG, PNG, WebP, PDF. Max 10 Mo."
+    },
     "team": {
       "title": "Feuilles de temps de l'équipe",
       "subtitle": "Consultez et gérez les soumissions de feuilles de temps de l'équipe",
@@ -987,6 +1001,19 @@
       "submitted": "Rapport de dépenses soumis pour approbation",
       "approved": "Rapport de dépenses approuvé",
       "rejected": "Rapport de dépenses refusé"
+    },
+    "receipt": {
+      "image": "Image du reçu",
+      "upload_image": "Téléverser le reçu",
+      "replace_image": "Remplacer le reçu",
+      "upload_success": "Reçu téléversé avec succès",
+      "delete_success": "Reçu supprimé",
+      "delete_confirm_title": "Supprimer le reçu?",
+      "delete_confirm_message": "Voulez-vous vraiment supprimer cette image du reçu?",
+      "delete_confirm": "Supprimer",
+      "invalid_file_type": "Type de fichier invalide. Utilisez JPG, PNG, WebP ou PDF.",
+      "file_too_large": "Fichier trop volumineux. Maximum 10 Mo.",
+      "file_requirements": "JPG, PNG, WebP ou PDF. Max 10 Mo."
     }
   },
   "invoices": {
@@ -1442,6 +1469,29 @@
       "status_expiring": "Expire bientôt",
       "status_expired": "Expirée",
       "status_missing": "Non téléchargée"
+    },
+    "documents": {
+      "title": "Documents des employés",
+      "subtitle": "Aperçu du statut des documents des employés",
+      "total": "Total",
+      "valid": "Valides",
+      "expiring_soon": "Expire bientôt",
+      "expired": "Expirés",
+      "missing": "Manquants",
+      "ccq_cards": "Cartes CCQ",
+      "ccq_cards_description": "Suivez le statut des cartes CCQ de tous les employés",
+      "employee": "Employé",
+      "card_number": "No de carte",
+      "expiry_date": "Expiration",
+      "status": "Statut",
+      "actions": "Actions",
+      "view": "Voir",
+      "edit": "Modifier",
+      "no_results": "Aucun employé trouvé",
+      "status_valid": "Valide",
+      "status_expiring": "{days} jours restants",
+      "status_expired": "Expirée",
+      "status_missing": "Manquante"
     },
     "employees": {
       "title": "Employés",

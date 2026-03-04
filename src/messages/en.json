@@ -706,6 +706,20 @@
       "approve_failed": "Failed to approve timesheet",
       "reject_failed": "Failed to reject timesheet"
     },
+    "receipt": {
+      "title": "Receipt Attachment",
+      "attach": "Attach receipt",
+      "view": "View receipt",
+      "upload": "Upload Receipt",
+      "upload_success": "Receipt uploaded",
+      "delete_success": "Receipt deleted",
+      "note_placeholder": "Note (e.g., Parking)",
+      "note_saved": "Note saved",
+      "save_note": "Save Note",
+      "invalid_file_type": "Invalid file type. Use JPG, PNG, WebP, or PDF.",
+      "file_too_large": "File too large. Maximum 10MB.",
+      "file_requirements": "JPG, PNG, WebP, PDF. Max 10MB."
+    },
     "team": {
       "title": "Team Timesheets",
       "subtitle": "View and manage team timesheet submissions",
@@ -988,6 +1002,19 @@
       "submitted": "Expense report submitted for approval",
       "approved": "Expense report approved",
       "rejected": "Expense report rejected"
+    },
+    "receipt": {
+      "image": "Receipt Image",
+      "upload_image": "Upload Receipt",
+      "replace_image": "Replace Receipt",
+      "upload_success": "Receipt uploaded successfully",
+      "delete_success": "Receipt deleted",
+      "delete_confirm_title": "Delete Receipt?",
+      "delete_confirm_message": "Are you sure you want to delete this receipt image?",
+      "delete_confirm": "Delete",
+      "invalid_file_type": "Invalid file type. Use JPG, PNG, WebP, or PDF.",
+      "file_too_large": "File too large. Maximum 10MB.",
+      "file_requirements": "JPG, PNG, WebP or PDF. Max 10MB."
     }
   },
   "invoices": {
@@ -1443,6 +1470,29 @@
       "status_expiring": "Expiring Soon",
       "status_expired": "Expired",
       "status_missing": "Not Uploaded"
+    },
+    "documents": {
+      "title": "Employee Documents",
+      "subtitle": "Overview of employee documentation status",
+      "total": "Total",
+      "valid": "Valid",
+      "expiring_soon": "Expiring Soon",
+      "expired": "Expired",
+      "missing": "Missing",
+      "ccq_cards": "CCQ Cards",
+      "ccq_cards_description": "Track CCQ card status for all employees",
+      "employee": "Employee",
+      "card_number": "Card #",
+      "expiry_date": "Expiry",
+      "status": "Status",
+      "actions": "Actions",
+      "view": "View",
+      "edit": "Edit",
+      "no_results": "No employees found",
+      "status_valid": "Valid",
+      "status_expiring": "{days} days left",
+      "status_expired": "Expired",
+      "status_missing": "Missing"
     },
     "employees": {
       "title": "Employees",

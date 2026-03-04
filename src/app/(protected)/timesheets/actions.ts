@@ -1533,3 +1533,240 @@ export async function sendTimesheetReminders(
     results,
   }
 }
+
+// ============================================
+// RECEIPT MANAGEMENT (Parking receipts, etc.)
+// ============================================
+
+/**
+ * Upload a receipt for a timesheet entry (e.g., parking receipt)
+ */
+export async function uploadTimesheetReceipt(
+  entryId: string,
+  formData: FormData
+): Promise<{ error?: string; url?: string }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Get entry with timesheet info
+  const { data: entry, error: entryError } = await supabase
+    .from('timesheet_entries')
+    .select('id, timesheet:timesheets!timesheet_entries_timesheet_id_fkey(id, status, user_id)')
+    .eq('id', entryId)
+    .single()
+
+  if (entryError || !entry) {
+    return { error: 'Entry not found' }
+  }
+
+  const timesheet = Array.isArray(entry.timesheet) ? entry.timesheet[0] : entry.timesheet
+
+  if (!timesheet) {
+    return { error: 'Timesheet not found' }
+  }
+
+  // Verify ownership or admin permission
+  const permissions = await getUserPermissions()
+  const isAdmin = hasPermission(permissions, 'admin.manage')
+  const isOwner = timesheet.user_id === user.id
+
+  if (!isOwner && !isAdmin) {
+    return { error: 'Not authorized to upload receipts for this timesheet' }
+  }
+
+  const file = formData.get('file') as File
+  if (!file || file.size === 0) {
+    return { error: 'No file provided' }
+  }
+
+  // Validate file type
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+  if (!allowedTypes.includes(file.type)) {
+    return { error: 'Invalid file type. Please upload JPG, PNG, WebP, or PDF.' }
+  }
+
+  // Validate file size (10MB max)
+  if (file.size > 10 * 1024 * 1024) {
+    return { error: 'File too large. Maximum size is 10MB.' }
+  }
+
+  // Get file extension
+  const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+  const fileName = `timesheet-receipts/${entryId}.${ext}`
+
+  // Convert File to ArrayBuffer for upload
+  const arrayBuffer = await file.arrayBuffer()
+  const fileBuffer = new Uint8Array(arrayBuffer)
+
+  // Upload to Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from('employee-documents')
+    .upload(fileName, fileBuffer, {
+      contentType: file.type,
+      cacheControl: '3600',
+      upsert: true,
+    })
+
+  if (uploadError) {
+    console.error('Error uploading timesheet receipt:', uploadError)
+    return { error: 'Failed to upload receipt: ' + uploadError.message }
+  }
+
+  // Get signed URL (private bucket)
+  const { data: urlData } = await supabase.storage
+    .from('employee-documents')
+    .createSignedUrl(fileName, 60 * 60 * 24 * 365) // 1 year
+
+  const receiptUrl = urlData?.signedUrl
+
+  // Update entry with receipt URL
+  const { error: updateError } = await supabase
+    .from('timesheet_entries')
+    .update({
+      receipt_url: receiptUrl,
+    })
+    .eq('id', entryId)
+
+  if (updateError) {
+    console.error('Error updating entry with receipt:', updateError)
+    return { error: 'Failed to update entry: ' + updateError.message }
+  }
+
+  revalidatePath('/timesheets')
+  return { url: receiptUrl }
+}
+
+/**
+ * Update receipt note for a timesheet entry
+ */
+export async function updateTimesheetReceiptNote(
+  entryId: string,
+  note: string | null
+): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Get entry with timesheet info
+  const { data: entry, error: entryError } = await supabase
+    .from('timesheet_entries')
+    .select('id, timesheet:timesheets!timesheet_entries_timesheet_id_fkey(id, status, user_id)')
+    .eq('id', entryId)
+    .single()
+
+  if (entryError || !entry) {
+    return { error: 'Entry not found' }
+  }
+
+  const timesheet = Array.isArray(entry.timesheet) ? entry.timesheet[0] : entry.timesheet
+
+  if (!timesheet) {
+    return { error: 'Timesheet not found' }
+  }
+
+  // Verify ownership or admin permission
+  const permissions = await getUserPermissions()
+  const isAdmin = hasPermission(permissions, 'admin.manage')
+  const isOwner = timesheet.user_id === user.id
+
+  if (!isOwner && !isAdmin) {
+    return { error: 'Not authorized to update this entry' }
+  }
+
+  // Update entry
+  const { error: updateError } = await supabase
+    .from('timesheet_entries')
+    .update({ receipt_note: note })
+    .eq('id', entryId)
+
+  if (updateError) {
+    console.error('Error updating receipt note:', updateError)
+    return { error: 'Failed to update note: ' + updateError.message }
+  }
+
+  revalidatePath('/timesheets')
+  return {}
+}
+
+/**
+ * Delete a receipt from a timesheet entry
+ */
+export async function deleteTimesheetReceipt(entryId: string): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Get entry with timesheet info
+  const { data: entry, error: entryError } = await supabase
+    .from('timesheet_entries')
+    .select('id, receipt_url, timesheet:timesheets!timesheet_entries_timesheet_id_fkey(id, status, user_id)')
+    .eq('id', entryId)
+    .single()
+
+  if (entryError || !entry) {
+    return { error: 'Entry not found' }
+  }
+
+  const timesheet = Array.isArray(entry.timesheet) ? entry.timesheet[0] : entry.timesheet
+
+  if (!timesheet) {
+    return { error: 'Timesheet not found' }
+  }
+
+  // Verify ownership or admin permission
+  const permissions = await getUserPermissions()
+  const isAdmin = hasPermission(permissions, 'admin.manage')
+  const isOwner = timesheet.user_id === user.id
+
+  if (!isOwner && !isAdmin) {
+    return { error: 'Not authorized to delete receipts for this timesheet' }
+  }
+
+  // Delete from storage
+  const { data: files } = await supabase.storage
+    .from('employee-documents')
+    .list('timesheet-receipts')
+
+  if (files) {
+    const toDelete = files
+      .filter((f) => f.name.startsWith(entryId.split('/').pop() ?? ''))
+      .map((f) => `timesheet-receipts/${f.name}`)
+
+    if (toDelete.length > 0) {
+      await supabase.storage.from('employee-documents').remove(toDelete)
+    }
+  }
+
+  // Update entry to remove receipt
+  const { error: updateError } = await supabase
+    .from('timesheet_entries')
+    .update({
+      receipt_url: null,
+      receipt_note: null,
+    })
+    .eq('id', entryId)
+
+  if (updateError) {
+    console.error('Error removing receipt from entry:', updateError)
+    return { error: 'Failed to remove receipt: ' + updateError.message }
+  }
+
+  revalidatePath('/timesheets')
+  return {}
+}

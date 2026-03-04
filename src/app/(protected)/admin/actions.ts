@@ -1894,6 +1894,152 @@ export async function deleteLogo() {
 }
 
 // ============================================
+// EMPLOYEE DOCUMENTS DASHBOARD
+// ============================================
+
+export type CcqCardStatus = 'valid' | 'expiring_soon' | 'expired' | 'missing'
+
+export type EmployeeDocumentRow = {
+  id: string
+  first_name: string
+  last_name: string
+  email: string
+  ccq_card_number: string | null
+  ccq_card_expiry: string | null
+  ccq_card_url: string | null
+  ccq_card_status: CcqCardStatus
+  days_until_expiry: number | null
+}
+
+export type DocumentsSummary = {
+  total: number
+  valid: number
+  expiringSoon: number
+  expired: number
+  missing: number
+}
+
+/**
+ * Get employee documents summary for admin dashboard
+ */
+export async function getEmployeeDocuments(options?: {
+  status?: CcqCardStatus
+  search?: string
+  limit?: number
+  offset?: number
+}): Promise<{ employees: EmployeeDocumentRow[]; summary: DocumentsSummary; count: number }> {
+  const supabase = await createClient()
+  const { status, search, limit = 50, offset = 0 } = options ?? {}
+
+  // Check permission
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'admin.manage')) {
+    return {
+      employees: [],
+      summary: { total: 0, valid: 0, expiringSoon: 0, expired: 0, missing: 0 },
+      count: 0,
+    }
+  }
+
+  // Get all active employees
+  let query = supabase
+    .from('profiles')
+    .select(
+      `
+      id,
+      first_name,
+      last_name,
+      email,
+      ccq_card_number,
+      ccq_card_expiry,
+      ccq_card_url
+    `,
+      { count: 'exact' }
+    )
+    .eq('is_active', true)
+    .or('user_type.eq.employee,user_type.is.null')
+
+  if (search) {
+    query = query.or(
+      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%`
+    )
+  }
+
+  query = query.order('last_name').order('first_name')
+
+  const { data, count, error } = await query
+
+  if (error) {
+    console.error('Error fetching employee documents:', error)
+    return {
+      employees: [],
+      summary: { total: 0, valid: 0, expiringSoon: 0, expired: 0, missing: 0 },
+      count: 0,
+    }
+  }
+
+  const today = new Date()
+
+  // Process employees and calculate status
+  const employees: EmployeeDocumentRow[] = (data ?? []).map((emp) => {
+    let ccqStatus: CcqCardStatus = 'missing'
+    let daysUntilExpiry: number | null = null
+
+    if (emp.ccq_card_url) {
+      if (emp.ccq_card_expiry) {
+        const expiry = new Date(emp.ccq_card_expiry)
+        daysUntilExpiry = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+        if (daysUntilExpiry < 0) {
+          ccqStatus = 'expired'
+        } else if (daysUntilExpiry <= 30) {
+          ccqStatus = 'expiring_soon'
+        } else {
+          ccqStatus = 'valid'
+        }
+      } else {
+        ccqStatus = 'valid' // Has card but no expiry date
+      }
+    }
+
+    return {
+      id: emp.id,
+      first_name: emp.first_name ?? '',
+      last_name: emp.last_name ?? '',
+      email: emp.email ?? '',
+      ccq_card_number: emp.ccq_card_number,
+      ccq_card_expiry: emp.ccq_card_expiry,
+      ccq_card_url: emp.ccq_card_url,
+      ccq_card_status: ccqStatus,
+      days_until_expiry: daysUntilExpiry,
+    }
+  })
+
+  // Filter by status if specified
+  const filteredEmployees = status
+    ? employees.filter((e) => e.ccq_card_status === status)
+    : employees
+
+  // Calculate summary
+  const summary: DocumentsSummary = {
+    total: employees.length,
+    valid: employees.filter((e) => e.ccq_card_status === 'valid').length,
+    expiringSoon: employees.filter((e) => e.ccq_card_status === 'expiring_soon').length,
+    expired: employees.filter((e) => e.ccq_card_status === 'expired').length,
+    missing: employees.filter((e) => e.ccq_card_status === 'missing').length,
+  }
+
+  // Apply pagination
+  const paginatedEmployees = filteredEmployees.slice(offset, offset + limit)
+
+  return {
+    employees: paginatedEmployees,
+    summary,
+    count: filteredEmployees.length,
+  }
+}
+
+// ============================================
 // CCQ CARD MANAGEMENT
 // ============================================
 
