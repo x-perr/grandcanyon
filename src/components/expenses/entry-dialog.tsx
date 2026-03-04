@@ -194,7 +194,7 @@ export function ExpenseEntryDialog({
         id: entry?.id,
         expense_type_id: expenseTypeId,
         project_id: projectId,
-        task_id: taskId || null,
+        task_id: taskId && taskId !== 'none' ? taskId : null,
         expense_date: expenseDate,
         description,
         receipt_number: receiptNumber || null,
@@ -273,7 +273,7 @@ export function ExpenseEntryDialog({
                     <SelectValue placeholder={t('entry.select_task')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">{t('entry.task_none')}</SelectItem>
+                    <SelectItem value="none">{t('entry.task_none')}</SelectItem>
                     {tasks.map((task) => (
                       <SelectItem key={task.id} value={task.id}>
                         {task.code} - {task.name}
