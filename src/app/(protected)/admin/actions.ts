@@ -204,6 +204,10 @@ type UserQueryResult = {
   manager_id: string | null
   person_id: string | null
   created_at: string | null
+  ccq_card_number: string | null
+  ccq_card_expiry: string | null
+  ccq_card_url: string | null
+  ccq_card_uploaded_at: string | null
   role: { id: string; name: string }[] | null
   manager: { id: string; first_name: string; last_name: string }[] | null
   person: { id: string; address: string | null; city: string | null; lat: number | null; lng: number | null }[] | null
@@ -230,6 +234,10 @@ export type UserWithRole = {
   manager_id: string | null
   person_id: string | null
   created_at: string | null
+  ccq_card_number: string | null
+  ccq_card_expiry: string | null
+  ccq_card_url: string | null
+  ccq_card_uploaded_at: string | null
   role: { id: string; name: string } | null
   manager: { id: string; first_name: string; last_name: string } | null
   person: PersonAddress | null
@@ -285,6 +293,10 @@ export async function getUsers(options?: {
       manager_id,
       person_id,
       created_at,
+      ccq_card_number,
+      ccq_card_expiry,
+      ccq_card_url,
+      ccq_card_uploaded_at,
       role:roles(id, name),
       manager:profiles!profiles_manager_id_fkey(id, first_name, last_name),
       person:people!profiles_person_id_fkey(id, address, city, lat, lng)
@@ -547,6 +559,10 @@ export async function getUser(id: string): Promise<UserWithRole | null> {
       manager_id,
       person_id,
       created_at,
+      ccq_card_number,
+      ccq_card_expiry,
+      ccq_card_url,
+      ccq_card_uploaded_at,
       role:roles(id, name),
       manager:profiles!profiles_manager_id_fkey(id, first_name, last_name),
       person:people!profiles_person_id_fkey(id, address, city, lat, lng)
@@ -1875,4 +1891,235 @@ export async function deleteLogo() {
   revalidatePath('/admin')
 
   return { success: true }
+}
+
+// ============================================
+// CCQ CARD MANAGEMENT
+// ============================================
+
+/**
+ * Upload a CCQ card image for an employee
+ */
+export async function uploadCcqCard(
+  userId: string,
+  formData: FormData
+): Promise<{ error?: string; url?: string }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Check permission - either admin or the user themselves
+  const permissions = await getUserPermissions()
+  const isAdmin = hasPermission(permissions, 'admin.manage')
+  const isSelf = user.id === userId
+
+  if (!isAdmin && !isSelf) {
+    return { error: 'You do not have permission to upload CCQ cards for other users' }
+  }
+
+  const file = formData.get('file') as File
+  if (!file || file.size === 0) {
+    return { error: 'No file provided' }
+  }
+
+  // Validate file type
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+  if (!allowedTypes.includes(file.type)) {
+    return { error: 'Invalid file type. Please upload JPG, PNG, WebP, or PDF.' }
+  }
+
+  // Validate file size (10MB max)
+  if (file.size > 10 * 1024 * 1024) {
+    return { error: 'File too large. Maximum size is 10MB.' }
+  }
+
+  // Get file extension
+  const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+  const fileName = `ccq-cards/${userId}/card.${ext}`
+
+  // Convert File to ArrayBuffer for upload
+  const arrayBuffer = await file.arrayBuffer()
+  const fileBuffer = new Uint8Array(arrayBuffer)
+
+  // Upload to Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from('employee-documents')
+    .upload(fileName, fileBuffer, {
+      contentType: file.type,
+      cacheControl: '3600',
+      upsert: true,
+    })
+
+  if (uploadError) {
+    console.error('Error uploading CCQ card:', uploadError)
+    return { error: 'Failed to upload CCQ card: ' + uploadError.message }
+  }
+
+  // Get signed URL (private bucket)
+  const { data: urlData } = await supabase.storage
+    .from('employee-documents')
+    .createSignedUrl(fileName, 60 * 60 * 24 * 365) // 1 year
+
+  const cardUrl = urlData?.signedUrl
+
+  // Update profile with CCQ card URL
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({
+      ccq_card_url: cardUrl,
+      ccq_card_uploaded_at: new Date().toISOString(),
+    })
+    .eq('id', userId)
+
+  if (updateError) {
+    console.error('Error updating profile with CCQ card:', updateError)
+    return { error: 'Failed to update profile: ' + updateError.message }
+  }
+
+  // Log audit
+  await logAudit({
+    action: 'upload',
+    entityType: 'ccq_card',
+    entityId: userId,
+    newValues: { ccq_card_url: cardUrl },
+  })
+
+  revalidatePath('/admin/users')
+  revalidatePath('/profile')
+
+  return { url: cardUrl }
+}
+
+/**
+ * Update CCQ card info (number and expiry date)
+ */
+export async function updateCcqCardInfo(
+  userId: string,
+  data: { cardNumber: string | null; expiryDate: string | null }
+): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Check permission
+  const permissions = await getUserPermissions()
+  const isAdmin = hasPermission(permissions, 'admin.manage')
+  const isSelf = user.id === userId
+
+  if (!isAdmin && !isSelf) {
+    return { error: 'You do not have permission to update CCQ card info for other users' }
+  }
+
+  // Get old values for audit
+  const { data: oldProfile } = await supabase
+    .from('profiles')
+    .select('ccq_card_number, ccq_card_expiry')
+    .eq('id', userId)
+    .single()
+
+  // Update profile
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({
+      ccq_card_number: data.cardNumber,
+      ccq_card_expiry: data.expiryDate,
+    })
+    .eq('id', userId)
+
+  if (updateError) {
+    console.error('Error updating CCQ card info:', updateError)
+    return { error: 'Failed to update CCQ card info: ' + updateError.message }
+  }
+
+  // Log audit
+  await logAudit({
+    action: 'update',
+    entityType: 'ccq_card',
+    entityId: userId,
+    oldValues: oldProfile ?? undefined,
+    newValues: { ccq_card_number: data.cardNumber, ccq_card_expiry: data.expiryDate },
+  })
+
+  revalidatePath('/admin/users')
+  revalidatePath('/profile')
+
+  return {}
+}
+
+/**
+ * Delete CCQ card for an employee
+ */
+export async function deleteCcqCard(userId: string): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Check permission
+  const permissions = await getUserPermissions()
+  const isAdmin = hasPermission(permissions, 'admin.manage')
+  const isSelf = user.id === userId
+
+  if (!isAdmin && !isSelf) {
+    return { error: 'You do not have permission to delete CCQ cards for other users' }
+  }
+
+  // Get current card URL for audit
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('ccq_card_url')
+    .eq('id', userId)
+    .single()
+
+  // Delete from storage
+  const filePath = `ccq-cards/${userId}`
+  const { data: files } = await supabase.storage
+    .from('employee-documents')
+    .list(filePath)
+
+  if (files && files.length > 0) {
+    const filesToDelete = files.map((f) => `${filePath}/${f.name}`)
+    await supabase.storage.from('employee-documents').remove(filesToDelete)
+  }
+
+  // Update profile to remove CCQ card info
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({
+      ccq_card_url: null,
+      ccq_card_uploaded_at: null,
+    })
+    .eq('id', userId)
+
+  if (updateError) {
+    console.error('Error removing CCQ card from profile:', updateError)
+    return { error: 'Failed to remove CCQ card: ' + updateError.message }
+  }
+
+  // Log audit
+  await logAudit({
+    action: 'delete',
+    entityType: 'ccq_card',
+    entityId: userId,
+    oldValues: { ccq_card_url: profile?.ccq_card_url },
+  })
+
+  revalidatePath('/admin/users')
+  revalidatePath('/profile')
+
+  return {}
 }

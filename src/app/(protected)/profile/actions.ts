@@ -23,6 +23,10 @@ const changePasswordSchema = z.object({
 
 export type ProfileData = ProfileWithRole & {
   manager: { id: string; first_name: string; last_name: string } | null
+  ccq_card_number: string | null
+  ccq_card_expiry: string | null
+  ccq_card_url: string | null
+  ccq_card_uploaded_at: string | null
 }
 
 /**

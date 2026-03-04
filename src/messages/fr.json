@@ -1419,6 +1419,30 @@
         "no_expenses": "Aucune dépense"
       }
     },
+    "ccq_card": {
+      "title": "Carte CCQ",
+      "description": "Carte de certification des travailleurs de la construction",
+      "card_image": "Image de la carte",
+      "card_number": "Numéro de carte",
+      "card_number_placeholder": "Entrez le numéro de carte",
+      "expiry_date": "Date d'expiration",
+      "upload_image": "Télécharger l'image",
+      "replace_image": "Remplacer l'image",
+      "save_info": "Enregistrer les infos",
+      "delete_confirm_title": "Supprimer la carte CCQ",
+      "delete_confirm_message": "Êtes-vous sûr de vouloir supprimer cette image de carte CCQ? Cette action est irréversible.",
+      "delete_confirm": "Supprimer",
+      "upload_success": "Carte CCQ téléchargée avec succès",
+      "delete_success": "Carte CCQ supprimée avec succès",
+      "info_saved": "Infos de la carte CCQ enregistrées",
+      "invalid_file_type": "Type de fichier invalide. Veuillez télécharger JPG, PNG, WebP ou PDF.",
+      "file_too_large": "Fichier trop volumineux. Taille maximale 10Mo.",
+      "file_requirements": "JPG, PNG, WebP ou PDF. Max 10Mo.",
+      "status_valid": "Valide",
+      "status_expiring": "Expire bientôt",
+      "status_expired": "Expirée",
+      "status_missing": "Non téléchargée"
+    },
     "employees": {
       "title": "Employés",
       "subtitle": "Gérez les employés et leurs adresses",

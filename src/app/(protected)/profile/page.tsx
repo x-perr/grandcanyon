@@ -7,6 +7,7 @@ import { getMyProfile } from './actions'
 import { ProfileContactForm } from '@/components/profile/profile-contact-form'
 import { ProfilePreferencesForm } from '@/components/profile/profile-preferences-form'
 import { ChangePasswordForm } from '@/components/profile/change-password-form'
+import { CcqCardSection } from '@/components/admin/ccq-card-section'
 import { redirect } from 'next/navigation'
 
 export default async function ProfilePage() {
@@ -93,6 +94,16 @@ export default async function ProfilePage() {
             <ChangePasswordForm />
           </CardContent>
         </Card>
+
+        {/* CCQ Card */}
+        <div className="md:col-span-2">
+          <CcqCardSection
+            userId={profile.id}
+            ccqCardNumber={profile.ccq_card_number ?? null}
+            ccqCardExpiry={profile.ccq_card_expiry ?? null}
+            ccqCardUrl={profile.ccq_card_url ?? null}
+          />
+        </div>
       </div>
     </div>
   )

@@ -7,7 +7,7 @@ import type { Json } from '@/types/database'
 export type AuditAction = 'create' | 'update' | 'delete' | 'send' | 'upload' | 'approve' | 'reject' | 'submit' | 'resend' | 'revoke' | 'accept'
 
 // Audit entity types
-export type AuditEntity = 'user' | 'settings' | 'logo' | 'password_reset' | 'invoice' | 'expense' | 'project' | 'timesheet' | 'classification' | 'invitation' | 'role_permission'
+export type AuditEntity = 'user' | 'settings' | 'logo' | 'password_reset' | 'invoice' | 'expense' | 'project' | 'timesheet' | 'classification' | 'invitation' | 'role_permission' | 'ccq_card'
 
 // Input for logging an audit event
 export interface AuditLogInput {

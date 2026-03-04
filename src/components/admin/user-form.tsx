@@ -29,6 +29,7 @@ import {
 import { toast } from 'sonner'
 import type { UserWithRole } from '@/app/(protected)/admin/actions'
 import { updateUser, sendPasswordReset } from '@/app/(protected)/admin/actions'
+import { CcqCardSection } from './ccq-card-section'
 
 interface UserFormProps {
   user: UserWithRole
@@ -245,6 +246,14 @@ export function UserForm({ user, roles, potentialManagers }: UserFormProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* CCQ Card */}
+      <CcqCardSection
+        userId={user.id}
+        ccqCardNumber={user.ccq_card_number}
+        ccqCardExpiry={user.ccq_card_expiry}
+        ccqCardUrl={user.ccq_card_url}
+      />
 
       {/* Actions */}
       <div className="flex justify-end gap-4">

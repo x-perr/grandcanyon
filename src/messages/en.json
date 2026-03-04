@@ -1420,6 +1420,30 @@
         "no_expenses": "No expenses"
       }
     },
+    "ccq_card": {
+      "title": "CCQ Card",
+      "description": "Construction worker certification card",
+      "card_image": "Card Image",
+      "card_number": "Card Number",
+      "card_number_placeholder": "Enter card number",
+      "expiry_date": "Expiry Date",
+      "upload_image": "Upload Image",
+      "replace_image": "Replace Image",
+      "save_info": "Save Card Info",
+      "delete_confirm_title": "Delete CCQ Card",
+      "delete_confirm_message": "Are you sure you want to delete this CCQ card image? This action cannot be undone.",
+      "delete_confirm": "Delete",
+      "upload_success": "CCQ card uploaded successfully",
+      "delete_success": "CCQ card deleted successfully",
+      "info_saved": "CCQ card info saved",
+      "invalid_file_type": "Invalid file type. Please upload JPG, PNG, WebP, or PDF.",
+      "file_too_large": "File too large. Maximum size is 10MB.",
+      "file_requirements": "JPG, PNG, WebP, or PDF. Max 10MB.",
+      "status_valid": "Valid",
+      "status_expiring": "Expiring Soon",
+      "status_expired": "Expired",
+      "status_missing": "Not Uploaded"
+    },
     "employees": {
       "title": "Employees",
       "subtitle": "Manage employees and their addresses",
