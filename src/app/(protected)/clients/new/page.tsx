@@ -1,15 +1,7 @@
-import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { ClientForm } from '@/components/clients/client-form'
 
 export default async function NewClientPage() {
-  const permissions = await getUserPermissions()
-
-  if (!hasPermission(permissions, 'clients.edit')) {
-    redirect('/clients')
-  }
-
   const t = await getTranslations('clients')
 
   return (
