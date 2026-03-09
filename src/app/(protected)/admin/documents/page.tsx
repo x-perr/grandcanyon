@@ -49,7 +49,7 @@ export default async function AdminDocumentsPage({
         return (
           <Badge variant="default" className="bg-yellow-500">
             <Clock className="mr-1 h-3 w-3" />
-            {t('documents.status_expiring', { days: daysUntilExpiry })}
+            {t('documents.status_expiring', { days: daysUntilExpiry ?? 0 })}
           </Badge>
         )
       case 'expired':

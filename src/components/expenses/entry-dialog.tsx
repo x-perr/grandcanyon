@@ -91,7 +91,7 @@ export function ExpenseEntryDialog({
         setQuantity(String(entry.quantity ?? 1))
         setUnitPrice(String(entry.unit_price ?? 0))
         setIsBillable(entry.is_billable ?? false)
-        setReceiptUrl(entry.receipt_url ?? null)
+        setReceiptUrl((entry as Record<string, unknown>).receipt_url as string ?? null)
       } else {
         setExpenseTypeId('')
         setProjectId('')

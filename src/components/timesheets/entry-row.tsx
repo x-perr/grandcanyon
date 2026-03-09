@@ -54,8 +54,9 @@ export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: En
   const [billingRoleId, setBillingRoleId] = useState(entry.billing_role_id)
   const [hours, setHours] = useState<number[]>(entry.hours ?? [0, 0, 0, 0, 0, 0, 0])
   const [isBillable, setIsBillable] = useState(entry.is_billable ?? true)
-  const [receiptUrl, setReceiptUrl] = useState<string | null>(entry.receipt_url ?? null)
-  const [receiptNote, setReceiptNote] = useState(entry.receipt_note ?? '')
+  const entryAny = entry as Record<string, unknown>
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(entryAny.receipt_url as string ?? null)
+  const [receiptNote, setReceiptNote] = useState(entryAny.receipt_note as string ?? '')
   const [receiptOpen, setReceiptOpen] = useState(false)
 
   // Get available tasks and billing roles based on selected project
