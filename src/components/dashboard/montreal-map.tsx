@@ -88,6 +88,20 @@ function MapLoading() {
   )
 }
 
+// Load Leaflet CSS dynamically (scoped to when map mounts, avoids global pollution)
+function useLeafletCSS() {
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const id = 'leaflet-css'
+    if (document.getElementById(id)) return
+    const link = document.createElement('link')
+    link.id = id
+    link.rel = 'stylesheet'
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+    document.head.appendChild(link)
+  }, [])
+}
+
 // Custom marker icons - use useState + useEffect for proper client-side initialization
 function useCustomIcons() {
   const [icons, setIcons] = useState<{ projectIcon: Icon; employeeIcon: Icon } | null>(null)
@@ -128,6 +142,7 @@ type ResolvedProjectPin = ProjectMapPin & { resolvedLat: number; resolvedLng: nu
 type ResolvedEmployeePin = EmployeeMapPin & { resolvedLat: number; resolvedLng: number }
 
 function MapContent({ projects, employees }: MontrealMapProps) {
+  useLeafletCSS()
   const icons = useCustomIcons()
   const [resolvedProjects, setResolvedProjects] = useState<ResolvedProjectPin[]>([])
   const [resolvedEmployees, setResolvedEmployees] = useState<ResolvedEmployeePin[]>([])
