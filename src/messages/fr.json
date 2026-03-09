@@ -586,6 +586,7 @@
       "deleted": "Projet supprimé avec succès",
       "activated": "Projet activé avec succès",
       "deactivated": "Projet désactivé avec succès",
+      "status_updated": "Statut du projet mis à jour",
       "error_delete": "Erreur lors de la suppression du projet",
       "error_toggle": "Erreur lors de la mise à jour du statut du projet"
     }

@@ -1,6 +1,5 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { getClient } from '../../actions'
 import { ClientForm } from '@/components/clients/client-form'
 
@@ -10,11 +9,6 @@ interface EditClientPageProps {
 
 export default async function EditClientPage({ params }: EditClientPageProps) {
   const { id } = await params
-  const permissions = await getUserPermissions()
-
-  if (!hasPermission(permissions, 'clients.edit')) {
-    redirect('/clients')
-  }
 
   const client = await getClient(id)
 

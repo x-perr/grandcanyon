@@ -24,7 +24,6 @@ import { Badge } from '@/components/ui/badge'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { ContactList } from '@/components/clients/contact-list'
 import { getClient360, type ClientInvoice, type ClientExpense } from '../actions'
-import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { provinces } from '@/lib/validations/client'
 import type { Enums } from '@/types/database'
 import { formatCurrency } from '@/lib/utils'
@@ -105,9 +104,8 @@ function InvoiceStatusBadge({ status, dueDate }: { status: InvoiceStatus; dueDat
 
 export default async function ClientDetailPage({ params }: ClientDetailPageProps) {
   const { id } = await params
-  const [data, permissions, t, tCommon, tProjects, tInvoices] = await Promise.all([
+  const [data, t, tCommon, tProjects, tInvoices] = await Promise.all([
     getClient360(id),
-    getUserPermissions(),
     getTranslations('clients'),
     getTranslations('common'),
     getTranslations('projects'),
@@ -119,7 +117,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
   }
 
   const { client, invoices, expenses, financials } = data
-  const canEdit = hasPermission(permissions, 'clients.edit')
+  const canEdit = true
 
   const getProvinceName = (code: string | null) => {
     if (!code) return null

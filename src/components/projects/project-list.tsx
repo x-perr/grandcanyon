@@ -303,7 +303,7 @@ export function ProjectList({
                   onClick={() => handleSort('start_date')}
                   className="hidden lg:table-cell"
                 />
-                <TableHead className="w-[50px]"></TableHead>
+                <TableHead className="w-[80px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -332,44 +332,48 @@ export function ProjectList({
                     {formatDate(project.start_date)}
                   </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">{tCommon('labels.actions')}</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/projects/${project.id}`}>
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                            {tCommon('actions.view')}
-                          </Link>
-                        </DropdownMenuItem>
-                        {canEdit && (
-                          <>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/projects/${project.id}/edit`}>
-                                <Pencil className="mr-2 h-4 w-4" />
-                                {tCommon('actions.edit')}
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setToggleId(project.id)}>
-                              <Power className="mr-2 h-4 w-4" />
-                              {project.is_active ? t('deactivate') : t('activate')}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive"
-                              onClick={() => setDeleteId(project.id)}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              {tCommon('actions.delete')}
-                            </DropdownMenuItem>
-                          </>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0" asChild>
+                        <Link href={`/projects/${project.id}/edit`}>
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">{tCommon('actions.edit')}</span>
+                        </Link>
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">{tCommon('labels.actions')}</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/projects/${project.id}`}>
+                              <ExternalLink className="mr-2 h-4 w-4" />
+                              {tCommon('actions.view')}
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/projects/${project.id}/edit`}>
+                              <Pencil className="mr-2 h-4 w-4" />
+                              {tCommon('actions.edit')}
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setToggleId(project.id)}>
+                            <Power className="mr-2 h-4 w-4" />
+                            {project.is_active ? t('deactivate') : t('activate')}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive"
+                            onClick={() => setDeleteId(project.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            {tCommon('actions.delete')}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

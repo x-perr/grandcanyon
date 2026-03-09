@@ -1,5 +1,4 @@
 import { getTranslations } from 'next-intl/server'
-import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { getProjects } from './actions'
 import type { SortColumn, SortDirection } from './actions'
 import { ProjectList } from '@/components/projects/project-list'
@@ -29,7 +28,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
     : 'created_at'
   const sortDirection: SortDirection = params.order === 'asc' ? 'asc' : 'desc'
 
-  const [{ projects, count }, permissions, t] = await Promise.all([
+  const [{ projects, count }, t] = await Promise.all([
     getProjects({
       search,
       showInactive,
@@ -39,11 +38,8 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
       sortColumn,
       sortDirection,
     }),
-    getUserPermissions(),
     getTranslations('projects'),
   ])
-
-  const canEdit = hasPermission(permissions, 'projects.edit')
 
   return (
     <div className="space-y-6">
@@ -55,7 +51,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
       <ProjectList
         projects={projects}
         totalCount={count}
-        canEdit={canEdit}
+        canEdit={true}
         currentPage={page}
         pageSize={pageSize}
         searchQuery={search}

@@ -2,7 +2,6 @@ import { Suspense } from 'react'
 import { getTranslations } from 'next-intl/server'
 import { getClients } from './actions'
 import type { SortColumn, SortDirection } from './actions'
-import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { ClientList } from '@/components/clients/client-list'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -31,19 +30,14 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
   const sortDirection: SortDirection = params.order === 'desc' ? 'desc' : 'asc'
   const showInactive = params.inactive === 'true'
 
-  const [{ clients, count }, permissions] = await Promise.all([
-    getClients({
-      search,
-      showInactive,
-      limit: pageSize,
-      offset: (page - 1) * pageSize,
-      sortColumn,
-      sortDirection,
-    }),
-    getUserPermissions(),
-  ])
-
-  const canEdit = hasPermission(permissions, 'clients.edit')
+  const { clients, count } = await getClients({
+    search,
+    showInactive,
+    limit: pageSize,
+    offset: (page - 1) * pageSize,
+    sortColumn,
+    sortDirection,
+  })
   const t = await getTranslations('clients')
 
   return (
@@ -57,7 +51,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
         <ClientList
           clients={clients}
           totalCount={count}
-          canEdit={canEdit}
+          canEdit={true}
           currentPage={page}
           pageSize={pageSize}
           searchQuery={search}

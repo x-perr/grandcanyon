@@ -587,6 +587,7 @@
       "deleted": "Project deleted successfully",
       "activated": "Project activated successfully",
       "deactivated": "Project deactivated successfully",
+      "status_updated": "Project status updated",
       "error_delete": "Error deleting project",
       "error_toggle": "Error updating project status"
     }

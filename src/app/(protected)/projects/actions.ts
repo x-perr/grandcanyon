@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { projectSchema } from '@/lib/validations/project'
-import { getUserPermissions, hasPermission } from '@/lib/auth'
 import type { Enums } from '@/types/database'
 
 type ProjectStatus = Enums<'project_status'>
@@ -211,12 +210,6 @@ export async function getUsersForSelect() {
 export async function createProjectAction(formData: FormData) {
   const supabase = await createClient()
 
-  // Verify permission
-  const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'projects.edit')) {
-    return { error: 'You do not have permission to create projects' }
-  }
-
   // Parse form data
   const rawData = Object.fromEntries(formData.entries())
 
@@ -297,12 +290,6 @@ export async function createProjectAction(formData: FormData) {
 export async function updateProjectAction(id: string, formData: FormData) {
   const supabase = await createClient()
 
-  // Verify permission
-  const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'projects.edit')) {
-    return { error: 'You do not have permission to edit projects' }
-  }
-
   // Parse form data
   const rawData = Object.fromEntries(formData.entries())
 
@@ -359,12 +346,6 @@ export async function updateProjectAction(id: string, formData: FormData) {
 export async function deleteProjectAction(id: string) {
   const supabase = await createClient()
 
-  // Verify permission
-  const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'projects.edit')) {
-    return { error: 'You do not have permission to delete projects' }
-  }
-
   // Get project for client revalidation
   const { data: project } = await supabase.from('projects').select('client_id').eq('id', id).single()
 
@@ -391,12 +372,6 @@ export async function deleteProjectAction(id: string) {
  */
 export async function toggleProjectActive(id: string) {
   const supabase = await createClient()
-
-  // Verify permission
-  const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'projects.edit')) {
-    return { error: 'You do not have permission to update projects' }
-  }
 
   // Get current status
   const { data: project, error: fetchError } = await supabase
@@ -429,4 +404,39 @@ export async function toggleProjectActive(id: string) {
   }
 
   return { success: true, is_active: newStatus }
+}
+
+/**
+ * Quick-update project status inline
+ */
+export async function updateProjectStatusAction(id: string, status: ProjectStatus) {
+  const supabase = await createClient()
+
+  const { data: project, error: fetchError } = await supabase
+    .from('projects')
+    .select('client_id')
+    .eq('id', id)
+    .single()
+
+  if (fetchError || !project) {
+    return { error: 'Project not found' }
+  }
+
+  const { error } = await supabase
+    .from('projects')
+    .update({ status })
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error updating project status:', error)
+    return { error: 'Failed to update project status' }
+  }
+
+  revalidatePath('/projects')
+  revalidatePath(`/projects/${id}`)
+  if (project.client_id) {
+    revalidatePath(`/clients/${project.client_id}`)
+  }
+
+  return { success: true }
 }

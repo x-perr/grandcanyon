@@ -15,12 +15,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { StatusBadge } from '@/components/ui/status-badge'
 import { TeamList } from '@/components/projects/team-list'
 import { TaskList } from '@/components/projects/task-list'
 import { BillingRoleList } from '@/components/projects/billing-role-list'
+import { StatusChanger } from '@/components/projects/status-changer'
 import { getProject, getUsersForSelect } from '../actions'
-import { getUserPermissions, hasPermission } from '@/lib/auth'
+import type { Enums } from '@/types/database'
 import { billingTypes } from '@/lib/validations/project'
 
 interface ProjectDetailPageProps {
@@ -29,9 +29,8 @@ interface ProjectDetailPageProps {
 
 export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
   const { id } = await params
-  const [project, permissions, users, t] = await Promise.all([
+  const [project, users, t] = await Promise.all([
     getProject(id),
-    getUserPermissions(),
     getUsersForSelect(),
     getTranslations('projects'),
   ])
@@ -39,8 +38,6 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   if (!project) {
     notFound()
   }
-
-  const canEdit = hasPermission(permissions, 'projects.edit')
 
   const formatDate = (date: string | null) => {
     if (!date) return t('detail.not_set')
@@ -97,7 +94,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
               <span className="font-mono text-lg font-semibold text-muted-foreground">
                 {project.code}
               </span>
-              {project.status && <StatusBadge status={project.status} />}
+              {project.status && <StatusChanger projectId={project.id} currentStatus={project.status as Enums<'project_status'>} />}
             </div>
             <h1 className="text-2xl font-bold">{project.name}</h1>
             {project.client && (
@@ -111,14 +108,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             )}
           </div>
         </div>
-        {canEdit && (
-          <Button asChild>
+                <Button asChild>
             <Link href={`/projects/${project.id}/edit`}>
               <Pencil className="mr-2 h-4 w-4" />
               {t('edit_project')}
             </Link>
           </Button>
-        )}
       </div>
 
       {/* Tabs */}
@@ -240,13 +235,13 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             members={project.members ?? []}
             billingRoles={project.billing_roles ?? []}
             availableUsers={users}
-            canEdit={canEdit}
+            canEdit={true}
           />
         </TabsContent>
 
         {/* Tasks Tab */}
         <TabsContent value="tasks">
-          <TaskList projectId={project.id} tasks={project.tasks ?? []} canEdit={canEdit} />
+          <TaskList projectId={project.id} tasks={project.tasks ?? []} canEdit={true} />
         </TabsContent>
 
         {/* Billing Roles Tab */}
@@ -254,7 +249,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           <BillingRoleList
             projectId={project.id}
             billingRoles={project.billing_roles ?? []}
-            canEdit={canEdit}
+            canEdit={true}
           />
         </TabsContent>
       </Tabs>

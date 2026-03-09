@@ -219,7 +219,7 @@ export function ClientList({
                   className="hidden md:table-cell"
                 />
                 <TableHead className="hidden sm:table-cell">{t('tabs.projects')}</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
+                <TableHead className="w-[80px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -245,40 +245,44 @@ export function ClientList({
                     {client.projects?.[0]?.count ?? 0}
                   </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">{tCommon('labels.actions')}</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/clients/${client.id}`}>
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                            {tCommon('actions.view')}
-                          </Link>
-                        </DropdownMenuItem>
-                        {canEdit && (
-                          <>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/clients/${client.id}/edit`}>
-                                <Pencil className="mr-2 h-4 w-4" />
-                                {tCommon('actions.edit')}
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive"
-                              onClick={() => setDeleteId(client.id)}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              {tCommon('actions.delete')}
-                            </DropdownMenuItem>
-                          </>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0" asChild>
+                        <Link href={`/clients/${client.id}/edit`}>
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">{tCommon('actions.edit')}</span>
+                        </Link>
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">{tCommon('labels.actions')}</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/clients/${client.id}`}>
+                              <ExternalLink className="mr-2 h-4 w-4" />
+                              {tCommon('actions.view')}
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/clients/${client.id}/edit`}>
+                              <Pencil className="mr-2 h-4 w-4" />
+                              {tCommon('actions.edit')}
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive"
+                            onClick={() => setDeleteId(client.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            {tCommon('actions.delete')}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

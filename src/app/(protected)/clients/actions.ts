@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { clientSchema, type ClientFormData } from '@/lib/validations/client'
-import { getUserPermissions, hasPermission } from '@/lib/auth'
 
 export type ClientWithProjects = {
   id: string
@@ -296,12 +295,6 @@ export async function getClient360(id: string): Promise<Client360Data | null> {
 export async function createClientAction(formData: FormData) {
   const supabase = await createClient()
 
-  // Verify permission
-  const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'clients.edit')) {
-    return { error: 'You do not have permission to create clients' }
-  }
-
   // Parse form data
   const rawData = Object.fromEntries(formData.entries())
 
@@ -359,12 +352,6 @@ export async function createClientAction(formData: FormData) {
 export async function updateClientAction(id: string, formData: FormData) {
   const supabase = await createClient()
 
-  // Verify permission
-  const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'clients.edit')) {
-    return { error: 'You do not have permission to edit clients' }
-  }
-
   // Parse form data
   const rawData = Object.fromEntries(formData.entries())
 
@@ -410,12 +397,6 @@ export async function updateClientAction(id: string, formData: FormData) {
 
 export async function deleteClientAction(id: string) {
   const supabase = await createClient()
-
-  // Verify permission
-  const permissions = await getUserPermissions()
-  if (!hasPermission(permissions, 'clients.edit')) {
-    return { error: 'You do not have permission to delete clients' }
-  }
 
   // Soft delete
   const { error } = await supabase

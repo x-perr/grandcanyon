@@ -1,6 +1,5 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { getProject, getClientsForSelect, getUsersForSelect } from '../../actions'
 import { ProjectForm } from '@/components/projects/project-form'
 
@@ -10,11 +9,6 @@ interface EditProjectPageProps {
 
 export default async function EditProjectPage({ params }: EditProjectPageProps) {
   const { id } = await params
-  const permissions = await getUserPermissions()
-
-  if (!hasPermission(permissions, 'projects.edit')) {
-    redirect('/projects')
-  }
 
   const [project, clients, users, t] = await Promise.all([
     getProject(id),
