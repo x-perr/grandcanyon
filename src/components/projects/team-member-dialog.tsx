@@ -99,8 +99,8 @@ export function TeamMemberDialog({
 
     try {
       const result = isEdit
-        ? await updateTeamMemberAction(projectId, member.id, selectedRoleId || null)
-        : await addTeamMemberAction(projectId, selectedUserId, selectedRoleId || null)
+        ? await updateTeamMemberAction(projectId, member.id, selectedRoleId && selectedRoleId !== 'none' ? selectedRoleId : null)
+        : await addTeamMemberAction(projectId, selectedUserId, selectedRoleId && selectedRoleId !== 'none' ? selectedRoleId : null)
 
       if (result?.error) {
         setError(result.error)
@@ -168,7 +168,7 @@ export function TeamMemberDialog({
                   <SelectValue placeholder={t('team.select_role')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{tCommon('labels.none')}</SelectItem>
+                  <SelectItem value="none">{tCommon('labels.none')}</SelectItem>
                   {billingRoles.map((role) => (
                     <SelectItem key={role.id} value={role.id}>
                       {role.name} ({formatCurrency(role.rate)}/h)

@@ -179,12 +179,12 @@ export function UserForm({ user, roles, potentialManagers }: UserFormProps) {
         <CardContent className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="role_id">{t('users.role')}</Label>
-            <Select name="role_id" defaultValue={user.role_id ?? ''}>
+            <Select name="role_id" defaultValue={user.role_id ?? 'none'}>
               <SelectTrigger>
                 <SelectValue placeholder={t('users.select_role')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">{t('users.no_role')}</SelectItem>
+                <SelectItem value="none">{t('users.no_role')}</SelectItem>
                 {roles.map((role) => (
                   <SelectItem key={role.id} value={role.id}>
                     {role.name}
@@ -196,12 +196,12 @@ export function UserForm({ user, roles, potentialManagers }: UserFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="manager_id">{t('users.manager')}</Label>
-            <Select name="manager_id" defaultValue={user.manager_id ?? ''}>
+            <Select name="manager_id" defaultValue={user.manager_id ?? 'none'}>
               <SelectTrigger>
                 <SelectValue placeholder={t('users.select_manager')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">{t('users.no_manager')}</SelectItem>
+                <SelectItem value="none">{t('users.no_manager')}</SelectItem>
                 {potentialManagers.map((manager) => (
                   <SelectItem key={manager.id} value={manager.id}>
                     {manager.first_name} {manager.last_name}

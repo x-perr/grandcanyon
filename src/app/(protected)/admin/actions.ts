@@ -606,8 +606,8 @@ export async function updateUser(id: string, formData: FormData) {
     first_name: formData.get('first_name') as string,
     last_name: formData.get('last_name') as string,
     phone: (formData.get('phone') as string) || null,
-    role_id: (formData.get('role_id') as string) || null,
-    manager_id: (formData.get('manager_id') as string) || null,
+    role_id: ((formData.get('role_id') as string) || null) === 'none' ? null : (formData.get('role_id') as string) || null,
+    manager_id: ((formData.get('manager_id') as string) || null) === 'none' ? null : (formData.get('manager_id') as string) || null,
     is_active: formData.get('is_active') === 'on',
   }
 

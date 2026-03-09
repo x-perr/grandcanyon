@@ -217,7 +217,7 @@ export async function createProjectAction(formData: FormData) {
   const formValues = {
     ...rawData,
     is_global: formData.get('is_global') === 'on',
-    project_manager_id: rawData.project_manager_id || undefined,
+    project_manager_id: rawData.project_manager_id && rawData.project_manager_id !== 'none' ? rawData.project_manager_id : undefined,
   }
 
   // Validate
@@ -298,7 +298,7 @@ export async function updateProjectAction(id: string, formData: FormData) {
   const formValues = {
     ...rawData,
     is_global: formData.get('is_global') === 'on',
-    project_manager_id: rawData.project_manager_id || undefined,
+    project_manager_id: rawData.project_manager_id && rawData.project_manager_id !== 'none' ? rawData.project_manager_id : undefined,
   }
 
   // Validate

@@ -173,12 +173,12 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
 
           <div className="space-y-2">
             <Label htmlFor="project_manager_id">{t('form.project_manager')}</Label>
-            <Select name="project_manager_id" defaultValue={project?.project_manager_id ?? ''}>
+            <Select name="project_manager_id" defaultValue={project?.project_manager_id ?? 'none'}>
               <SelectTrigger>
                 <SelectValue placeholder={t('form.select_pm')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">{tCommon('labels.none')}</SelectItem>
+                <SelectItem value="none">{tCommon('labels.none')}</SelectItem>
                 {users.map((user) => (
                   <SelectItem key={user.id} value={user.id}>
                     {user.first_name} {user.last_name}
