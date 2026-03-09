@@ -1,23 +1,14 @@
 'use client'
 
-import { useState, useTransition, useCallback, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useCallback, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { FolderKanban, MoreHorizontal, Pencil, Trash2, Plus, ExternalLink, Power } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { SearchInput } from '@/components/ui/search-input'
 import { StatusBadge } from '@/components/ui/status-badge'
-import { Checkbox } from '@/components/ui/checkbox'
 import { SortableHeader } from '@/components/ui/sortable-header'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -42,10 +33,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Card, CardContent } from '@/components/ui/card'
-import { useDebounceSearch, usePagination, useSort } from '@/hooks'
+import { usePagination, useSort } from '@/hooks'
 import type { ProjectWithClient, SortDirection } from '@/app/(protected)/projects/actions'
 import { deleteProjectAction, toggleProjectActive } from '@/app/(protected)/projects/actions'
-import { projectStatuses } from '@/lib/validations/project'
+import { ProjectListFilters } from './project-list-filters'
 
 interface ProjectListProps {
   projects: ProjectWithClient[]
@@ -73,20 +64,13 @@ export function ProjectList({
   sortDirection,
 }: ProjectListProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const t = useTranslations('projects')
   const tCommon = useTranslations('common')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [toggleId, setToggleId] = useState<string | null>(null)
   const [isToggling, setIsToggling] = useState(false)
-  const [isFilterPending, startTransition] = useTransition()
-
-  // Use custom hooks for debounced search and pagination
-  const { search, setSearch, isPending: isSearchPending } = useDebounceSearch({
-    initialValue: searchQuery,
-    basePath: '/projects',
-  })
+  const [isFilterPending, setIsFilterPending] = useState(false)
 
   const {
     totalPages,
@@ -114,35 +98,9 @@ export function ProjectList({
     defaultDirection: sortDirection,
   })
 
-  const isPending = isSearchPending || isPagePending || isFilterPending || isSortPending
+  const isPending = isPagePending || isFilterPending || isSortPending
   const projectToDelete = useMemo(() => projects.find((p) => p.id === deleteId), [projects, deleteId])
   const projectToToggle = useMemo(() => projects.find((p) => p.id === toggleId), [projects, toggleId])
-
-  const updateStatus = useCallback((value: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    if (value && value !== 'all') {
-      params.set('status', value)
-    } else {
-      params.delete('status')
-    }
-    params.delete('page') // Reset to first page on filter
-    startTransition(() => {
-      router.push(`/projects?${params.toString()}`)
-    })
-  }, [searchParams, router])
-
-  const toggleInactive = useCallback((checked: boolean) => {
-    const params = new URLSearchParams(searchParams.toString())
-    if (checked) {
-      params.set('inactive', 'true')
-    } else {
-      params.delete('inactive')
-    }
-    params.set('page', '1')
-    startTransition(() => {
-      router.push(`/projects?${params.toString()}`)
-    })
-  }, [searchParams, router])
 
   const handleDelete = async () => {
     if (!deleteId) return
@@ -193,50 +151,15 @@ export function ProjectList({
   return (
     <div className="space-y-4">
       {/* Header with Search, Filter, and Add Button */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 flex-wrap items-center gap-2">
-          <SearchInput
-            placeholder={t('search_placeholder')}
-            value={search}
-            onChange={setSearch}
-            className="flex-1 sm:max-w-sm"
-          />
-          <Select value={statusFilter || 'all'} onValueChange={updateStatus}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder={tCommon('labels.status')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('all_statuses')}</SelectItem>
-              {projectStatuses.map((status) => (
-                <SelectItem key={status.value} value={status.value}>
-                  {status.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="show-inactive"
-              checked={showInactive}
-              onCheckedChange={toggleInactive}
-            />
-            <label
-              htmlFor="show-inactive"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              {t('show_inactive')}
-            </label>
-          </div>
-        </div>
-        {canEdit && (
-          <Button asChild>
-            <Link href="/projects/new">
-              <Plus className="mr-2 h-4 w-4" />
-              {t('new_project')}
-            </Link>
-          </Button>
-        )}
-      </div>
+      <ProjectListFilters
+        searchQuery={searchQuery}
+        statusFilter={statusFilter}
+        showInactive={showInactive}
+        canEdit={canEdit}
+        t={t}
+        tCommon={tCommon}
+        onPendingChange={setIsFilterPending}
+      />
 
       {/* Table */}
       {projects.length === 0 ? (

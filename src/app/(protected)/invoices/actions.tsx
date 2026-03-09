@@ -3,12 +3,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { renderToBuffer } from '@react-pdf/renderer'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { calculateTaxes, formatCurrency } from '@/lib/tax'
 import { createInvoiceSchema, type CreateInvoiceData, type InvoiceLineFormData } from '@/lib/validations/invoice'
 import { sendInvoiceEmail, getEmailHistory } from '@/lib/email'
-import { InvoicePDF, DEFAULT_COMPANY_INFO } from '@/components/invoices/invoice-pdf'
 import type { Enums, Tables } from '@/types/database'
 
 type InvoiceStatus = Enums<'invoice_status'>
@@ -1032,7 +1030,12 @@ export async function sendInvoiceWithEmail(
 
   const isResend = invoice.status === 'sent'
 
-  // Generate PDF buffer
+  // Dynamically import react-pdf (200KB) only when actually generating a PDF
+  const [{ renderToBuffer }, { InvoicePDF, DEFAULT_COMPANY_INFO }] = await Promise.all([
+    import('@react-pdf/renderer'),
+    import('@/components/invoices/invoice-pdf'),
+  ])
+
   let pdfBuffer: Buffer
   try {
     pdfBuffer = await renderToBuffer(

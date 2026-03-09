@@ -1,6 +1,6 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useOptimistic, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import {
@@ -24,10 +24,12 @@ interface StatusChangerProps {
 
 export function StatusChanger({ projectId, currentStatus }: StatusChangerProps) {
   const [isPending, startTransition] = useTransition()
+  const [optimisticStatus, setOptimisticStatus] = useOptimistic(currentStatus)
   const t = useTranslations('projects')
 
   const handleChange = (newStatus: string) => {
-    if (newStatus === currentStatus) return
+    if (newStatus === optimisticStatus) return
+    setOptimisticStatus(newStatus as ProjectStatus)
     startTransition(async () => {
       const result = await updateProjectStatusAction(projectId, newStatus as ProjectStatus)
       if (result.error) {
@@ -39,10 +41,10 @@ export function StatusChanger({ projectId, currentStatus }: StatusChangerProps) 
   }
 
   return (
-    <Select value={currentStatus} onValueChange={handleChange} disabled={isPending}>
+    <Select value={optimisticStatus} onValueChange={handleChange} disabled={isPending}>
       <SelectTrigger className="w-[140px] h-7 text-xs border-dashed">
         <SelectValue>
-          <StatusBadge status={currentStatus} />
+          <StatusBadge status={optimisticStatus} />
         </SelectValue>
       </SelectTrigger>
       <SelectContent>

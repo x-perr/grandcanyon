@@ -8,8 +8,6 @@ import {
   ChevronRight,
   Calendar,
   Check,
-  X,
-  Eye,
   Clock,
   Users,
   CheckCircle,
@@ -22,7 +20,6 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent } from '@/components/ui/card'
-import { StatusBadge } from '@/components/ui/status-badge'
 import {
   Table,
   TableBody,
@@ -61,6 +58,7 @@ import {
 } from '@/app/(protected)/timesheets/actions'
 import { getExpensesByUserAndWeek } from '@/app/(protected)/expenses/actions'
 import { TimesheetDetailPanel, type ApprovalTarget, type RejectionTarget } from './timesheet-detail-panel'
+import { TeamTimesheetRowItem } from './team-timesheet-row'
 
 interface TeamTimesheetTableProps {
   rows: TeamTimesheetRow[]
@@ -472,79 +470,20 @@ export function TeamTimesheetTable({
               </TableRow>
             ) : (
               rows.map((row) => (
-                <TableRow key={row.userId}>
-                  {canApprove && submittedRows.length > 0 && (
-                    <TableCell>
-                      {row.status === 'submitted' && row.timesheetId && (
-                        <Checkbox
-                          checked={selectedIds.has(row.timesheetId)}
-                          onCheckedChange={() => toggleSelect(row.timesheetId!)}
-                          aria-label={t('team.select_employee', {
-                            name: `${row.firstName} ${row.lastName}`,
-                          })}
-                        />
-                      )}
-                    </TableCell>
-                  )}
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">
-                        {row.firstName} {row.lastName}
-                      </div>
-                      <div className="text-sm text-muted-foreground">{row.email}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <StatusBadge status={row.status} />
-                  </TableCell>
-                  <TableCell className="text-right font-mono">
-                    {formatHours(row.totalHours)}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {row.submittedAt
-                      ? new Date(row.submittedAt).toLocaleDateString(locale, {
-                          month: 'short',
-                          day: 'numeric',
-                        })
-                      : '-'}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      {row.timesheetId && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleViewDetail(row)}
-                          title={tCommon('actions.view')}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {canApprove && row.status === 'submitted' && row.timesheetId && (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleApprove(row.timesheetId!)}
-                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                            title={t('actions.approve')}
-                          >
-                            <Check className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleReject(row.timesheetId!)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            title={t('actions.reject')}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <TeamTimesheetRowItem
+                  key={row.userId}
+                  row={row}
+                  canApprove={canApprove}
+                  showCheckbox={canApprove && submittedRows.length > 0}
+                  isSelected={row.timesheetId ? selectedIds.has(row.timesheetId) : false}
+                  onToggleSelect={toggleSelect}
+                  onViewDetail={handleViewDetail}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
+                  locale={locale}
+                  t={t}
+                  tCommon={tCommon}
+                />
               ))
             )}
           </TableBody>

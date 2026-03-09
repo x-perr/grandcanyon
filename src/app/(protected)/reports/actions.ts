@@ -81,6 +81,8 @@ export type ProfitabilityReportRow = {
   status: string
 }
 
+const MAX_REPORT_ROWS = 10000
+
 // === FILTER DATA FETCHERS ===
 
 /**
@@ -210,6 +212,8 @@ export async function getTimesheetReportData(
   if (filters.userId) {
     query = query.eq('timesheet.user_id', filters.userId)
   }
+
+  query = query.limit(MAX_REPORT_ROWS)
 
   const { data, error } = await query
 
@@ -346,7 +350,7 @@ export async function getInvoiceReportData(
     query = query.eq('status', filters.status)
   }
 
-  query = query.order('invoice_date', { ascending: false })
+  query = query.order('invoice_date', { ascending: false }).limit(MAX_REPORT_ROWS)
 
   const { data, error } = await query
 
@@ -513,14 +517,7 @@ export async function getProfitabilityReportData(
     projectQuery = projectQuery.eq('client_id', filters.clientId)
   }
 
-  const { data: projects, error: projectError } = await projectQuery
-
-  if (projectError) {
-    console.error('Error fetching projects for profitability:', projectError)
-    return []
-  }
-
-  // 2. Get timesheet entries (labor cost)
+  // 2. Build timesheet query (labor cost)
   let timesheetQuery = supabase
     .from('timesheet_entries')
     .select(`
@@ -538,19 +535,12 @@ export async function getProfitabilityReportData(
     timesheetQuery = timesheetQuery.lte('timesheet.week_start', filters.endDate)
   }
 
-  const { data: timesheetData, error: timesheetError } = await timesheetQuery
-
-  if (timesheetError) {
-    console.error('Error fetching timesheet data for profitability:', timesheetError)
-  }
-
-  // 3. Get expense entries (expense cost)
+  // 3. Build expense query (expense cost)
   let expenseQuery = supabase
     .from('expense_entries')
     .select(`
       project_id,
       total,
-      is_billable,
       expense:expenses!inner(week_start, status)
     `)
     .eq('expense.status', 'approved')
@@ -563,16 +553,10 @@ export async function getProfitabilityReportData(
     expenseQuery = expenseQuery.lte('expense.week_start', filters.endDate)
   }
 
-  const { data: expenseData, error: expenseError } = await expenseQuery
-
-  if (expenseError) {
-    console.error('Error fetching expense data for profitability:', expenseError)
-  }
-
-  // 4. Get invoices (revenue)
+  // 4. Build invoice query (revenue)
   let invoiceQuery = supabase
     .from('invoices')
-    .select('project_id, total, status')
+    .select('project_id, total')
     .in('status', ['sent', 'paid'])
 
   if (filters.startDate) {
@@ -582,8 +566,29 @@ export async function getProfitabilityReportData(
     invoiceQuery = invoiceQuery.lte('invoice_date', filters.endDate)
   }
 
-  const { data: invoiceData, error: invoiceError } = await invoiceQuery
+  // Run all 4 queries in parallel
+  const [
+    { data: projects, error: projectError },
+    { data: timesheetData, error: timesheetError },
+    { data: expenseData, error: expenseError },
+    { data: invoiceData, error: invoiceError },
+  ] = await Promise.all([
+    projectQuery,
+    timesheetQuery.limit(MAX_REPORT_ROWS),
+    expenseQuery.limit(MAX_REPORT_ROWS),
+    invoiceQuery.limit(MAX_REPORT_ROWS),
+  ])
 
+  if (projectError) {
+    console.error('Error fetching projects for profitability:', projectError)
+    return []
+  }
+  if (timesheetError) {
+    console.error('Error fetching timesheet data for profitability:', timesheetError)
+  }
+  if (expenseError) {
+    console.error('Error fetching expense data for profitability:', expenseError)
+  }
   if (invoiceError) {
     console.error('Error fetching invoice data for profitability:', invoiceError)
   }

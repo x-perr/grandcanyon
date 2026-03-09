@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import type { Tables } from '@/types/database'
@@ -41,7 +42,7 @@ export async function requireAuth() {
 /**
  * Get the user's profile with role and permissions
  */
-export async function getProfile(): Promise<ProfileWithRole | null> {
+export const getProfile = cache(async (): Promise<ProfileWithRole | null> => {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -62,12 +63,12 @@ export async function getProfile(): Promise<ProfileWithRole | null> {
     .single()
 
   return profile as ProfileWithRole | null
-}
+})
 
 /**
  * Get array of permission codes for the current user
  */
-export async function getUserPermissions(): Promise<string[]> {
+export const getUserPermissions = cache(async (): Promise<string[]> => {
   const profile = await getProfile()
 
   if (!profile?.role?.role_permissions) return []
@@ -75,7 +76,7 @@ export async function getUserPermissions(): Promise<string[]> {
   return profile.role.role_permissions
     .map(rp => rp.permission?.code)
     .filter((code): code is string => Boolean(code))
-}
+})
 
 /**
  * Check if user has a specific permission

@@ -206,42 +206,45 @@ export async function getClient360(id: string): Promise<Client360Data | null> {
     contacts: contacts ?? [],
   }
 
-  // Fetch invoices for this client
-  const { data: invoices, error: invoicesError } = await supabase
-    .from('invoices')
-    .select(
+  // Fetch display invoices and financial totals in parallel
+  const [
+    { data: invoices, error: invoicesError },
+    { data: invoiceTotals },
+  ] = await Promise.all([
+    supabase
+      .from('invoices')
+      .select(
+        `
+        id,
+        invoice_number,
+        invoice_date,
+        due_date,
+        total,
+        status,
+        project:projects(code, name)
       `
-      id,
-      invoice_number,
-      invoice_date,
-      due_date,
-      total,
-      status,
-      project:projects(code, name)
-    `
-    )
-    .eq('client_id', id)
-    .order('invoice_date', { ascending: false })
-    .limit(10)
+      )
+      .eq('client_id', id)
+      .order('invoice_date', { ascending: false })
+      .limit(10),
+    supabase
+      .from('invoices')
+      .select('total, status')
+      .eq('client_id', id),
+  ])
 
   if (invoicesError) {
     console.error('Error fetching invoices:', invoicesError)
   }
 
-  // Calculate financials from all invoices (not just recent 10)
-  const { data: allInvoices } = await supabase
-    .from('invoices')
-    .select('total, status')
-    .eq('client_id', id)
-
   const financials: ClientFinancials = {
     totalBilled: 0,
     totalPaid: 0,
     totalOutstanding: 0,
-    invoiceCount: allInvoices?.length ?? 0,
+    invoiceCount: invoiceTotals?.length ?? 0,
   }
 
-  allInvoices?.forEach((inv) => {
+  invoiceTotals?.forEach((inv) => {
     if (inv.status !== 'void') {
       financials.totalBilled += inv.total
       if (inv.status === 'paid') {
