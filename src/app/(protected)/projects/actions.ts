@@ -213,10 +213,11 @@ export async function createProjectAction(formData: FormData) {
   // Parse form data
   const rawData = Object.fromEntries(formData.entries())
 
-  // Handle checkboxes
+  // Handle checkboxes and empty optional fields
   const formValues = {
     ...rawData,
     is_global: formData.get('is_global') === 'on',
+    project_manager_id: rawData.project_manager_id || undefined,
   }
 
   // Validate
@@ -293,9 +294,11 @@ export async function updateProjectAction(id: string, formData: FormData) {
   // Parse form data
   const rawData = Object.fromEntries(formData.entries())
 
+  // Handle checkboxes and empty optional fields
   const formValues = {
     ...rawData,
     is_global: formData.get('is_global') === 'on',
+    project_manager_id: rawData.project_manager_id || undefined,
   }
 
   // Validate

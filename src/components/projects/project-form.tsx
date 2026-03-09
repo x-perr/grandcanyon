@@ -94,8 +94,11 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
         <CardContent className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="client_id">{t('form.client')} *</Label>
+            {mode === 'edit' && (
+              <input type="hidden" name="client_id" value={selectedClientId} />
+            )}
             <Select
-              name="client_id"
+              name={mode === 'create' ? 'client_id' : undefined}
               value={selectedClientId}
               onValueChange={setSelectedClientId}
               required
