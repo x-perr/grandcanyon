@@ -32,4 +32,24 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+// Only wrap with Sentry when configured — avoids webpack plugin overhead in builds without Sentry
+const sentryEnabled = !!(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_ORG && process.env.SENTRY_PROJECT);
+
+let finalConfig: NextConfig = withNextIntl(nextConfig);
+
+if (sentryEnabled) {
+  const { withSentryConfig } = require("@sentry/nextjs");
+  finalConfig = withSentryConfig(finalConfig, {
+    silent: true,
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    bundleSizeOptimizations: {
+      excludeDebugStatements: true,
+      excludeReplayIframe: true,
+      excludeReplayShadowDom: true,
+    },
+  });
+}
+
+export default finalConfig;

@@ -282,6 +282,7 @@ export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: En
               size="sm"
               className={`h-8 w-8 p-0 ${receiptUrl ? 'text-green-600' : 'text-muted-foreground'}`}
               title={receiptUrl ? t('receipt.view') : t('receipt.attach')}
+              aria-label={receiptUrl ? t('receipt.view') : t('receipt.attach')}
             >
               <Paperclip className="h-4 w-4" />
             </Button>
@@ -305,6 +306,7 @@ export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: En
                       className="absolute -right-1 -top-1 h-5 w-5"
                       onClick={handleReceiptDelete}
                       disabled={isDeleting || !isEditable}
+                      aria-label={t('receipt.delete')}
                     >
                       {isDeleting ? (
                         <Loader2 className="h-3 w-3 animate-spin" />

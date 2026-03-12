@@ -1,4 +1,46 @@
 import { z } from 'zod'
+import { getMonday, parseDateISO } from '@/lib/date'
+
+// === DATE RESTRICTION RULES ===
+
+/** Maximum number of past weeks a regular user can edit */
+export const MAX_PAST_WEEKS = 4
+
+/**
+ * Check if a given week is editable based on date restrictions.
+ * - Future weeks are always blocked
+ * - Past weeks beyond MAX_PAST_WEEKS are blocked for regular users
+ * - Managers/admins can override the past limit
+ */
+export function isWeekEditable(
+  weekStart: string,
+  permissions: string[]
+): { allowed: boolean; reason?: 'future_week' | 'past_limit' } {
+  const week = getMonday(parseDateISO(weekStart))
+  const now = getMonday(new Date())
+
+  // Block future weeks
+  if (week.getTime() > now.getTime()) {
+    return { allowed: false, reason: 'future_week' }
+  }
+
+  // Admin/manager override for past limit
+  const hasOverride = permissions.some((p) =>
+    ['timesheets.manage', 'admin.manage'].includes(p)
+  )
+  if (hasOverride) {
+    return { allowed: true }
+  }
+
+  // Calculate weeks difference
+  const diffMs = now.getTime() - week.getTime()
+  const weeksAgo = Math.round(diffMs / (7 * 24 * 60 * 60 * 1000))
+  if (weeksAgo > MAX_PAST_WEEKS) {
+    return { allowed: false, reason: 'past_limit' }
+  }
+
+  return { allowed: true }
+}
 
 // Timesheet status configuration for UI
 export const timesheetStatuses = [

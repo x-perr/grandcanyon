@@ -3,23 +3,8 @@
 import { useState, useCallback, useTransition, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
-import {
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  Check,
-  Clock,
-  Users,
-  CheckCircle,
-  AlertCircle,
-  Download,
-  Mail,
-  Loader2,
-} from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -40,6 +25,8 @@ import {
   formatWeekRangeLocale,
   parseDateISO,
   addDays,
+  isFutureWeek,
+  isCurrentWeek,
 } from '@/lib/date'
 import { generateCSV, downloadCSV, formatHoursForCSV, formatDateForCSV } from '@/lib/csv'
 import type { TeamTimesheetRow, TeamTimesheetSummary } from '@/app/(protected)/timesheets/actions'
@@ -59,6 +46,8 @@ import {
 import { getExpensesByUserAndWeek } from '@/app/(protected)/expenses/actions'
 import { TimesheetDetailPanel, type ApprovalTarget, type RejectionTarget } from './timesheet-detail-panel'
 import { TeamTimesheetRowItem } from './team-timesheet-row'
+import { TeamTimesheetSummaryCards } from './team-timesheet-summary-cards'
+import { TeamTimesheetToolbar } from './team-timesheet-toolbar'
 
 interface TeamTimesheetTableProps {
   rows: TeamTimesheetRow[]
@@ -91,14 +80,19 @@ export function TeamTimesheetTable({
   // Calculate week range
   const weekDate = useMemo(() => parseDateISO(weekStart), [weekStart])
   const weekRange = useMemo(() => formatWeekRangeLocale(weekDate, locale), [weekDate, locale])
+  const isCurrentWeekSelected = useMemo(() => isCurrentWeek(weekDate), [weekDate])
+  const isFutureWeekSelected = useMemo(() => isFutureWeek(weekDate), [weekDate])
+  const isNextWeekDisabled = isCurrentWeekSelected || isFutureWeekSelected
 
   // Navigation
   const navigateWeek = useCallback((direction: 'prev' | 'next') => {
     const current = parseDateISO(weekStart)
     const offset = direction === 'prev' ? -7 : 7
-    const newWeek = formatDateISO(addDays(current, offset))
+    const newWeek = addDays(current, offset)
+    // Block navigation to future weeks
+    if (direction === 'next' && isFutureWeek(newWeek)) return
     startTransition(() => {
-      router.push(`/timesheets/team?week=${newWeek}`)
+      router.push(`/timesheets/team?week=${formatDateISO(newWeek)}`)
     })
   }, [weekStart, router])
 
@@ -326,119 +320,29 @@ export function TeamTimesheetTable({
     }
   }, [missingRows, weekStart, t])
 
-  const formatHours = (hours: number) => hours.toFixed(1)
-
   return (
     <div className="space-y-4">
-      {/* Week Navigation */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigateWeek('prev')}
-            disabled={isPending}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-md">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium">{weekRange}</span>
-          </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigateWeek('next')}
-            disabled={isPending}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={goToToday} disabled={isPending}>
-            {t('team.today')}
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleExportCSV}>
-            <Download className="mr-2 h-4 w-4" />
-            {t('team.export')}
-          </Button>
-          {canApprove && missingRows.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSendReminders}
-              disabled={isSendingReminders}
-              className="text-amber-600 border-amber-300 hover:bg-amber-50"
-            >
-              {isSendingReminders ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Mail className="mr-2 h-4 w-4" />
-              )}
-              {t('team.send_reminders', { count: missingRows.length })}
-            </Button>
-          )}
-        </div>
-
-        {/* Bulk Actions */}
-        {canApprove && selectedIds.size > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              {t('team.selected', { count: selectedIds.size })}
-            </span>
-            <Button size="sm" onClick={handleBulkApprove} disabled={isPending}>
-              <Check className="mr-2 h-4 w-4" />
-              {t('team.approve_selected')}
-            </Button>
-          </div>
-        )}
-      </div>
+      {/* Week Navigation & Bulk Actions */}
+      <TeamTimesheetToolbar
+        weekRange={weekRange}
+        isPending={isPending}
+        isNextWeekDisabled={isNextWeekDisabled}
+        isCurrentWeekSelected={isCurrentWeekSelected}
+        isFutureWeekSelected={isFutureWeekSelected}
+        canApprove={canApprove}
+        selectedCount={selectedIds.size}
+        missingCount={missingRows.length}
+        isSendingReminders={isSendingReminders}
+        onNavigateWeek={navigateWeek}
+        onGoToToday={goToToday}
+        onExportCSV={handleExportCSV}
+        onSendReminders={handleSendReminders}
+        onBulkApprove={handleBulkApprove}
+        t={t}
+      />
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <Users className="h-8 w-8 text-muted-foreground" />
-              <div>
-                <div className="text-2xl font-bold">{summary.total}</div>
-                <p className="text-xs text-muted-foreground">{t('team.total_employees')}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <Clock className="h-8 w-8 text-blue-500" />
-              <div>
-                <div className="text-2xl font-bold">{formatHours(summary.totalHours)}</div>
-                <p className="text-xs text-muted-foreground">{t('team.total_hours')}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <AlertCircle className="h-8 w-8 text-amber-500" />
-              <div>
-                <div className="text-2xl font-bold">{summary.submitted}</div>
-                <p className="text-xs text-muted-foreground">{t('team.pending_approval')}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <CheckCircle className="h-8 w-8 text-green-500" />
-              <div>
-                <div className="text-2xl font-bold">{summary.approved}</div>
-                <p className="text-xs text-muted-foreground">{t('team.approved')}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <TeamTimesheetSummaryCards summary={summary} t={t} />
 
       {/* Table */}
       <div className="rounded-md border">

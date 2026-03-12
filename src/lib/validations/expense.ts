@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { calculateTaxes } from '@/lib/tax'
 
 // Expense status configuration for UI
 export const expenseStatuses = [
@@ -10,12 +11,6 @@ export const expenseStatuses = [
 
 export type ExpenseStatus = (typeof expenseStatuses)[number]['value']
 
-// Tax rates (Quebec)
-export const TAX_RATES = {
-  GST: 0.05,      // 5%
-  QST: 0.09975,   // 9.975%
-}
-
 // Validation constants
 export const EXPENSE_RULES = {
   maxQuantity: 9999,
@@ -25,18 +20,10 @@ export const EXPENSE_RULES = {
 }
 
 // Calculate taxes and totals
-export function calculateExpenseTotals(quantity: number, unitPrice: number): {
-  subtotal: number
-  gst_amount: number
-  qst_amount: number
-  total: number
-} {
+export function calculateExpenseTotals(quantity: number, unitPrice: number) {
   const subtotal = quantity * unitPrice
-  const gst_amount = Math.round(subtotal * TAX_RATES.GST * 100) / 100
-  const qst_amount = Math.round(subtotal * TAX_RATES.QST * 100) / 100
-  const total = Math.round((subtotal + gst_amount + qst_amount) * 100) / 100
-
-  return { subtotal, gst_amount, qst_amount, total }
+  const taxes = calculateTaxes(subtotal, true, true)
+  return { subtotal: taxes.subtotal, gst_amount: taxes.gst, qst_amount: taxes.qst, total: taxes.total }
 }
 
 // Expense entry schema for form validation

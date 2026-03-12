@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { getUserPermissions, hasAnyPermission } from '@/lib/auth'
 import { projectSchema } from '@/lib/validations/project'
 import type { Enums } from '@/types/database'
 
@@ -45,7 +46,7 @@ export async function getProjects(options?: {
   offset?: number
   sortColumn?: SortColumn
   sortDirection?: SortDirection
-}): Promise<{ projects: ProjectWithClient[]; count: number }> {
+}): Promise<{ projects: ProjectWithClient[]; count: number; error?: string }> {
   const supabase = await createClient()
   const {
     search,
@@ -126,7 +127,7 @@ export async function getProjects(options?: {
 
   if (error) {
     console.error('Error fetching projects:', error)
-    return { projects: [], count: 0 }
+    return { projects: [], count: 0, error: 'Failed to load projects' }
   }
 
   // Transform data to handle Supabase's array response for joins
@@ -291,6 +292,21 @@ export async function createProjectAction(formData: FormData) {
 export async function updateProjectAction(id: string, formData: FormData) {
   const supabase = await createClient()
 
+  // Authorization check
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+  const permissions = await getUserPermissions()
+  if (!hasAnyPermission(permissions, ['projects.edit', 'admin.manage'])) {
+    const { data: proj } = await supabase.from('projects').select('created_by, project_manager_id').eq('id', id).single()
+    if (proj?.created_by !== user.id && proj?.project_manager_id !== user.id) {
+      return { error: 'Unauthorized' }
+    }
+  }
+
   // Parse form data
   const rawData = Object.fromEntries(formData.entries())
 
@@ -348,6 +364,21 @@ export async function updateProjectAction(id: string, formData: FormData) {
 
 export async function deleteProjectAction(id: string) {
   const supabase = await createClient()
+
+  // Authorization check
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+  const permissions = await getUserPermissions()
+  if (!hasAnyPermission(permissions, ['projects.edit', 'admin.manage'])) {
+    const { data: proj } = await supabase.from('projects').select('created_by, project_manager_id').eq('id', id).single()
+    if (proj?.created_by !== user.id && proj?.project_manager_id !== user.id) {
+      return { error: 'Unauthorized' }
+    }
+  }
 
   // Get project for client revalidation
   const { data: project } = await supabase.from('projects').select('client_id').eq('id', id).single()
@@ -414,6 +445,21 @@ export async function toggleProjectActive(id: string) {
  */
 export async function updateProjectStatusAction(id: string, status: ProjectStatus) {
   const supabase = await createClient()
+
+  // Authorization check
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+  const permissions = await getUserPermissions()
+  if (!hasAnyPermission(permissions, ['projects.edit', 'admin.manage'])) {
+    const { data: proj } = await supabase.from('projects').select('created_by, project_manager_id').eq('id', id).single()
+    if (proj?.created_by !== user.id && proj?.project_manager_id !== user.id) {
+      return { error: 'Unauthorized' }
+    }
+  }
 
   const { data: project, error: fetchError } = await supabase
     .from('projects')

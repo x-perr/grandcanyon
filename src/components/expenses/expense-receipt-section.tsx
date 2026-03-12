@@ -104,6 +104,7 @@ export function ExpenseReceiptSection({
                   size="icon"
                   className="absolute -right-2 -top-2 h-6 w-6"
                   disabled={isDeleting}
+                  aria-label={t('receipt.delete_image')}
                 >
                   {isDeleting ? (
                     <Loader2 className="h-3 w-3 animate-spin" />

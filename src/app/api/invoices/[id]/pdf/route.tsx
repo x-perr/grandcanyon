@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { createClient } from '@/lib/supabase/server'
+import { getUserPermissions, hasAnyPermission } from '@/lib/auth'
 import { InvoicePDF, DEFAULT_COMPANY_INFO, type CompanyInfo } from '@/components/invoices/invoice-pdf'
 import type { InvoiceWithRelations } from '@/app/(protected)/invoices/actions'
 
@@ -78,6 +79,14 @@ export async function GET(
     }
 
     const invoiceData = invoiceResult.data
+
+    // Authorization: check permissions or ownership
+    const permissions = await getUserPermissions()
+    if (!hasAnyPermission(permissions, ['invoices.create', 'admin.manage'])) {
+      if (invoiceData.created_by !== user.id) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+    }
 
     // Transform the data to match InvoiceWithRelations type
     const invoice: InvoiceWithRelations = {

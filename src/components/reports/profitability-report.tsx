@@ -215,7 +215,7 @@ export function ProfitabilityReport({ data, summary }: ProfitabilityReportProps)
                     )}
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">
-                    <StatusBadge status={row.status as 'draft' | 'active' | 'on_hold' | 'completed' | 'cancelled'} />
+                    <StatusBadge status={row.status as 'soumission' | 'active' | 'on_hold' | 'completed' | 'invoiced' | 'lost' | 'cancelled'} />
                   </TableCell>
                 </TableRow>
               ))}

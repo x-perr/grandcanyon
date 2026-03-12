@@ -19,6 +19,21 @@ interface AuditLogDetailProps {
   onClose: () => void
 }
 
+// Known audit log action and entity types — must stay in sync with i18n keys (admin.logs.actions.*, admin.logs.entities.*)
+const KNOWN_ACTIONS = ['create', 'update', 'delete', 'send', 'upload', 'approve', 'reject'] as const
+const KNOWN_ENTITIES = ['user', 'settings', 'logo', 'password_reset', 'timesheet', 'expense'] as const
+
+type KnownAction = typeof KNOWN_ACTIONS[number]
+type KnownEntity = typeof KNOWN_ENTITIES[number]
+
+function isKnownAction(action: string): action is KnownAction {
+  return (KNOWN_ACTIONS as readonly string[]).includes(action)
+}
+
+function isKnownEntity(entity: string): entity is KnownEntity {
+  return (KNOWN_ENTITIES as readonly string[]).includes(entity)
+}
+
 export function AuditLogDetail({ log, onClose }: AuditLogDetailProps) {
   const t = useTranslations('admin')
 
@@ -72,7 +87,7 @@ export function AuditLogDetail({ log, onClose }: AuditLogDetailProps) {
           <DialogTitle className="flex items-center gap-2">
             {t('logs.detail.title')}
             <Badge variant="outline" className="ml-2">
-              {t(`logs.actions.${log.action}` as any) || log.action}
+              {isKnownAction(log.action) ? t(`logs.actions.${log.action}`) : log.action}
             </Badge>
           </DialogTitle>
         </DialogHeader>
@@ -109,7 +124,7 @@ export function AuditLogDetail({ log, onClose }: AuditLogDetailProps) {
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">{t('logs.table.entity')}:</span>
                 <span>
-                  {t(`logs.entities.${log.entity_type}` as any) || log.entity_type}
+                  {isKnownEntity(log.entity_type) ? t(`logs.entities.${log.entity_type}`) : log.entity_type}
                   {log.entity_id && (
                     <span className="text-muted-foreground ml-1">
                       ({log.entity_id})

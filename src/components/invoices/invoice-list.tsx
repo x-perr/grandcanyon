@@ -132,7 +132,7 @@ export function InvoiceList({
     })
   }, [searchParams, router])
 
-  const handleMarkPaid = useCallback(async (invoiceId: string, e: React.MouseEvent) => {
+  const handleMarkPaid = useCallback(async (invoiceId: string, e: { stopPropagation: () => void }) => {
     e.stopPropagation()
     const result = await markInvoicePaid(invoiceId)
     if (result.error) {
@@ -349,7 +349,7 @@ export function InvoiceList({
                               <RefreshCw className="mr-2 h-4 w-4" />
                               {t('actions.resend_email')}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => handleMarkPaid(invoice.id, e as unknown as React.MouseEvent)}>
+                            <DropdownMenuItem onClick={(e) => handleMarkPaid(invoice.id, e)}>
                               <Check className="mr-2 h-4 w-4" />
                               {t('actions.mark_paid')}
                             </DropdownMenuItem>

@@ -15,6 +15,7 @@ const statusColors = {
   inactive: 'bg-status-neutral-muted text-status-neutral-foreground border-status-neutral-muted',
   void: 'bg-status-neutral-muted text-status-neutral-foreground border-status-neutral-muted',
   not_started: 'bg-status-neutral-muted text-status-neutral-foreground border-status-neutral-muted',
+  lost: 'bg-status-neutral-muted text-status-neutral-foreground border-status-neutral-muted',
 
   // Success states (green)
   active: 'bg-status-success-muted text-status-success-foreground border-status-success-muted',
@@ -30,6 +31,7 @@ const statusColors = {
   completed: 'bg-status-info-muted text-status-info-foreground border-status-info-muted',
   submitted: 'bg-status-info-muted text-status-info-foreground border-status-info-muted',
   sent: 'bg-status-info-muted text-status-info-foreground border-status-info-muted',
+  invoiced: 'bg-status-info-muted text-status-info-foreground border-status-info-muted',
 
   // Error states (red)
   cancelled: 'bg-status-error-muted text-status-error-foreground border-status-error-muted',
@@ -39,6 +41,7 @@ const statusColors = {
 
   // Special states (purple)
   locked: 'bg-status-purple-muted text-status-purple-foreground border-status-purple-muted',
+  soumission: 'bg-status-purple-muted text-status-purple-foreground border-status-purple-muted',
 } as const
 
 type StatusType = keyof typeof statusColors

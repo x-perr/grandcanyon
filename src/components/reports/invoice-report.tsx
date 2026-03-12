@@ -285,6 +285,7 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
                     className="h-8 w-8"
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
+                    aria-label={tc('pagination.previous')}
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -294,6 +295,7 @@ export function InvoiceReport({ data, aging, totals }: InvoiceReportProps) {
                     className="h-8 w-8"
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
+                    aria-label={tc('pagination.next')}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>

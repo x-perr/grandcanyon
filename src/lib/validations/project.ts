@@ -1,10 +1,12 @@
 import { z } from 'zod'
 
 export const projectStatuses = [
-  { value: 'draft', label: 'Draft', color: 'gray' },
+  { value: 'soumission', label: 'Soumission', color: 'purple' },
   { value: 'active', label: 'Active', color: 'green' },
   { value: 'on_hold', label: 'On Hold', color: 'yellow' },
   { value: 'completed', label: 'Completed', color: 'blue' },
+  { value: 'invoiced', label: 'Invoiced', color: 'teal' },
+  { value: 'lost', label: 'Lost', color: 'gray' },
   { value: 'cancelled', label: 'Cancelled', color: 'red' },
 ] as const
 
@@ -25,7 +27,7 @@ export const projectSchema = z
 
     description: z.string().max(2000).optional().nullable(),
 
-    status: z.enum(['draft', 'active', 'on_hold', 'completed', 'cancelled']).default('draft'),
+    status: z.enum(['soumission', 'active', 'on_hold', 'completed', 'invoiced', 'lost', 'cancelled']).default('soumission'),
 
     billing_type: z.enum(['hourly', 'fixed', 'per_unit']).default('hourly'),
 

@@ -46,8 +46,19 @@ interface AuditLogListProps {
   dateTo?: string
 }
 
-const ACTION_TYPES = ['create', 'update', 'delete', 'send', 'upload']
-const ENTITY_TYPES = ['user', 'settings', 'logo', 'password_reset']
+const ACTION_TYPES = ['create', 'update', 'delete', 'send', 'upload', 'approve', 'reject'] as const
+const ENTITY_TYPES = ['user', 'settings', 'logo', 'password_reset', 'timesheet', 'expense'] as const
+
+type KnownAction = typeof ACTION_TYPES[number]
+type KnownEntity = typeof ENTITY_TYPES[number]
+
+function isKnownAction(action: string): action is KnownAction {
+  return (ACTION_TYPES as readonly string[]).includes(action)
+}
+
+function isKnownEntity(entity: string): entity is KnownEntity {
+  return (ENTITY_TYPES as readonly string[]).includes(entity)
+}
 
 export function AuditLogList({
   logs,
@@ -256,12 +267,12 @@ export function AuditLogList({
                     </TableCell>
                     <TableCell>
                       <Badge variant={getActionBadgeVariant(log.action)}>
-                        {t(`logs.actions.${log.action}` as any) || log.action}
+                        {isKnownAction(log.action) ? t(`logs.actions.${log.action}`) : log.action}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span>{t(`logs.entities.${log.entity_type}` as any) || log.entity_type}</span>
+                        <span>{isKnownEntity(log.entity_type) ? t(`logs.entities.${log.entity_type}`) : log.entity_type}</span>
                         {log.entity_id && (
                           <span className="text-xs text-muted-foreground truncate max-w-40">
                             {log.entity_id}
@@ -278,6 +289,7 @@ export function AuditLogList({
                         variant="ghost"
                         size="icon"
                         onClick={() => setSelectedLog(log)}
+                        aria-label={t('logs.view_details')}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>

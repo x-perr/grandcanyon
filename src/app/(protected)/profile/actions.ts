@@ -55,11 +55,10 @@ export async function getMyProfile(): Promise<ProfileData | null> {
 
   if (!profile) return null
 
-  // Normalize manager (comes as array from join)
-  const managerArray = profile.manager as unknown
-  const manager = Array.isArray(managerArray) && managerArray.length > 0
-    ? managerArray[0] as { id: string; first_name: string; last_name: string }
-    : null
+  // Normalize manager — Supabase self-joins may return an array instead of a single object
+  type ManagerInfo = { id: string; first_name: string; last_name: string }
+  const rawManager: ManagerInfo | ManagerInfo[] | null = profile.manager as ManagerInfo | ManagerInfo[] | null
+  const manager: ManagerInfo | null = Array.isArray(rawManager) ? rawManager[0] ?? null : rawManager
 
   return {
     ...profile,

@@ -283,13 +283,30 @@ export async function getClient360(id: string): Promise<Client360Data | null> {
     if (expensesError) {
       console.error('Error fetching expenses:', expensesError)
     } else {
-      expenses = (expenseData ?? []) as unknown as ClientExpense[]
+      expenses = (expenseData ?? []).map((e): ClientExpense => ({
+        id: e.id,
+        expense_date: e.expense_date,
+        description: e.description,
+        total: e.total,
+        is_billable: e.is_billable,
+        expense_type: Array.isArray(e.expense_type) ? e.expense_type[0] ?? null : e.expense_type,
+        project: Array.isArray(e.project) ? e.project[0] ?? null : e.project,
+        invoice_line: Array.isArray(e.invoice_line) ? e.invoice_line[0] ?? null : e.invoice_line,
+      }))
     }
   }
 
   return {
     client,
-    invoices: (invoices ?? []) as unknown as ClientInvoice[],
+    invoices: (invoices ?? []).map((inv): ClientInvoice => ({
+      id: inv.id,
+      invoice_number: inv.invoice_number,
+      invoice_date: inv.invoice_date,
+      due_date: inv.due_date,
+      total: inv.total,
+      status: inv.status as ClientInvoice['status'],
+      project: Array.isArray(inv.project) ? inv.project[0] ?? null : inv.project,
+    })),
     expenses,
     financials,
   }

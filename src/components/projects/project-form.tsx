@@ -157,7 +157,7 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
 
           <div className="space-y-2">
             <Label htmlFor="status">{t('form.status')} *</Label>
-            <Select name="status" defaultValue={project?.status ?? 'draft'}>
+            <Select name="status" defaultValue={project?.status ?? 'soumission'}>
               <SelectTrigger>
                 <SelectValue placeholder={t('form.select_status')} />
               </SelectTrigger>

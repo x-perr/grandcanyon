@@ -188,6 +188,7 @@ export function CcqCardSection({
                       size="icon"
                       className="absolute -right-2 -top-2 h-6 w-6"
                       disabled={isDeleting}
+                      aria-label={t('ccq_card.delete_image')}
                     >
                       {isDeleting ? (
                         <Loader2 className="h-3 w-3 animate-spin" />

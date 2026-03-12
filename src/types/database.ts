@@ -1424,7 +1424,7 @@ export type Database = {
       expense_status: "draft" | "submitted" | "approved" | "rejected"
       invoice_status: "draft" | "sent" | "paid" | "void"
       project_billing_type: "hourly" | "fixed" | "per_unit"
-      project_status: "draft" | "active" | "on_hold" | "completed" | "cancelled"
+      project_status: "soumission" | "active" | "on_hold" | "completed" | "invoiced" | "lost" | "cancelled"
       timesheet_status:
         | "draft"
         | "submitted"
@@ -1562,7 +1562,7 @@ export const Constants = {
       expense_status: ["draft", "submitted", "approved", "rejected"],
       invoice_status: ["draft", "sent", "paid", "void"],
       project_billing_type: ["hourly", "fixed", "per_unit"],
-      project_status: ["draft", "active", "on_hold", "completed", "cancelled"],
+      project_status: ["soumission", "active", "on_hold", "completed", "invoiced", "lost", "cancelled"],
       timesheet_status: [
         "draft",
         "submitted",

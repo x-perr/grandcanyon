@@ -11,6 +11,7 @@ import {
   getNextWeekStart,
   getPreviousWeekStart,
   isCurrentWeek,
+  isFutureWeek,
   parseDateISO,
 } from '@/lib/date'
 
@@ -25,6 +26,7 @@ export function WeekPicker({ weekStart, basePath = '/timesheets' }: WeekPickerPr
   const currentDate = parseDateISO(weekStart)
   const weekRange = formatWeekRange(currentDate)
   const isCurrent = isCurrentWeek(currentDate)
+  const isFuture = isFutureWeek(currentDate)
 
   const goToPreviousWeek = () => {
     const prevWeek = getPreviousWeekStart(currentDate)
@@ -33,6 +35,8 @@ export function WeekPicker({ weekStart, basePath = '/timesheets' }: WeekPickerPr
 
   const goToNextWeek = () => {
     const nextWeek = getNextWeekStart(currentDate)
+    // Block navigation to future weeks
+    if (isFutureWeek(nextWeek)) return
     router.push(`${basePath}/${formatDateISO(nextWeek)}`)
   }
 
@@ -53,12 +57,18 @@ export function WeekPicker({ weekStart, basePath = '/timesheets' }: WeekPickerPr
         <span className="font-medium">{weekRange}</span>
       </div>
 
-      <Button variant="outline" size="sm" onClick={goToNextWeek}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={goToNextWeek}
+        disabled={isCurrent || isFuture}
+        title={isCurrent || isFuture ? t('errors.future_week') : undefined}
+      >
         <span className="hidden sm:inline">{t('week_picker.next')}</span>
         <ChevronRight className="h-4 w-4" />
       </Button>
 
-      {!isCurrent && (
+      {!isCurrent && !isFuture && (
         <Button variant="secondary" size="sm" onClick={goToCurrentWeek}>
           {t('current_week')}
         </Button>

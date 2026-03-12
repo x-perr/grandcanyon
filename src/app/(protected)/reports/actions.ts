@@ -95,7 +95,7 @@ export async function getProjectsForFilter(): Promise<ProjectForFilter[]> {
     .from('projects')
     .select('id, code, name')
     .is('deleted_at', null)
-    .in('status', ['active', 'on_hold', 'completed'])
+    .in('status', ['soumission', 'active', 'on_hold', 'completed', 'invoiced'])
     .order('code')
 
   if (error) {

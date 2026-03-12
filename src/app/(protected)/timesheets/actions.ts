@@ -6,10 +6,20 @@ import { getUserPermissions, hasPermission, getProfile } from '@/lib/auth'
 import { formatDateISO, getMonday, getSunday, getPreviousWeekStart, formatWeekRangeLocale } from '@/lib/date'
 import { logAudit } from '@/lib/audit'
 import { sendTimesheetReminder } from '@/lib/email'
-import { timesheetEntrySchema } from '@/lib/validations/timesheet'
+import { timesheetEntrySchema, isWeekEditable } from '@/lib/validations/timesheet'
 import type { Enums, Tables } from '@/types/database'
 
 type TimesheetStatus = Enums<'timesheet_status'>
+
+const DEFAULT_HOURS: number[] = [0, 0, 0, 0, 0, 0, 0]
+
+/** Validate and normalize a hours array from the DB. Returns a safe 7-element number[] even if DB data is corrupted. */
+function safeHours(hours: unknown): number[] {
+  if (!Array.isArray(hours) || hours.length !== 7) {
+    return [...DEFAULT_HOURS]
+  }
+  return hours.map((h) => (typeof h === 'number' && !Number.isNaN(h) ? h : 0))
+}
 
 // === TYPE DEFINITIONS ===
 
@@ -116,7 +126,7 @@ export async function getTimesheets(options?: {
 
     const hoursByTimesheet = new Map<string, number>()
     entries?.forEach((entry) => {
-      const total = entry.hours?.reduce((sum: number, h: number | null) => sum + (h ?? 0), 0) ?? 0
+      const total = safeHours(entry.hours).reduce((sum, h) => sum + h, 0)
       hoursByTimesheet.set(entry.timesheet_id, (hoursByTimesheet.get(entry.timesheet_id) ?? 0) + total)
     })
 
@@ -226,7 +236,14 @@ export async function getTimesheetById(timesheetId: string) {
     return null
   }
 
-  return data
+  // Validate hours arrays on all entries to guard against corrupted DB data
+  return {
+    ...data,
+    entries: (data.entries ?? []).map((entry: Record<string, unknown>) => ({
+      ...entry,
+      hours: safeHours(entry.hours),
+    })),
+  }
 }
 
 /**
@@ -274,7 +291,7 @@ export async function getPendingApprovals(): Promise<{ timesheets: TimesheetWith
 
     const hoursByTimesheet = new Map<string, number>()
     entries?.forEach((entry) => {
-      const total = entry.hours?.reduce((sum: number, h: number | null) => sum + (h ?? 0), 0) ?? 0
+      const total = safeHours(entry.hours).reduce((sum, h) => sum + h, 0)
       hoursByTimesheet.set(entry.timesheet_id, (hoursByTimesheet.get(entry.timesheet_id) ?? 0) + total)
     })
 
@@ -406,7 +423,7 @@ export async function saveTimesheetEntry(
   // Verify timesheet exists and is editable
   const { data: timesheet, error: tsError } = await supabase
     .from('timesheets')
-    .select('id, status, user_id')
+    .select('id, status, user_id, week_start')
     .eq('id', timesheetId)
     .single()
 
@@ -419,11 +436,19 @@ export async function saveTimesheetEntry(
   }
 
   // Verify ownership or impersonation permission
+  const permissions = await getUserPermissions()
   if (timesheet.user_id !== user?.id) {
-    const permissions = await getUserPermissions()
     if (!hasPermission(permissions, 'timesheets.impersonate')) {
       return { error: 'Not authorized' }
     }
+  }
+
+  // Enforce date restrictions
+  const editCheck = isWeekEditable(timesheet.week_start, permissions)
+  if (!editCheck.allowed) {
+    return { error: editCheck.reason === 'future_week'
+      ? 'Cannot edit timesheets for future weeks'
+      : 'Cannot edit timesheets older than 4 weeks. Contact your manager.' }
   }
 
   // Validate entry
@@ -484,7 +509,7 @@ export async function deleteTimesheetEntry(entryId: string) {
   // Get entry with timesheet info
   const { data: entry, error: entryError } = await supabase
     .from('timesheet_entries')
-    .select('id, timesheet:timesheets!timesheet_entries_timesheet_id_fkey(id, status, user_id)')
+    .select('id, timesheet:timesheets!timesheet_entries_timesheet_id_fkey(id, status, user_id, week_start)')
     .eq('id', entryId)
     .single()
 
@@ -499,11 +524,19 @@ export async function deleteTimesheetEntry(entryId: string) {
   }
 
   // Verify ownership or impersonation permission
+  const permissions = await getUserPermissions()
   if (timesheet.user_id !== user?.id) {
-    const permissions = await getUserPermissions()
     if (!hasPermission(permissions, 'timesheets.impersonate')) {
       return { error: 'Not authorized' }
     }
+  }
+
+  // Enforce date restrictions
+  const editCheck = isWeekEditable(timesheet.week_start, permissions)
+  if (!editCheck.allowed) {
+    return { error: editCheck.reason === 'future_week'
+      ? 'Cannot edit timesheets for future weeks'
+      : 'Cannot edit timesheets older than 4 weeks. Contact your manager.' }
   }
 
   const { error } = await supabase.from('timesheet_entries').delete().eq('id', entryId)
@@ -529,7 +562,7 @@ export async function submitTimesheet(timesheetId: string) {
   // Get timesheet
   const { data: timesheet, error: tsError } = await supabase
     .from('timesheets')
-    .select('id, status, user_id')
+    .select('id, status, user_id, week_start')
     .eq('id', timesheetId)
     .single()
 
@@ -545,6 +578,15 @@ export async function submitTimesheet(timesheetId: string) {
   // Verify status
   if (timesheet.status !== 'draft') {
     return { error: 'Timesheet already submitted' }
+  }
+
+  // Enforce date restrictions
+  const permissions = await getUserPermissions()
+  const editCheck = isWeekEditable(timesheet.week_start, permissions)
+  if (!editCheck.allowed) {
+    return { error: editCheck.reason === 'future_week'
+      ? 'Cannot submit timesheets for future weeks'
+      : 'Cannot edit timesheets older than 4 weeks. Contact your manager.' }
   }
 
   // Verify has entries
@@ -881,7 +923,7 @@ export async function getTeamTimesheetsByWeek(
       .in('timesheet_id', timesheetIds)
 
     entries?.forEach((entry) => {
-      const total = entry.hours?.reduce((sum: number, h: number | null) => sum + (h ?? 0), 0) ?? 0
+      const total = safeHours(entry.hours).reduce((sum, h) => sum + h, 0)
       hoursByTimesheet.set(entry.timesheet_id, (hoursByTimesheet.get(entry.timesheet_id) ?? 0) + total)
     })
   }
@@ -996,6 +1038,15 @@ export async function submitWeek(weekStart: string) {
   // Normalize to Monday
   const monday = getMonday(new Date(weekStart))
   const weekStartISO = formatDateISO(monday)
+
+  // Enforce date restrictions
+  const permissions = await getUserPermissions()
+  const editCheck = isWeekEditable(weekStartISO, permissions)
+  if (!editCheck.allowed) {
+    return { error: editCheck.reason === 'future_week'
+      ? 'Cannot submit timesheets for future weeks'
+      : 'Cannot edit timesheets older than 4 weeks. Contact your manager.' }
+  }
 
   // Get timesheet for this week
   const { data: timesheet } = await supabase

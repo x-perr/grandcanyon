@@ -121,6 +121,7 @@ export function InviteUserDialog({ roles, trigger }: InviteUserDialogProps) {
                     variant="outline"
                     size="icon"
                     onClick={handleCopyLink}
+                    aria-label={tCommon('actions.copy')}
                   >
                     {copied ? (
                       <Check className="h-4 w-4 text-green-500" />

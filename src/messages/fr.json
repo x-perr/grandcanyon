@@ -33,11 +33,14 @@
       "done": "Terminé"
     },
     "status": {
+      "soumission": "Soumission",
       "draft": "Brouillon",
       "active": "Actif",
       "inactive": "Inactif",
       "on_hold": "En attente",
       "completed": "Terminé",
+      "invoiced": "Facturé",
+      "lost": "Perdu",
       "cancelled": "Annulé",
       "submitted": "Soumis",
       "approved": "Approuvé",
@@ -124,7 +127,9 @@
       "per_page": "par page",
       "rows_per_page": "Lignes par page",
       "no_results": "Aucun résultat",
-      "try_adjusting_filters": "Essayez d'ajuster vos filtres"
+      "try_adjusting_filters": "Essayez d'ajuster vos filtres",
+      "previous": "Page précédente",
+      "next": "Page suivante"
     },
     "validation": {
       "required": "Ce champ est requis",
@@ -144,6 +149,17 @@
       "message": "Êtes-vous sûr de vouloir supprimer cet élément? Cette action est irréversible.",
       "confirm": "Supprimer",
       "cancel": "Annuler"
+    },
+    "error": {
+      "title": "Une erreur est survenue",
+      "description": "Une erreur inattendue s'est produite. Veuillez réessayer.",
+      "try_again": "Réessayer",
+      "description_section": "Une erreur est survenue lors du chargement de {section}. Veuillez réessayer."
+    },
+    "not_found": {
+      "title": "Page introuvable",
+      "description": "La page que vous recherchez n'existe pas ou a été déplacée.",
+      "go_home": "Aller au tableau de bord"
     }
   },
   "nav": {
@@ -215,7 +231,8 @@
       "confirm_password": "Confirmer le nouveau mot de passe",
       "password_requirements": "Minimum 8 caractères",
       "change_password": "Changer le mot de passe",
-      "password_changed": "Mot de passe changé avec succès"
+      "password_changed": "Mot de passe changé avec succès",
+      "toggle_password_visibility": "Afficher/masquer le mot de passe"
     },
     "billing": {
       "title": "Informations de facturation",
@@ -690,6 +707,10 @@
       "previous": "Précédent",
       "next": "Suivant"
     },
+    "errors": {
+      "future_week": "Impossible de soumettre des feuilles de temps pour les semaines futures",
+      "past_limit": "Impossible de modifier les feuilles de temps de plus de 4 semaines. Contactez votre gestionnaire."
+    },
     "toast": {
       "saved": "Feuille de temps enregistrée",
       "submitted": "Feuille de temps soumise pour approbation",
@@ -718,7 +739,8 @@
       "save_note": "Enregistrer",
       "invalid_file_type": "Type de fichier invalide. Utilisez JPG, PNG, WebP ou PDF.",
       "file_too_large": "Fichier trop volumineux. Maximum 10 Mo.",
-      "file_requirements": "JPG, PNG, WebP, PDF. Max 10 Mo."
+      "file_requirements": "JPG, PNG, WebP, PDF. Max 10 Mo.",
+      "delete": "Supprimer le reçu"
     },
     "team": {
       "title": "Feuilles de temps de l'équipe",
@@ -790,6 +812,8 @@
       "nothing_to_approve": "Rien à approuver",
       "nothing_to_reject": "Rien à refuser",
       "export": "Exporter CSV",
+      "previous_week": "Semaine précédente",
+      "next_week": "Semaine suivante",
       "send_reminders": "Envoyer rappels ({count})",
       "csv": {
         "last_name": "Nom",
@@ -1014,7 +1038,8 @@
       "delete_confirm": "Supprimer",
       "invalid_file_type": "Type de fichier invalide. Utilisez JPG, PNG, WebP ou PDF.",
       "file_too_large": "Fichier trop volumineux. Maximum 10 Mo.",
-      "file_requirements": "JPG, PNG, WebP ou PDF. Max 10 Mo."
+      "file_requirements": "JPG, PNG, WebP ou PDF. Max 10 Mo.",
+      "delete_image": "Supprimer l'image du reçu"
     }
   },
   "invoices": {
@@ -1469,7 +1494,8 @@
       "status_valid": "Valide",
       "status_expiring": "Expire bientôt",
       "status_expired": "Expirée",
-      "status_missing": "Non téléchargée"
+      "status_missing": "Non téléchargée",
+      "delete_image": "Supprimer l'image de la carte CCQ"
     },
     "documents": {
       "title": "Documents des employés",
@@ -1571,13 +1597,17 @@
         "update": "Modifier",
         "delete": "Supprimer",
         "send": "Envoyer",
-        "upload": "Téléverser"
+        "upload": "Téléverser",
+        "approve": "Approuver",
+        "reject": "Rejeter"
       },
       "entities": {
         "user": "Utilisateur",
         "settings": "Paramètres",
         "logo": "Logo",
-        "password_reset": "Réinitialisation mot de passe"
+        "password_reset": "Réinitialisation mot de passe",
+        "timesheet": "Feuille de temps",
+        "expense": "Dépense"
       },
       "detail": {
         "title": "Détails du journal d'audit",
@@ -1589,7 +1619,8 @@
       "pagination": {
         "previous": "Page précédente",
         "next": "Page suivante"
-      }
+      },
+      "view_details": "Voir les détails"
     },
     "company_settings": {
       "title": "Paramètres de l'entreprise",

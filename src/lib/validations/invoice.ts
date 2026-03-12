@@ -15,6 +15,17 @@ export function getStatusConfig(status: InvoiceStatus) {
   return invoiceStatuses.find((s) => s.value === status) ?? invoiceStatuses[0]
 }
 
+export const INVOICE_TRANSITIONS: Record<string, string[]> = {
+  draft: ['sent', 'void'],
+  sent: ['paid', 'void'],
+  paid: [],
+  void: [],
+}
+
+export function isValidInvoiceTransition(from: string, to: string): boolean {
+  return INVOICE_TRANSITIONS[from]?.includes(to) ?? false
+}
+
 // Invoice line item schema (for form validation)
 export const invoiceLineSchema = z.object({
   id: z.string().uuid().optional(), // Optional for new lines

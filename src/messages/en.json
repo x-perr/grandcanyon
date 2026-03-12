@@ -33,11 +33,14 @@
       "done": "Done"
     },
     "status": {
+      "soumission": "Bid / Quote",
       "draft": "Draft",
       "active": "Active",
       "inactive": "Inactive",
       "on_hold": "On Hold",
       "completed": "Completed",
+      "invoiced": "Invoiced",
+      "lost": "Lost",
       "cancelled": "Cancelled",
       "submitted": "Submitted",
       "approved": "Approved",
@@ -125,7 +128,9 @@
       "per_page": "per page",
       "rows_per_page": "Rows per page",
       "no_results": "No results",
-      "try_adjusting_filters": "Try adjusting your filters"
+      "try_adjusting_filters": "Try adjusting your filters",
+      "previous": "Previous page",
+      "next": "Next page"
     },
     "validation": {
       "required": "This field is required",
@@ -145,6 +150,17 @@
       "message": "Are you sure you want to delete this item? This action cannot be undone.",
       "confirm": "Delete",
       "cancel": "Cancel"
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. Please try again.",
+      "try_again": "Try again",
+      "description_section": "An error occurred while loading {section}. Please try again."
+    },
+    "not_found": {
+      "title": "Page not found",
+      "description": "The page you're looking for doesn't exist or has been moved.",
+      "go_home": "Go to dashboard"
     }
   },
   "nav": {
@@ -216,7 +232,8 @@
       "confirm_password": "Confirm New Password",
       "password_requirements": "Minimum 8 characters",
       "change_password": "Change Password",
-      "password_changed": "Password changed successfully"
+      "password_changed": "Password changed successfully",
+      "toggle_password_visibility": "Toggle password visibility"
     },
     "billing": {
       "title": "Billing Information",
@@ -691,6 +708,10 @@
       "previous": "Previous",
       "next": "Next"
     },
+    "errors": {
+      "future_week": "Cannot submit timesheets for future weeks",
+      "past_limit": "Cannot edit timesheets older than 4 weeks. Contact your manager."
+    },
     "toast": {
       "saved": "Timesheet saved",
       "submitted": "Timesheet submitted for approval",
@@ -719,7 +740,8 @@
       "save_note": "Save Note",
       "invalid_file_type": "Invalid file type. Use JPG, PNG, WebP, or PDF.",
       "file_too_large": "File too large. Maximum 10MB.",
-      "file_requirements": "JPG, PNG, WebP, PDF. Max 10MB."
+      "file_requirements": "JPG, PNG, WebP, PDF. Max 10MB.",
+      "delete": "Delete receipt"
     },
     "team": {
       "title": "Team Timesheets",
@@ -791,6 +813,8 @@
       "nothing_to_approve": "Nothing to approve",
       "nothing_to_reject": "Nothing to reject",
       "export": "Export CSV",
+      "previous_week": "Previous week",
+      "next_week": "Next week",
       "send_reminders": "Send Reminders ({count})",
       "csv": {
         "last_name": "Last Name",
@@ -1015,7 +1039,8 @@
       "delete_confirm": "Delete",
       "invalid_file_type": "Invalid file type. Use JPG, PNG, WebP, or PDF.",
       "file_too_large": "File too large. Maximum 10MB.",
-      "file_requirements": "JPG, PNG, WebP or PDF. Max 10MB."
+      "file_requirements": "JPG, PNG, WebP or PDF. Max 10MB.",
+      "delete_image": "Delete receipt image"
     }
   },
   "invoices": {
@@ -1470,7 +1495,8 @@
       "status_valid": "Valid",
       "status_expiring": "Expiring Soon",
       "status_expired": "Expired",
-      "status_missing": "Not Uploaded"
+      "status_missing": "Not Uploaded",
+      "delete_image": "Delete CCQ card image"
     },
     "documents": {
       "title": "Employee Documents",
@@ -1572,13 +1598,17 @@
         "update": "Update",
         "delete": "Delete",
         "send": "Send",
-        "upload": "Upload"
+        "upload": "Upload",
+        "approve": "Approve",
+        "reject": "Reject"
       },
       "entities": {
         "user": "User",
         "settings": "Settings",
         "logo": "Logo",
-        "password_reset": "Password Reset"
+        "password_reset": "Password Reset",
+        "timesheet": "Timesheet",
+        "expense": "Expense"
       },
       "detail": {
         "title": "Audit Log Details",
@@ -1590,7 +1620,8 @@
       "pagination": {
         "previous": "Previous page",
         "next": "Next page"
-      }
+      },
+      "view_details": "View details"
     },
     "company_settings": {
       "title": "Company Settings",

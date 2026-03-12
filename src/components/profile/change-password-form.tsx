@@ -50,6 +50,7 @@ export function ChangePasswordForm() {
             size="icon"
             className="absolute right-0 top-0 h-full px-3"
             onClick={() => setShowCurrent(!showCurrent)}
+            aria-label={t('toggle_password_visibility')}
           >
             {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>
@@ -74,6 +75,7 @@ export function ChangePasswordForm() {
             size="icon"
             className="absolute right-0 top-0 h-full px-3"
             onClick={() => setShowNew(!showNew)}
+            aria-label={t('toggle_password_visibility')}
           >
             {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>
@@ -99,6 +101,7 @@ export function ChangePasswordForm() {
             size="icon"
             className="absolute right-0 top-0 h-full px-3"
             onClick={() => setShowConfirm(!showConfirm)}
+            aria-label={t('toggle_password_visibility')}
           >
             {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>

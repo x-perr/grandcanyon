@@ -50,23 +50,26 @@ function mapEventToStatus(
 
 export async function POST(request: NextRequest) {
   try {
+    const webhookSecret = process.env.RESEND_WEBHOOK_SECRET
+    if (!webhookSecret) {
+      console.error('RESEND_WEBHOOK_SECRET is not configured')
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
+    }
+
     const body = await request.text()
     const headers = Object.fromEntries(request.headers.entries())
 
-    // Verify webhook signature if signing secret is configured
-    const webhookSecret = process.env.RESEND_WEBHOOK_SECRET
-    if (webhookSecret) {
-      const svix = new Webhook(webhookSecret)
-      try {
-        svix.verify(body, {
-          'svix-id': headers['svix-id'] || '',
-          'svix-timestamp': headers['svix-timestamp'] || '',
-          'svix-signature': headers['svix-signature'] || '',
-        })
-      } catch {
-        console.error('Invalid webhook signature')
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
-      }
+    // Verify webhook signature
+    const svix = new Webhook(webhookSecret)
+    try {
+      svix.verify(body, {
+        'svix-id': headers['svix-id'] || '',
+        'svix-timestamp': headers['svix-timestamp'] || '',
+        'svix-signature': headers['svix-signature'] || '',
+      })
+    } catch {
+      console.error('Invalid webhook signature')
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
     }
 
     const payload = JSON.parse(body) as ResendWebhookPayload
