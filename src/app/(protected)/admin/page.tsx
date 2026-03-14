@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Settings, Users, Shield, Building2, ClipboardList, HardHat, Contact } from 'lucide-react'
+import { Settings, Users, Shield, Building2, ClipboardList, HardHat, Contact, Layers, DollarSign } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { getCompanySettings, getUsers, getRoles, getEmployees, getContacts } from './actions'
@@ -101,6 +101,40 @@ export default async function AdminPage() {
               <div className="text-2xl font-bold">{roles.length}</div>
               <p className="text-xs text-muted-foreground">
                 {t('nav.roles_description')}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/admin/rate-tiers">
+          <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {t('nav.rate_tiers')}
+              </CardTitle>
+              <Layers className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">-</div>
+              <p className="text-xs text-muted-foreground">
+                {t('nav.rate_tiers_description')}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/admin/ccq-rates">
+          <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {t('nav.ccq_rates')}
+              </CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">-</div>
+              <p className="text-xs text-muted-foreground">
+                {t('nav.ccq_rates_description')}
               </p>
             </CardContent>
           </Card>

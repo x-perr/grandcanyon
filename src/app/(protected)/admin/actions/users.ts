@@ -7,7 +7,7 @@ import { logAudit } from '@/lib/audit'
 import {
   userUpdateSchema,
 } from '@/lib/validations/admin'
-import type { UserQueryResult, UserWithRole } from './types'
+import type { UserQueryResult, UserWithRole, UserWithClassification } from './types'
 import { normalizeUser } from './types'
 
 /**
@@ -94,7 +94,7 @@ export async function getEmployees(options?: {
   showInactive?: boolean
   limit?: number
   offset?: number
-}): Promise<{ employees: UserWithRole[]; count: number }> {
+}): Promise<{ employees: UserWithClassification[]; count: number }> {
   const supabase = await createClient()
   const { search, showInactive = false, limit = 25, offset = 0 } = options ?? {}
 
@@ -151,7 +151,54 @@ export async function getEmployees(options?: {
   }
 
   const employees = (data as UserQueryResult[]).map(normalizeUser)
-  return { employees, count: count ?? 0 }
+
+  // Enrich with current CCQ classification data for each employee
+  const personIds = employees
+    .map((e) => e.person_id)
+    .filter((id): id is string => id != null)
+
+  let classificationMap = new Map<string, {
+    classification: { level: string; name_fr: string; name_en: string } | null
+    trade: { code: string; name_fr: string; name_en: string } | null
+  }>()
+
+  if (personIds.length > 0) {
+    const { data: classifications } = await supabase
+      .from('employee_classifications')
+      .select(`
+        person_id,
+        classification:ccq_classifications(
+          level,
+          name_fr,
+          name_en,
+          trade:ccq_trades(code, name_fr, name_en)
+        )
+      `)
+      .in('person_id', personIds)
+      .is('effective_to', null)
+
+    if (classifications) {
+      for (const row of classifications) {
+        const cls = Array.isArray(row.classification) ? row.classification[0] : row.classification
+        if (cls && row.person_id) {
+          const trade = cls.trade
+            ? (Array.isArray(cls.trade) ? cls.trade[0] : cls.trade)
+            : null
+          classificationMap.set(row.person_id, {
+            classification: { level: cls.level, name_fr: cls.name_fr, name_en: cls.name_en },
+            trade: trade ? { code: trade.code, name_fr: trade.name_fr, name_en: trade.name_en } : null,
+          })
+        }
+      }
+    }
+  }
+
+  const employeesWithClassification: UserWithClassification[] = employees.map((emp) => ({
+    ...emp,
+    current_classification: emp.person_id ? classificationMap.get(emp.person_id) ?? null : null,
+  }))
+
+  return { employees: employeesWithClassification, count: count ?? 0 }
 }
 
 /**

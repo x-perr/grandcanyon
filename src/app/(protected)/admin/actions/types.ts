@@ -1,4 +1,10 @@
 import type { Json } from '@/types/database'
+import type {
+  EmployeeClassification,
+  EmployeeRateOverride,
+  CcqClassification,
+  CcqTrade,
+} from '@/types/billing'
 
 // Re-export types that components need
 export type { CompanyInfo } from '@/lib/validations/admin'
@@ -97,6 +103,14 @@ export type UserWithRole = {
   role: { id: string; name: string } | null
   manager: { id: string; first_name: string; last_name: string } | null
   person: PersonAddress | null
+}
+
+/** Employee with CCQ classification info (extends UserWithRole) */
+export type UserWithClassification = UserWithRole & {
+  current_classification: {
+    classification: { level: string; name_fr: string; name_en: string } | null
+    trade: { code: string; name_fr: string; name_en: string } | null
+  } | null
 }
 
 // Helper to normalize query result to UserWithRole
@@ -217,6 +231,13 @@ export type Employee360Data = {
   summary: {
     hoursThisMonth: number
     expensesThisMonth: number
+  }
+  /** Billing classification and rate override data */
+  billing?: {
+    currentClassification: (EmployeeClassification & { classification?: CcqClassification }) | null
+    tradeInfo: CcqTrade | null
+    activeRateOverrides: EmployeeRateOverride[]
+    classificationHistory: (EmployeeClassification & { classification?: CcqClassification })[]
   }
 }
 

@@ -8,6 +8,7 @@ import { logAudit } from '@/lib/audit'
 import { sendTimesheetReminder } from '@/lib/email'
 import { timesheetEntrySchema, isWeekEditable } from '@/lib/validations/timesheet'
 import type { Enums, Tables } from '@/types/database'
+import type { OtFlags } from '@/types/billing'
 
 type TimesheetStatus = Enums<'timesheet_status'>
 
@@ -413,6 +414,7 @@ export async function saveTimesheetEntry(
     description?: string | null
     hours: number[]
     is_billable?: boolean
+    ot_flags?: OtFlags | null
   }
 ) {
   const supabase = await createClient()
@@ -457,7 +459,7 @@ export async function saveTimesheetEntry(
     return { error: validation.error.issues[0]?.message ?? 'Validation failed' }
   }
 
-  const entryData = {
+  const entryData: Record<string, unknown> = {
     timesheet_id: timesheetId,
     project_id: entry.project_id,
     task_id: entry.task_id || null,
@@ -465,6 +467,11 @@ export async function saveTimesheetEntry(
     description: entry.description || null,
     hours: entry.hours,
     is_billable: entry.is_billable ?? true,
+  }
+
+  // Include OT flags if provided (ot_flags jsonb column on timesheet_entries)
+  if (entry.ot_flags !== undefined) {
+    entryData.ot_flags = entry.ot_flags
   }
 
   if (entry.id) {

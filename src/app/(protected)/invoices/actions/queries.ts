@@ -2,6 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
+import { resolveHourlyRate } from '@/lib/billing/rate-resolution'
+import type { ResolvedRate } from '@/types/billing'
 import type {
   InvoiceStatus,
   InvoiceWithRelations,
@@ -212,7 +214,7 @@ export async function getUninvoicedEntries(
         id,
         week_start,
         status,
-        user:profiles!timesheets_user_id_fkey(id, first_name, last_name)
+        user:profiles!timesheets_user_id_fkey(id, first_name, last_name, person_id)
       ),
       project:projects!timesheet_entries_project_id_fkey(id, code, name),
       task:project_tasks!timesheet_entries_task_id_fkey(id, code, name),
@@ -254,8 +256,8 @@ export async function getUninvoicedEntries(
     return true
   })
 
-  // Map to clean format
-  return filtered.map((entry) => {
+  // Map to clean format and resolve billing rates
+  const entries = filtered.map((entry) => {
     const ts = Array.isArray(entry.timesheet) ? entry.timesheet[0] : entry.timesheet
     const tsUser = ts?.user ? (Array.isArray(ts.user) ? ts.user[0] : ts.user) : null
 
@@ -272,7 +274,56 @@ export async function getUninvoicedEntries(
       task: Array.isArray(entry.task) ? entry.task[0] ?? null : entry.task,
       billing_role: Array.isArray(entry.billing_role) ? entry.billing_role[0] ?? null : entry.billing_role,
     }
-  }) as UninvoicedEntry[]
+  })
+
+  // Resolve billing rates for each entry using the rate cascade
+  const entriesWithRates = await Promise.all(
+    entries.map(async (entry) => {
+      const personId = entry.timesheet?.user?.person_id as string | undefined
+      let resolvedRate: ResolvedRate | null = null
+
+      if (personId) {
+        try {
+          resolvedRate = await resolveHourlyRate({
+            employeePersonId: personId,
+            projectId,
+          })
+        } catch {
+          // Rate resolution failed — fall back to legacy billing role rate
+        }
+      }
+
+      // Use resolved rate if available and non-zero, otherwise keep billing_role rate
+      const effectiveRate =
+        resolvedRate && resolvedRate.rate > 0
+          ? resolvedRate.rate
+          : entry.billing_role?.rate ?? 0
+
+      return {
+        ...entry,
+        // Strip person_id from user before returning (internal use only)
+        timesheet: entry.timesheet
+          ? {
+              id: entry.timesheet.id,
+              week_start: entry.timesheet.week_start,
+              user: entry.timesheet.user
+                ? {
+                    id: entry.timesheet.user.id,
+                    first_name: entry.timesheet.user.first_name,
+                    last_name: entry.timesheet.user.last_name,
+                  }
+                : null,
+            }
+          : null,
+        resolved_rate: effectiveRate,
+        rate_source: resolvedRate?.source ?? 'legacy_role',
+        rate_tier_code: resolvedRate?.tierCode ?? null,
+        rate_classification_level: resolvedRate?.classificationLevel ?? null,
+      }
+    })
+  )
+
+  return entriesWithRates as UninvoicedEntry[]
 }
 
 /**

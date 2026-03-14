@@ -9,6 +9,25 @@ import {
   DEFAULT_COMPANY_INFO,
   type CompanyInfo,
 } from '@/lib/validations/admin'
+import { billingSettingsSchema } from '@/lib/validations/billing'
+import type { BillingSettings } from '@/types/billing'
+
+// Default billing settings (fallback when no DB row exists)
+const DEFAULT_BILLING_SETTINGS: BillingSettings = {
+  default_rate_tier_id: null,
+  rate_tier_versioning: 'annual_may',
+  ot_default_mode: 'standard',
+  ot_standard_multiplier_1_5x: 1.5,
+  ot_standard_multiplier_2x: 2.0,
+  ot_custom_multiplier_1_5x: null,
+  ot_custom_multiplier_2x: null,
+  ot_approval_default: 'per_instance',
+  retainage_default_percent: 10,
+  retainage_on_subtotal: true,
+  retainage_hold_days: 45,
+  learning_phase_default_weeks: 2,
+  learning_phase_alert_days: 3,
+}
 
 /**
  * Get company settings from database
@@ -98,6 +117,102 @@ export async function updateCompanySettings(formData: FormData) {
   revalidatePath('/admin')
   // Also revalidate PDF routes since they use company info
   revalidatePath('/api/invoices/[id]/pdf', 'page')
+
+  return { success: true }
+}
+
+// ============================================================
+// Billing Settings
+// ============================================================
+
+/**
+ * Get billing settings from database
+ */
+export async function getBillingSettings(): Promise<BillingSettings> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('settings')
+    .select('value')
+    .eq('key', 'billing_settings')
+    .single()
+
+  if (error || !data) {
+    return DEFAULT_BILLING_SETTINGS
+  }
+
+  // Merge with defaults to ensure all fields exist
+  return { ...DEFAULT_BILLING_SETTINGS, ...(data.value as Partial<BillingSettings>) }
+}
+
+/**
+ * Update billing settings
+ */
+export async function updateBillingSettings(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Check admin permission
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'admin.manage')) {
+    return { error: 'You do not have permission to update billing settings' }
+  }
+
+  // Get old values for audit log
+  const oldSettings = await getBillingSettings()
+
+  // Parse form data
+  const rawData = {
+    default_rate_tier_id: (formData.get('default_rate_tier_id') as string) || null,
+    rate_tier_versioning: formData.get('rate_tier_versioning') as string,
+    ot_default_mode: formData.get('ot_default_mode') as string,
+    ot_standard_multiplier_1_5x: formData.get('ot_standard_multiplier_1_5x'),
+    ot_standard_multiplier_2x: formData.get('ot_standard_multiplier_2x'),
+    ot_custom_multiplier_1_5x: formData.get('ot_custom_multiplier_1_5x') || null,
+    ot_custom_multiplier_2x: formData.get('ot_custom_multiplier_2x') || null,
+    ot_approval_default: formData.get('ot_approval_default') as string,
+    retainage_default_percent: formData.get('retainage_default_percent'),
+    retainage_on_subtotal: formData.get('retainage_on_subtotal') === 'true',
+    retainage_hold_days: formData.get('retainage_hold_days'),
+    learning_phase_default_weeks: formData.get('learning_phase_default_weeks'),
+    learning_phase_alert_days: formData.get('learning_phase_alert_days'),
+  }
+
+  // Validate
+  const validation = billingSettingsSchema.safeParse(rawData)
+  if (!validation.success) {
+    return { error: validation.error.issues[0]?.message ?? 'Validation failed' }
+  }
+
+  // Upsert settings
+  const { error } = await supabase.from('settings').upsert({
+    key: 'billing_settings',
+    value: validation.data,
+    description: 'Billing configuration',
+    updated_by: user.id,
+  })
+
+  if (error) {
+    console.error('Error updating billing settings:', error)
+    return { error: 'Failed to save billing settings' }
+  }
+
+  // Log audit
+  await logAudit({
+    action: 'update',
+    entityType: 'settings',
+    entityId: 'billing_settings',
+    oldValues: oldSettings as unknown as Record<string, unknown>,
+    newValues: validation.data as unknown as Record<string, unknown>,
+  })
+
+  revalidatePath('/admin')
 
   return { success: true }
 }

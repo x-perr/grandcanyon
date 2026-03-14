@@ -1,4 +1,5 @@
 import type { Enums, Tables } from '@/types/database'
+import type { RateSource } from '@/types/billing'
 
 export type InvoiceStatus = Enums<'invoice_status'>
 
@@ -68,6 +69,14 @@ export type UninvoicedEntry = {
     name: string
     rate: number
   } | null
+  /** Effective hourly rate after billing cascade resolution */
+  resolved_rate?: number
+  /** Which tier/override was used to resolve the rate */
+  rate_source?: RateSource
+  /** Rate tier code (if resolved via client or default tier) */
+  rate_tier_code?: string | null
+  /** Employee classification level used for rate lookup */
+  rate_classification_level?: string | null
 }
 
 export type ClientForSelect = {

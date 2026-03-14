@@ -9,6 +9,12 @@ import type {
   Employee360Profile,
   Employee360SkillLevel,
 } from './types'
+import type {
+  EmployeeClassification,
+  EmployeeRateOverride,
+  CcqClassification,
+  CcqTrade,
+} from '@/types/billing'
 
 /**
  * Get Employee 360° view data
@@ -178,6 +184,87 @@ export async function getEmployee360(userId: string): Promise<Employee360Data | 
     }
   })
 
+  // Fetch billing classification and rate data via person_id
+  const personId = normalizedPerson?.id
+  let currentClassification: (EmployeeClassification & { classification?: CcqClassification }) | null = null
+  let tradeInfo: CcqTrade | null = null
+  let activeRateOverrides: EmployeeRateOverride[] = []
+  let classificationHistory: (EmployeeClassification & { classification?: CcqClassification })[] = []
+
+  if (personId) {
+    const today = new Date().toISOString().split('T')[0]
+
+    // Current classification (effective_to IS NULL = currently active)
+    const { data: currentClassData } = await supabase
+      .from('employee_classifications')
+      .select(`
+        *,
+        classification:ccq_classifications(*, trade:ccq_trades(*))
+      `)
+      .eq('person_id', personId)
+      .is('effective_to', null)
+      .order('effective_from', { ascending: false })
+      .limit(1)
+      .single()
+
+    if (currentClassData) {
+      const rawClassification = Array.isArray(currentClassData.classification)
+        ? currentClassData.classification[0]
+        : currentClassData.classification
+      currentClassification = {
+        ...currentClassData,
+        classification: rawClassification ?? undefined,
+      } as EmployeeClassification & { classification?: CcqClassification }
+    }
+
+    // Trade info via people.primary_trade_id
+    const { data: personData } = await supabase
+      .from('people')
+      .select('primary_trade_id')
+      .eq('id', personId)
+      .single()
+
+    if (personData?.primary_trade_id) {
+      const { data: trade } = await supabase
+        .from('ccq_trades')
+        .select('*')
+        .eq('id', personData.primary_trade_id)
+        .single()
+
+      if (trade) {
+        tradeInfo = trade as CcqTrade
+      }
+    }
+
+    // Active rate overrides (not yet expired)
+    const { data: overrides } = await supabase
+      .from('employee_rate_overrides')
+      .select('*')
+      .eq('person_id', personId)
+      .or(`effective_to.is.null,effective_to.gte.${today}`)
+      .order('effective_from', { ascending: false })
+
+    activeRateOverrides = (overrides ?? []) as EmployeeRateOverride[]
+
+    // Classification history (all rows for this person)
+    const { data: historyData } = await supabase
+      .from('employee_classifications')
+      .select(`
+        *,
+        classification:ccq_classifications(*, trade:ccq_trades(*))
+      `)
+      .eq('person_id', personId)
+      .order('effective_from', { ascending: false })
+
+    classificationHistory = (historyData ?? []).map((row) => {
+      const rawCls = Array.isArray(row.classification) ? row.classification[0] : row.classification
+      return {
+        ...row,
+        classification: rawCls ?? undefined,
+      }
+    }) as (EmployeeClassification & { classification?: CcqClassification })[]
+  }
+
   // Calculate this month's totals
   const now = new Date()
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -204,6 +291,12 @@ export async function getEmployee360(userId: string): Promise<Employee360Data | 
     summary: {
       hoursThisMonth,
       expensesThisMonth,
+    },
+    billing: {
+      currentClassification,
+      tradeInfo,
+      activeRateOverrides,
+      classificationHistory,
     },
   }
 }

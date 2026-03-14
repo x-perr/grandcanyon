@@ -12,8 +12,59 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.1"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
+      _client_contacts_migration_map: {
+        Row: {
+          migrated_at: string | null
+          new_people_id: string | null
+          old_id: string
+        }
+        Insert: {
+          migrated_at?: string | null
+          new_people_id?: string | null
+          old_id: string
+        }
+        Update: {
+          migrated_at?: string | null
+          new_people_id?: string | null
+          old_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "_client_contacts_migration_map_new_people_id_fkey"
+            columns: ["new_people_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assignments: {
         Row: {
           created_at: string | null
@@ -81,6 +132,7 @@ export type Database = {
       audit_logs: {
         Row: {
           action: string
+          changed_fields: string[] | null
           created_at: string | null
           entity_id: string | null
           entity_type: string
@@ -88,11 +140,16 @@ export type Database = {
           ip_address: unknown
           new_values: Json | null
           old_values: Json | null
+          operation: string | null
+          row_id: string | null
+          source: string | null
+          table_name: string | null
           user_agent: string | null
           user_id: string | null
         }
         Insert: {
           action: string
+          changed_fields?: string[] | null
           created_at?: string | null
           entity_id?: string | null
           entity_type: string
@@ -100,11 +157,16 @@ export type Database = {
           ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
+          operation?: string | null
+          row_id?: string | null
+          source?: string | null
+          table_name?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
         Update: {
           action?: string
+          changed_fields?: string[] | null
           created_at?: string | null
           entity_id?: string | null
           entity_type?: string
@@ -112,6 +174,10 @@ export type Database = {
           ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
+          operation?: string | null
+          row_id?: string | null
+          source?: string | null
+          table_name?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
@@ -124,6 +190,172 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      billing_rate_history: {
+        Row: {
+          billing_role_id: string
+          changed_by: string | null
+          created_at: string
+          effective_from: string
+          effective_to: string | null
+          id: string
+          rate: number
+        }
+        Insert: {
+          billing_role_id: string
+          changed_by?: string | null
+          created_at?: string
+          effective_from: string
+          effective_to?: string | null
+          id?: string
+          rate: number
+        }
+        Update: {
+          billing_role_id?: string
+          changed_by?: string | null
+          created_at?: string
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_rate_history_billing_role_id_fkey"
+            columns: ["billing_role_id"]
+            isOneToOne: false
+            referencedRelation: "project_billing_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_rate_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ccq_classifications: {
+        Row: {
+          created_at: string
+          hours_required: number | null
+          id: string
+          level: string
+          name_en: string
+          name_fr: string
+          sort_order: number
+          trade_id: string
+        }
+        Insert: {
+          created_at?: string
+          hours_required?: number | null
+          id?: string
+          level: string
+          name_en: string
+          name_fr: string
+          sort_order?: number
+          trade_id: string
+        }
+        Update: {
+          created_at?: string
+          hours_required?: number | null
+          id?: string
+          level?: string
+          name_en?: string
+          name_fr?: string
+          sort_order?: number
+          trade_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ccq_classifications_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "ccq_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ccq_rates: {
+        Row: {
+          benefit_rate: number | null
+          classification_id: string
+          created_at: string
+          effective_from: string
+          effective_to: string | null
+          hourly_rate: number
+          id: string
+          notes: string | null
+          total_hourly_cost: number | null
+          vacation_percent: number | null
+        }
+        Insert: {
+          benefit_rate?: number | null
+          classification_id: string
+          created_at?: string
+          effective_from: string
+          effective_to?: string | null
+          hourly_rate: number
+          id?: string
+          notes?: string | null
+          total_hourly_cost?: number | null
+          vacation_percent?: number | null
+        }
+        Update: {
+          benefit_rate?: number | null
+          classification_id?: string
+          created_at?: string
+          effective_from?: string
+          effective_to?: string | null
+          hourly_rate?: number
+          id?: string
+          notes?: string | null
+          total_hourly_cost?: number | null
+          vacation_percent?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ccq_rates_classification_id_fkey"
+            columns: ["classification_id"]
+            isOneToOne: false
+            referencedRelation: "ccq_classifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ccq_trades: {
+        Row: {
+          apprentice_periods: number
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name_en: string
+          name_fr: string
+          sort_order: number
+        }
+        Insert: {
+          apprentice_periods?: number
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_en: string
+          name_fr: string
+          sort_order?: number
+        }
+        Update: {
+          apprentice_periods?: number
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_en?: string
+          name_fr?: string
+          sort_order?: number
+        }
+        Relationships: []
       }
       classifications: {
         Row: {
@@ -198,6 +430,55 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_rate_tiers: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          client_id: string
+          id: string
+          notes: string | null
+          tier_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          client_id: string
+          id?: string
+          notes?: string | null
+          tier_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          client_id?: string
+          id?: string
+          notes?: string | null
+          tier_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_rate_tiers_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_rate_tiers_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_rate_tiers_tier_id_fkey"
+            columns: ["tier_id"]
+            isOneToOne: false
+            referencedRelation: "rate_tiers"
             referencedColumns: ["id"]
           },
         ]
@@ -315,6 +596,178 @@ export type Database = {
           },
         ]
       }
+      email_logs: {
+        Row: {
+          bounced_at: string | null
+          clicked_at: string | null
+          created_at: string | null
+          delivered_at: string | null
+          id: string
+          metadata: Json | null
+          opened_at: string | null
+          recipient_email: string
+          related_id: string | null
+          related_type: string | null
+          resend_id: string | null
+          sent_at: string | null
+          sent_by: string | null
+          status: string
+          subject: string
+          template_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          bounced_at?: string | null
+          clicked_at?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          id?: string
+          metadata?: Json | null
+          opened_at?: string | null
+          recipient_email: string
+          related_id?: string | null
+          related_type?: string | null
+          resend_id?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string
+          subject: string
+          template_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          bounced_at?: string | null
+          clicked_at?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          id?: string
+          metadata?: Json | null
+          opened_at?: string | null
+          recipient_email?: string
+          related_id?: string | null
+          related_type?: string | null
+          resend_id?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string
+          subject?: string
+          template_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      employee_classifications: {
+        Row: {
+          ccq_hours_accumulated: number | null
+          classification_id: string
+          created_at: string
+          effective_from: string
+          effective_to: string | null
+          id: string
+          notes: string | null
+          person_id: string
+          updated_at: string
+        }
+        Insert: {
+          ccq_hours_accumulated?: number | null
+          classification_id: string
+          created_at?: string
+          effective_from: string
+          effective_to?: string | null
+          id?: string
+          notes?: string | null
+          person_id: string
+          updated_at?: string
+        }
+        Update: {
+          ccq_hours_accumulated?: number | null
+          classification_id?: string
+          created_at?: string
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          notes?: string | null
+          person_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_classifications_classification_id_fkey"
+            columns: ["classification_id"]
+            isOneToOne: false
+            referencedRelation: "ccq_classifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_classifications_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_rate_overrides: {
+        Row: {
+          classification_id: string | null
+          created_at: string
+          created_by: string | null
+          effective_from: string
+          effective_to: string | null
+          hourly_rate: number
+          id: string
+          person_id: string
+          reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          classification_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          effective_from: string
+          effective_to?: string | null
+          hourly_rate: number
+          id?: string
+          person_id: string
+          reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          classification_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          hourly_rate?: number
+          id?: string
+          person_id?: string
+          reason?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_rate_overrides_classification_id_fkey"
+            columns: ["classification_id"]
+            isOneToOne: false
+            referencedRelation: "ccq_classifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_rate_overrides_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_rate_overrides_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expense_entries: {
         Row: {
           created_at: string | null
@@ -329,6 +782,8 @@ export type Database = {
           qst_amount: number | null
           quantity: number
           receipt_number: string | null
+          receipt_uploaded_at: string | null
+          receipt_url: string | null
           subtotal: number
           task_id: string | null
           total: number
@@ -348,6 +803,8 @@ export type Database = {
           qst_amount?: number | null
           quantity?: number
           receipt_number?: string | null
+          receipt_uploaded_at?: string | null
+          receipt_url?: string | null
           subtotal: number
           task_id?: string | null
           total: number
@@ -367,6 +824,8 @@ export type Database = {
           qst_amount?: number | null
           quantity?: number
           receipt_number?: string | null
+          receipt_uploaded_at?: string | null
+          receipt_url?: string | null
           subtotal?: number
           task_id?: string | null
           total?: number
@@ -504,10 +963,13 @@ export type Database = {
       invoice_emails: {
         Row: {
           body: string
+          clicked_at: string | null
           created_at: string | null
+          delivered_at: string | null
           error_message: string | null
           id: string
           invoice_id: string
+          opened_at: string | null
           resend_message_id: string | null
           sent_at: string
           sent_by: string
@@ -517,10 +979,13 @@ export type Database = {
         }
         Insert: {
           body: string
+          clicked_at?: string | null
           created_at?: string | null
+          delivered_at?: string | null
           error_message?: string | null
           id?: string
           invoice_id: string
+          opened_at?: string | null
           resend_message_id?: string | null
           sent_at?: string
           sent_by: string
@@ -530,10 +995,13 @@ export type Database = {
         }
         Update: {
           body?: string
+          clicked_at?: string | null
           created_at?: string | null
+          delivered_at?: string | null
           error_message?: string | null
           id?: string
           invoice_id?: string
+          opened_at?: string | null
           resend_message_id?: string | null
           sent_at?: string
           sent_by?: string
@@ -715,11 +1183,14 @@ export type Database = {
           address: string | null
           city: string | null
           classification_id: string | null
+          client_id: string | null
+          contact_type: Database["public"]["Enums"]["contact_type"] | null
           created_at: string | null
           email: string | null
           first_name: string
           id: string
           is_active: boolean | null
+          is_primary: boolean | null
           last_name: string
           lat: number | null
           legacy_user_id: number | null
@@ -727,17 +1198,22 @@ export type Database = {
           notes: string | null
           phone: string | null
           postal_code: string | null
+          primary_trade_id: string | null
+          title: string | null
           updated_at: string | null
         }
         Insert: {
           address?: string | null
           city?: string | null
           classification_id?: string | null
+          client_id?: string | null
+          contact_type?: Database["public"]["Enums"]["contact_type"] | null
           created_at?: string | null
           email?: string | null
           first_name?: string
           id?: string
           is_active?: boolean | null
+          is_primary?: boolean | null
           last_name?: string
           lat?: number | null
           legacy_user_id?: number | null
@@ -745,17 +1221,22 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           postal_code?: string | null
+          primary_trade_id?: string | null
+          title?: string | null
           updated_at?: string | null
         }
         Update: {
           address?: string | null
           city?: string | null
           classification_id?: string | null
+          client_id?: string | null
+          contact_type?: Database["public"]["Enums"]["contact_type"] | null
           created_at?: string | null
           email?: string | null
           first_name?: string
           id?: string
           is_active?: boolean | null
+          is_primary?: boolean | null
           last_name?: string
           lat?: number | null
           legacy_user_id?: number | null
@@ -763,6 +1244,8 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           postal_code?: string | null
+          primary_trade_id?: string | null
+          title?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -771,6 +1254,20 @@ export type Database = {
             columns: ["classification_id"]
             isOneToOne: false
             referencedRelation: "classifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "people_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "people_primary_trade_id_fkey"
+            columns: ["primary_trade_id"]
+            isOneToOne: false
+            referencedRelation: "ccq_trades"
             referencedColumns: ["id"]
           },
         ]
@@ -801,6 +1298,10 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ccq_card_expiry: string | null
+          ccq_card_number: string | null
+          ccq_card_uploaded_at: string | null
+          ccq_card_url: string | null
           created_at: string | null
           email: string
           first_name: string
@@ -813,8 +1314,13 @@ export type Database = {
           preferred_locale: string | null
           role_id: string | null
           updated_at: string | null
+          user_type: Database["public"]["Enums"]["user_type"] | null
         }
         Insert: {
+          ccq_card_expiry?: string | null
+          ccq_card_number?: string | null
+          ccq_card_uploaded_at?: string | null
+          ccq_card_url?: string | null
           created_at?: string | null
           email: string
           first_name: string
@@ -827,8 +1333,13 @@ export type Database = {
           preferred_locale?: string | null
           role_id?: string | null
           updated_at?: string | null
+          user_type?: Database["public"]["Enums"]["user_type"] | null
         }
         Update: {
+          ccq_card_expiry?: string | null
+          ccq_card_number?: string | null
+          ccq_card_uploaded_at?: string | null
+          ccq_card_url?: string | null
           created_at?: string | null
           email?: string
           first_name?: string
@@ -841,6 +1352,7 @@ export type Database = {
           preferred_locale?: string | null
           role_id?: string | null
           updated_at?: string | null
+          user_type?: Database["public"]["Enums"]["user_type"] | null
         }
         Relationships: [
           {
@@ -868,6 +1380,7 @@ export type Database = {
       }
       project_billing_roles: {
         Row: {
+          classification_id: string | null
           created_at: string | null
           id: string
           name: string
@@ -876,6 +1389,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          classification_id?: string | null
           created_at?: string | null
           id?: string
           name: string
@@ -884,6 +1398,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          classification_id?: string | null
           created_at?: string | null
           id?: string
           name?: string
@@ -892,6 +1407,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "project_billing_roles_classification_id_fkey"
+            columns: ["classification_id"]
+            isOneToOne: false
+            referencedRelation: "ccq_classifications"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "project_billing_roles_project_id_fkey"
             columns: ["project_id"]
@@ -904,6 +1426,7 @@ export type Database = {
       project_members: {
         Row: {
           billing_role_id: string | null
+          classification_override_id: string | null
           created_at: string | null
           id: string
           is_active: boolean | null
@@ -912,6 +1435,7 @@ export type Database = {
         }
         Insert: {
           billing_role_id?: string | null
+          classification_override_id?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -920,6 +1444,7 @@ export type Database = {
         }
         Update: {
           billing_role_id?: string | null
+          classification_override_id?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -932,6 +1457,13 @@ export type Database = {
             columns: ["billing_role_id"]
             isOneToOne: false
             referencedRelation: "project_billing_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_members_classification_override_id_fkey"
+            columns: ["classification_override_id"]
+            isOneToOne: false
+            referencedRelation: "ccq_classifications"
             referencedColumns: ["id"]
           },
           {
@@ -995,6 +1527,48 @@ export type Database = {
           },
         ]
       }
+      project_rate_overrides: {
+        Row: {
+          classification_id: string | null
+          created_at: string
+          hourly_rate: number
+          id: string
+          project_id: string
+          reason: string | null
+        }
+        Insert: {
+          classification_id?: string | null
+          created_at?: string
+          hourly_rate: number
+          id?: string
+          project_id: string
+          reason?: string | null
+        }
+        Update: {
+          classification_id?: string | null
+          created_at?: string
+          hourly_rate?: number
+          id?: string
+          project_id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_rate_overrides_classification_id_fkey"
+            columns: ["classification_id"]
+            isOneToOne: false
+            referencedRelation: "ccq_classifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_rate_overrides_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_tasks: {
         Row: {
           code: string
@@ -1049,6 +1623,7 @@ export type Database = {
             | Database["public"]["Enums"]["project_billing_type"]
             | null
           city: string | null
+          civic_number: string | null
           client_id: string
           code: string
           created_at: string | null
@@ -1056,6 +1631,7 @@ export type Database = {
           default_billing_role_id: string | null
           deleted_at: string | null
           description: string | null
+          display_title: string | null
           end_date: string | null
           fixed_price: number | null
           hourly_rate: number | null
@@ -1064,13 +1640,16 @@ export type Database = {
           is_global: boolean | null
           lat: number | null
           lng: number | null
-          name: string
+          name: string | null
+          ot_billing_config: Json | null
           per_unit_rate: number | null
           po_number: string | null
           postal_code: string | null
           project_manager_id: string | null
+          province: string | null
           start_date: string | null
-          status: Database["public"]["Enums"]["project_status"] | null
+          status: Database["public"]["Enums"]["project_status"]
+          street_name: string | null
           updated_at: string | null
           work_type: string | null
         }
@@ -1080,6 +1659,7 @@ export type Database = {
             | Database["public"]["Enums"]["project_billing_type"]
             | null
           city?: string | null
+          civic_number?: string | null
           client_id: string
           code: string
           created_at?: string | null
@@ -1087,6 +1667,7 @@ export type Database = {
           default_billing_role_id?: string | null
           deleted_at?: string | null
           description?: string | null
+          display_title?: string | null
           end_date?: string | null
           fixed_price?: number | null
           hourly_rate?: number | null
@@ -1095,13 +1676,16 @@ export type Database = {
           is_global?: boolean | null
           lat?: number | null
           lng?: number | null
-          name: string
+          name?: string | null
+          ot_billing_config?: Json | null
           per_unit_rate?: number | null
           po_number?: string | null
           postal_code?: string | null
           project_manager_id?: string | null
+          province?: string | null
           start_date?: string | null
-          status?: Database["public"]["Enums"]["project_status"] | null
+          status?: Database["public"]["Enums"]["project_status"]
+          street_name?: string | null
           updated_at?: string | null
           work_type?: string | null
         }
@@ -1111,6 +1695,7 @@ export type Database = {
             | Database["public"]["Enums"]["project_billing_type"]
             | null
           city?: string | null
+          civic_number?: string | null
           client_id?: string
           code?: string
           created_at?: string | null
@@ -1118,6 +1703,7 @@ export type Database = {
           default_billing_role_id?: string | null
           deleted_at?: string | null
           description?: string | null
+          display_title?: string | null
           end_date?: string | null
           fixed_price?: number | null
           hourly_rate?: number | null
@@ -1126,13 +1712,16 @@ export type Database = {
           is_global?: boolean | null
           lat?: number | null
           lng?: number | null
-          name?: string
+          name?: string | null
+          ot_billing_config?: Json | null
           per_unit_rate?: number | null
           po_number?: string | null
           postal_code?: string | null
           project_manager_id?: string | null
+          province?: string | null
           start_date?: string | null
-          status?: Database["public"]["Enums"]["project_status"] | null
+          status?: Database["public"]["Enums"]["project_status"]
+          street_name?: string | null
           updated_at?: string | null
           work_type?: string | null
         }
@@ -1166,6 +1755,87 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      rate_tier_lines: {
+        Row: {
+          classification_id: string
+          created_at: string
+          effective_date: string
+          hourly_rate: number
+          id: string
+          notes: string | null
+          tier_id: string
+        }
+        Insert: {
+          classification_id: string
+          created_at?: string
+          effective_date?: string
+          hourly_rate: number
+          id?: string
+          notes?: string | null
+          tier_id: string
+        }
+        Update: {
+          classification_id?: string
+          created_at?: string
+          effective_date?: string
+          hourly_rate?: number
+          id?: string
+          notes?: string | null
+          tier_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rate_tier_lines_classification_id_fkey"
+            columns: ["classification_id"]
+            isOneToOne: false
+            referencedRelation: "ccq_classifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rate_tier_lines_tier_id_fkey"
+            columns: ["tier_id"]
+            isOneToOne: false
+            referencedRelation: "rate_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rate_tiers: {
+        Row: {
+          auto_rules: Json | null
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          is_default: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          auto_rules?: Json | null
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          auto_rules?: Json | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       role_permissions: {
         Row: {
@@ -1267,7 +1937,10 @@ export type Database = {
           hours: number[]
           id: string
           is_billable: boolean | null
+          ot_flags: Json | null
           project_id: string
+          receipt_note: string | null
+          receipt_url: string | null
           task_id: string | null
           timesheet_id: string
           updated_at: string | null
@@ -1279,7 +1952,10 @@ export type Database = {
           hours?: number[]
           id?: string
           is_billable?: boolean | null
+          ot_flags?: Json | null
           project_id: string
+          receipt_note?: string | null
+          receipt_url?: string | null
           task_id?: string | null
           timesheet_id: string
           updated_at?: string | null
@@ -1291,7 +1967,10 @@ export type Database = {
           hours?: number[]
           id?: string
           is_billable?: boolean | null
+          ot_flags?: Json | null
           project_id?: string
+          receipt_note?: string | null
+          receipt_url?: string | null
           task_id?: string | null
           timesheet_id?: string
           updated_at?: string | null
@@ -1407,13 +2086,130 @@ export type Database = {
           },
         ]
       }
+      user_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          role_id: string | null
+          status: Database["public"]["Enums"]["invitation_status"]
+          token: string
+          updated_at: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string | null
+          email: string
+          expires_at: string
+          id?: string
+          invited_by: string
+          role_id?: string | null
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token: string
+          updated_at?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          role_id?: string | null
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_invitations_accepted_by_fkey"
+            columns: ["accepted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_invitations_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_preferences: {
+        Row: {
+          created_at: string | null
+          dashboard_layout: Json | null
+          locale: string | null
+          notifications_enabled: boolean | null
+          sidebar_collapsed: boolean | null
+          table_preferences: Json | null
+          theme: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          dashboard_layout?: Json | null
+          locale?: string | null
+          notifications_enabled?: boolean | null
+          sidebar_collapsed?: boolean | null
+          table_preferences?: Json | null
+          theme?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          dashboard_layout?: Json | null
+          locale?: string | null
+          notifications_enabled?: boolean | null
+          sidebar_collapsed?: boolean | null
+          table_preferences?: Json | null
+          theme?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       generate_project_code: { Args: { p_client_id: string }; Returns: string }
+      get_next_invoice_number: { Args: never; Returns: number }
       has_permission: { Args: { permission_code: string }; Returns: boolean }
+      set_audit_context: {
+        Args: {
+          p_ip_address?: string
+          p_user_agent?: string
+          p_user_id?: string
+        }
+        Returns: undefined
+      }
       timesheet_total_hours: {
         Args: { p_timesheet_id: string }
         Returns: number
@@ -1421,16 +2217,26 @@ export type Database = {
     }
     Enums: {
       assignment_status: "scheduled" | "active" | "completed" | "cancelled"
+      contact_type: "employee" | "client_contact" | "subcontractor" | "external"
       expense_status: "draft" | "submitted" | "approved" | "rejected"
+      invitation_status: "pending" | "accepted" | "expired" | "revoked"
       invoice_status: "draft" | "sent" | "paid" | "void"
       project_billing_type: "hourly" | "fixed" | "per_unit"
-      project_status: "soumission" | "active" | "on_hold" | "completed" | "invoiced" | "lost" | "cancelled"
+      project_status:
+        | "soumission"
+        | "active"
+        | "on_hold"
+        | "completed"
+        | "invoiced"
+        | "lost"
+        | "cancelled"
       timesheet_status:
         | "draft"
         | "submitted"
         | "approved"
         | "rejected"
         | "locked"
+      user_type: "employee" | "admin" | "client" | "subcontractor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1556,13 +2362,26 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       assignment_status: ["scheduled", "active", "completed", "cancelled"],
+      contact_type: ["employee", "client_contact", "subcontractor", "external"],
       expense_status: ["draft", "submitted", "approved", "rejected"],
+      invitation_status: ["pending", "accepted", "expired", "revoked"],
       invoice_status: ["draft", "sent", "paid", "void"],
       project_billing_type: ["hourly", "fixed", "per_unit"],
-      project_status: ["soumission", "active", "on_hold", "completed", "invoiced", "lost", "cancelled"],
+      project_status: [
+        "soumission",
+        "active",
+        "on_hold",
+        "completed",
+        "invoiced",
+        "lost",
+        "cancelled",
+      ],
       timesheet_status: [
         "draft",
         "submitted",
@@ -1570,6 +2389,7 @@ export const Constants = {
         "rejected",
         "locked",
       ],
+      user_type: ["employee", "admin", "client", "subcontractor"],
     },
   },
 } as const
