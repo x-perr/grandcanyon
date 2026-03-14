@@ -16,6 +16,7 @@ import {
 } from '@/app/(protected)/timesheets/actions'
 import { toast } from 'sonner'
 import type { Tables } from '@/types/database'
+import type { OtFlags } from '@/types/billing'
 
 interface TimesheetGridProps {
   timesheet: Tables<'timesheets'>
@@ -47,10 +48,13 @@ export function TimesheetGrid({ timesheet, entries, projects, isEditable }: Time
       billing_role_id?: string | null
       hours?: number[]
       is_billable?: boolean
+      ot_flags?: OtFlags | null
     }
   ) => {
     const entry = entries.find((e) => e.id === entryId)
     if (!entry) return
+
+    const entryAny = entry as Record<string, unknown>
 
     try {
       const result = await saveTimesheetEntry(timesheet.id, {
@@ -60,6 +64,7 @@ export function TimesheetGrid({ timesheet, entries, projects, isEditable }: Time
         billing_role_id: updates.billing_role_id !== undefined ? updates.billing_role_id : entry.billing_role_id,
         hours: updates.hours ?? entry.hours ?? [0, 0, 0, 0, 0, 0, 0],
         is_billable: updates.is_billable !== undefined ? updates.is_billable : entry.is_billable ?? true,
+        ot_flags: updates.ot_flags !== undefined ? updates.ot_flags : (entryAny.ot_flags as OtFlags | null) ?? null,
       })
 
       if (result.error) {

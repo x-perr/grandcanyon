@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation'
 import { getClientsForInvoice, getProjectsForClient, getUninvoicedEntries, getNextInvoiceNumber } from '../actions'
 import { InvoiceWizard } from '@/components/invoices/invoice-wizard'
 import { getTranslations } from 'next-intl/server'
+import { createClient } from '@/lib/supabase/server'
+import { getBillingSettings } from '@/lib/billing/rate-resolution'
+import type { OtBillingConfig } from '@/types/billing'
 
 interface NewInvoicePageProps {
   searchParams: Promise<{
@@ -43,6 +46,27 @@ export default async function NewInvoicePage({ searchParams }: NewInvoicePagePro
   // Get client tax settings for step 3
   const selectedClient = clients.find((c) => c.id === params.client_id)
 
+  // Get project OT billing config and standard OT multiplier
+  let otBillingConfig: OtBillingConfig | null = null
+  let otStandardMultiplier = 1.5
+
+  if (params.project_id && step >= 2) {
+    const [billingSettings, projectOtConfig] = await Promise.all([
+      getBillingSettings(),
+      (async () => {
+        const supabase = await createClient()
+        const { data } = await supabase
+          .from('projects')
+          .select('ot_billing_config')
+          .eq('id', params.project_id!)
+          .single()
+        return data?.ot_billing_config as OtBillingConfig | null
+      })(),
+    ])
+    otBillingConfig = projectOtConfig
+    otStandardMultiplier = billingSettings.ot_standard_multiplier_1_5x
+  }
+
   const t = await getTranslations('invoices')
 
   return (
@@ -70,6 +94,8 @@ export default async function NewInvoicePage({ searchParams }: NewInvoicePagePro
               }
             : undefined
         }
+        otBillingConfig={otBillingConfig}
+        otStandardMultiplier={otStandardMultiplier}
         initialValues={{
           client_id: params.client_id,
           project_id: params.project_id,

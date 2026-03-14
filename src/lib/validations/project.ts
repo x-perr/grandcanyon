@@ -16,6 +16,19 @@ export const billingTypes = [
   { value: 'per_unit', label: 'Per Unit', description: 'Bill per unit of work' },
 ] as const
 
+export const otModes = ['flat', 'standard', 'custom', 'off'] as const
+
+export const otApprovalModes = ['pre_approved', 'per_instance', 'never'] as const
+
+export const otBillingConfigSchema = z.object({
+  mode: z.enum(otModes).default('flat'),
+  ot_1_5x: z.coerce.number().min(0).optional().nullable(),
+  ot_2x: z.coerce.number().min(0).optional().nullable(),
+  client_approval: z.enum(otApprovalModes).default('per_instance'),
+})
+
+export type OtBillingConfigFormData = z.infer<typeof otBillingConfigSchema>
+
 export const projectSchema = z
   .object({
     client_id: z.string().uuid('Invalid client'),
@@ -46,6 +59,12 @@ export const projectSchema = z
     address: z.string().max(200).optional().nullable(),
     po_number: z.string().max(50).optional().nullable(),
     work_type: z.string().max(100).optional().nullable(),
+
+    // OT billing config
+    ot_mode: z.enum(otModes).optional().default('flat'),
+    ot_1_5x: z.coerce.number().min(0).optional().nullable(),
+    ot_2x: z.coerce.number().min(0).optional().nullable(),
+    ot_client_approval: z.enum(otApprovalModes).optional().default('per_instance'),
   })
   .refine(
     (data) => {

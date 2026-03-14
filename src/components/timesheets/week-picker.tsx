@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   formatDateISO,
@@ -18,9 +18,11 @@ import {
 interface WeekPickerProps {
   weekStart: string
   basePath?: string // Default: '/timesheets'
+  isLocked?: boolean // True when the week is not editable (past limit or future)
+  lockReason?: string // Translated reason shown to the user
 }
 
-export function WeekPicker({ weekStart, basePath = '/timesheets' }: WeekPickerProps) {
+export function WeekPicker({ weekStart, basePath = '/timesheets', isLocked, lockReason }: WeekPickerProps) {
   const t = useTranslations('timesheets')
   const router = useRouter()
   const currentDate = parseDateISO(weekStart)
@@ -52,9 +54,18 @@ export function WeekPicker({ weekStart, basePath = '/timesheets' }: WeekPickerPr
         <span className="hidden sm:inline">{t('week_picker.previous')}</span>
       </Button>
 
-      <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-4 py-2">
-        <Calendar className="h-4 w-4 text-muted-foreground" />
-        <span className="font-medium">{weekRange}</span>
+      <div
+        className={`flex items-center gap-2 rounded-md border px-4 py-2 ${
+          isLocked ? 'border-muted bg-muted/30' : 'bg-muted/50'
+        }`}
+        title={isLocked ? lockReason : undefined}
+      >
+        {isLocked ? (
+          <Lock className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <Calendar className="h-4 w-4 text-muted-foreground" />
+        )}
+        <span className={`font-medium ${isLocked ? 'text-muted-foreground' : ''}`}>{weekRange}</span>
       </div>
 
       <Button

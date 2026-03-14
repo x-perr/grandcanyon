@@ -210,6 +210,7 @@ export async function getUninvoicedEntries(
       hours,
       is_billable,
       description,
+      ot_flags,
       timesheet:timesheets!timesheet_entries_timesheet_id_fkey(
         id,
         week_start,
@@ -219,7 +220,7 @@ export async function getUninvoicedEntries(
       project:projects!timesheet_entries_project_id_fkey(id, code, name),
       task:project_tasks!timesheet_entries_task_id_fkey(id, code, name),
       billing_role:project_billing_roles!timesheet_entries_billing_role_id_fkey(id, name, rate)
-    `
+`
     )
     .eq('project_id', projectId)
     .eq('is_billable', true)
@@ -319,6 +320,7 @@ export async function getUninvoicedEntries(
         rate_source: resolvedRate?.source ?? 'legacy_role',
         rate_tier_code: resolvedRate?.tierCode ?? null,
         rate_classification_level: resolvedRate?.classificationLevel ?? null,
+        ot_flags: (entry.ot_flags ?? null) as UninvoicedEntry['ot_flags'],
       }
     })
   )

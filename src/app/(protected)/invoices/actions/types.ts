@@ -1,5 +1,5 @@
 import type { Enums, Tables } from '@/types/database'
-import type { RateSource } from '@/types/billing'
+import type { RateSource, OtFlags } from '@/types/billing'
 
 export type InvoiceStatus = Enums<'invoice_status'>
 
@@ -37,6 +37,15 @@ export type InvoiceLineWithRelations = Tables<'invoice_lines'> & {
     timesheet: {
       user: { first_name: string; last_name: string } | null
     } | null
+  } | null
+  /** Rate source from billing cascade (stored during invoice creation) */
+  rate_source?: RateSource | null
+  /** Additional rate context (tier_code, classification_level, is_ot, ot_multiplier) */
+  rate_metadata?: {
+    tier_code?: string
+    classification_level?: string
+    is_ot?: boolean
+    ot_multiplier?: number
   } | null
 }
 
@@ -77,6 +86,8 @@ export type UninvoicedEntry = {
   rate_tier_code?: string | null
   /** Employee classification level used for rate lookup */
   rate_classification_level?: string | null
+  /** OT flags per day (from timesheet entry) */
+  ot_flags?: OtFlags | null
 }
 
 export type ClientForSelect = {

@@ -606,7 +606,20 @@
       "status_updated": "Statut du projet mis à jour",
       "error_delete": "Erreur lors de la suppression du projet",
       "error_toggle": "Erreur lors de la mise à jour du statut du projet"
-    }
+    },
+    "ot_billing": "Facturation des heures supplémentaires",
+    "ot_billing_desc": "Configurer la facturation des heures supplémentaires pour ce projet",
+    "ot_mode": "Mode de facturation HS",
+    "ot_mode_flat": "Forfaitaire (même taux)",
+    "ot_mode_standard": "Standard (1,5x / 2x)",
+    "ot_mode_custom": "Multiplicateurs personnalisés",
+    "ot_mode_off": "Pas de facturation HS",
+    "ot_multiplier_1_5x": "Multiplicateur temps et demi",
+    "ot_multiplier_2x": "Multiplicateur temps double",
+    "ot_client_approval": "Pré-approbation client HS",
+    "ot_pre_approved": "Pré-approuvé",
+    "ot_per_instance": "Au cas par cas",
+    "ot_never": "Jamais"
   },
   "timesheets": {
     "title": "Feuilles de temps",
@@ -725,7 +738,64 @@
       "submit_failed": "Échec de la soumission",
       "copy_failed": "Échec de la copie",
       "approve_failed": "Échec de l'approbation",
-      "reject_failed": "Échec du refus"
+      "reject_failed": "Échec du refus",
+      "ot_approved": "Entrée TS approuvée",
+      "ot_rejected": "Entrée TS refusée",
+      "ot_approve_failed": "Échec de l'approbation de l'entrée TS",
+      "ot_reject_failed": "Échec du refus de l'entrée TS",
+      "ot_bulk_approved": "{count} entrées TS approuvées",
+      "ot_bulk_rejected": "{count} entrées TS refusées"
+    },
+    "ot": {
+      "add_flag": "Marquer comme temps supplémentaire",
+      "remove_flag": "Retirer le marquage temps supplémentaire",
+      "type_label": "Type TS",
+      "types": {
+        "standard_ot": "TS Standard",
+        "weekend": "Fin de semaine",
+        "conditions": "Conditions",
+        "custom": "Personnalisé"
+      },
+      "day_short": {
+        "0": "Lun",
+        "1": "Mar",
+        "2": "Mer",
+        "3": "Jeu",
+        "4": "Ven",
+        "5": "Sam",
+        "6": "Dim"
+      },
+      "status": {
+        "pending": "En attente",
+        "approved": "Approuvé",
+        "rejected": "Refusé"
+      },
+      "approvals": {
+        "title": "Approbations TS",
+        "subtitle": "Examiner et approuver les entrées de temps supplémentaire",
+        "no_pending": "Aucune approbation TS en attente",
+        "no_pending_message": "Les entrées de temps supplémentaire des employés apparaîtront ici lorsqu'elles seront signalées.",
+        "employee": "Employé",
+        "week": "Semaine",
+        "day": "Jour",
+        "hours": "Heures",
+        "ot_type": "Type TS",
+        "status": "Statut",
+        "actions": "Actions",
+        "approve": "Approuver",
+        "reject": "Refuser",
+        "approve_all": "Tout approuver",
+        "reject_all": "Tout refuser",
+        "day_names": {
+          "0": "Lundi",
+          "1": "Mardi",
+          "2": "Mercredi",
+          "3": "Jeudi",
+          "4": "Vendredi",
+          "5": "Samedi",
+          "6": "Dimanche"
+        }
+      }
     },
     "receipt": {
       "title": "Pièce jointe",
@@ -1127,7 +1197,21 @@
       "week": "Semaine",
       "employee": "Employé",
       "task": "Tâche",
-      "role": "Rôle"
+      "role": "Rôle",
+      "resolved_rate": "Taux"
+    },
+    "rate_source": {
+      "client_tier": "Palier {code}",
+      "default_tier": "Par défaut",
+      "project_override": "Projet",
+      "employee_override": "Surcharge",
+      "legacy_role": "Ancien",
+      "mixed": "Mixte"
+    },
+    "ot": {
+      "line_suffix": "(TS {multiplier}x)",
+      "badge": "TS",
+      "regular": "Régulier"
     },
     "detail": {
       "back_to_invoices": "Retour aux factures",
@@ -1676,6 +1760,14 @@
       "advancement": "Alertes d'avancement",
       "advancementDescription": "Apprentis approchant les seuils d'avancement de classification",
       "noAlerts": "Aucune alerte d'avancement pour le moment",
+      "allOnTrack": "Tous les apprentis sont en bonne voie",
+      "totalApprentices": "Apprentis actifs",
+      "nearAdvancement": "Proche de l'avancement",
+      "readyForAdvancement": "Prêt pour l'avancement",
+      "advanceAll": "Avancer tous les prêts",
+      "advanceAllConfirmTitle": "Avancer tous les prêts",
+      "advanceAllConfirmMessage": "Avancer les {count} apprentis qui ont atteint 100% de leurs heures requises?",
+      "trade": "Métier",
       "addTier": "Ajouter un palier",
       "createTier": "Créer un palier tarifaire",
       "createTierDescription": "Ajouter un nouveau palier tarifaire pour la facturation client",

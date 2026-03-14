@@ -18,9 +18,10 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { projectStatuses, billingTypes } from '@/lib/validations/project'
+import { projectStatuses, billingTypes, otModes, otApprovalModes } from '@/lib/validations/project'
 import { createProjectAction, updateProjectAction } from '@/app/(protected)/projects/actions'
 import type { Tables } from '@/types/database'
+import type { OtBillingConfig } from '@/types/billing'
 
 type Project = Tables<'projects'>
 
@@ -52,6 +53,9 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
   const tCommon = useTranslations('common')
   const [billingType, setBillingType] = useState(project?.billing_type ?? 'hourly')
   const [selectedClientId, setSelectedClientId] = useState(project?.client_id ?? '')
+
+  const existingOtConfig = project?.ot_billing_config as OtBillingConfig | null
+  const [otMode, setOtMode] = useState(existingOtConfig?.mode ?? 'flat')
 
   const selectedClient = clients.find((c) => c.id === selectedClientId)
   const generatedCode = selectedClient
@@ -287,6 +291,82 @@ export function ProjectForm({ project, clients, users, mode }: ProjectFormProps)
               </div>
               <p className="text-xs text-muted-foreground">{t('form.rate_per_unit')}</p>
             </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Overtime Billing */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('ot_billing')}</CardTitle>
+          <CardDescription>{t('ot_billing_desc')}</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="ot_mode">{t('ot_mode')}</Label>
+            <Select
+              name="ot_mode"
+              value={otMode}
+              onValueChange={(value) => setOtMode(value as typeof otMode)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {otModes.map((mode) => (
+                  <SelectItem key={mode} value={mode}>
+                    {t(`ot_mode_${mode}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="ot_client_approval">{t('ot_client_approval')}</Label>
+            <Select
+              name="ot_client_approval"
+              defaultValue={existingOtConfig?.client_approval ?? 'per_instance'}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {otApprovalModes.map((mode) => (
+                  <SelectItem key={mode} value={mode}>
+                    {t(`ot_${mode}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {otMode === 'custom' && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="ot_1_5x">{t('ot_multiplier_1_5x')}</Label>
+                <Input
+                  id="ot_1_5x"
+                  name="ot_1_5x"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  defaultValue={existingOtConfig?.ot_1_5x ?? 1.5}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ot_2x">{t('ot_multiplier_2x')}</Label>
+                <Input
+                  id="ot_2x"
+                  name="ot_2x"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  defaultValue={existingOtConfig?.ot_2x ?? 2.0}
+                />
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

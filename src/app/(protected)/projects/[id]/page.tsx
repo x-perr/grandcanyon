@@ -21,6 +21,7 @@ import { BillingRoleList } from '@/components/projects/billing-role-list'
 import { StatusChanger } from '@/components/projects/status-changer'
 import { getProject, getUsersForSelect } from '../actions'
 import type { Enums } from '@/types/database'
+import type { OtBillingConfig } from '@/types/billing'
 import { billingTypes } from '@/lib/validations/project'
 
 interface ProjectDetailPageProps {
@@ -57,6 +58,27 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   }
 
   const billingTypeLabel = billingTypes.find((t) => t.value === project.billing_type)?.label ?? project.billing_type
+
+  const otConfig = project.ot_billing_config as OtBillingConfig | null
+
+  const getOtModeLabel = (mode: string) => {
+    switch (mode) {
+      case 'flat': return t('ot_mode_flat')
+      case 'standard': return t('ot_mode_standard')
+      case 'custom': return t('ot_mode_custom')
+      case 'off': return t('ot_mode_off')
+      default: return mode
+    }
+  }
+
+  const getOtApprovalLabel = (approval: string) => {
+    switch (approval) {
+      case 'pre_approved': return t('ot_pre_approved')
+      case 'per_instance': return t('ot_per_instance')
+      case 'never': return t('ot_never')
+      default: return approval
+    }
+  }
 
   const getBillingRate = () => {
     switch (project.billing_type) {
@@ -182,6 +204,32 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                     <span className="text-muted-foreground">{t('detail.po_number')}</span>
                     <span className="font-mono">{project.po_number}</span>
                   </div>
+                )}
+                {otConfig && (
+                  <>
+                    <div className="flex items-center justify-between pt-2 border-t">
+                      <span className="text-muted-foreground">{t('ot_mode')}</span>
+                      <Badge variant="outline">{getOtModeLabel(otConfig.mode)}</Badge>
+                    </div>
+                    {otConfig.client_approval && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t('ot_client_approval')}</span>
+                        <span className="text-sm">{getOtApprovalLabel(otConfig.client_approval)}</span>
+                      </div>
+                    )}
+                    {otConfig.mode === 'custom' && otConfig.ot_1_5x && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t('ot_multiplier_1_5x')}</span>
+                        <span className="text-sm">{otConfig.ot_1_5x}x</span>
+                      </div>
+                    )}
+                    {otConfig.mode === 'custom' && otConfig.ot_2x && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t('ot_multiplier_2x')}</span>
+                        <span className="text-sm">{otConfig.ot_2x}x</span>
+                      </div>
+                    )}
+                  </>
                 )}
               </CardContent>
             </Card>

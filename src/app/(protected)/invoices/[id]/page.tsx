@@ -18,6 +18,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { StatusBadge } from '@/components/ui/status-badge'
+import { Badge } from '@/components/ui/badge'
+import type { RateSource } from '@/types/billing'
 import {
   Table,
   TableBody,
@@ -86,6 +88,38 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
       }
     }
     return line.description
+  }
+
+  // Rate source badge styling
+  const getRateSourceBadge = (source: RateSource, meta?: NonNullable<typeof invoice.lines>[number]['rate_metadata']) => {
+    const configs: Record<RateSource, { className: string; labelKey: string; labelParams?: Record<string, string> }> = {
+      client_tier: {
+        className: 'bg-blue-100 text-blue-700 border-blue-200',
+        labelKey: 'client_tier',
+        labelParams: { code: meta?.tier_code ?? '?' },
+      },
+      default_tier: {
+        className: 'bg-gray-100 text-gray-600 border-gray-200',
+        labelKey: 'default_tier',
+      },
+      project_override: {
+        className: 'bg-purple-100 text-purple-700 border-purple-200',
+        labelKey: 'project_override',
+      },
+      employee_override: {
+        className: 'bg-orange-100 text-orange-700 border-orange-200',
+        labelKey: 'employee_override',
+      },
+      legacy_role: {
+        className: 'bg-gray-50 text-gray-400 border-gray-200',
+        labelKey: 'legacy_role',
+      },
+    }
+    const config = configs[source] ?? configs.legacy_role
+    return {
+      className: config.className,
+      label: t(`rate_source.${config.labelKey}`, config.labelParams ?? {}),
+    }
   }
 
   const isDraft = invoice.status === 'draft'
@@ -360,20 +394,47 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {(invoice.lines ?? []).map((line) => (
-                      <TableRow key={line.id}>
-                        <TableCell>{getLineDescription(line)}</TableCell>
-                        <TableCell className="text-right font-mono">
-                          {line.quantity.toFixed(1)}
-                        </TableCell>
-                        <TableCell className="text-right font-mono">
-                          {formatCurrency(line.unit_price)}
-                        </TableCell>
-                        <TableCell className="text-right font-mono font-medium">
-                          {formatCurrency(line.amount)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {(invoice.lines ?? []).map((line) => {
+                      const lineAny = line as typeof line & { rate_source?: RateSource | null; rate_metadata?: { tier_code?: string; classification_level?: string; is_ot?: boolean; ot_multiplier?: number } | null }
+                      const rateSource = lineAny.rate_source
+                      const rateMeta = lineAny.rate_metadata
+                      const isOt = rateMeta?.is_ot === true
+                      const badge = rateSource ? getRateSourceBadge(rateSource, rateMeta) : null
+
+                      return (
+                        <TableRow key={line.id} className={isOt ? 'bg-amber-50/50' : ''}>
+                          <TableCell>
+                            <div className="flex items-center gap-1.5">
+                              <span>{getLineDescription(line)}</span>
+                              {isOt && (
+                                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] px-1 py-0">
+                                  {t('ot.badge')}
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right font-mono">
+                            {line.quantity.toFixed(1)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <span className="font-mono">{formatCurrency(line.unit_price)}</span>
+                              {badge && (
+                                <Badge
+                                  variant="outline"
+                                  className={`text-[10px] px-1 py-0 ${badge.className}`}
+                                >
+                                  {badge.label}
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right font-mono font-medium">
+                            {formatCurrency(line.amount)}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
                   </TableBody>
                   <TableFooter>
                     <TableRow>

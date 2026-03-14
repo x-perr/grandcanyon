@@ -13,6 +13,7 @@ import { getDefaultInvoiceDates, getDefaultPeriod, type InvoiceLineFormData } fr
 import { toast } from 'sonner'
 import { ChevronLeft, ChevronRight, Loader2, Save, Send } from 'lucide-react'
 import type { ClientForSelect, ProjectForSelect, UninvoicedEntry } from '@/app/(protected)/invoices/actions'
+import type { OtBillingConfig } from '@/types/billing'
 import { useTranslations } from 'next-intl'
 
 interface InvoiceWizardProps {
@@ -25,12 +26,78 @@ interface InvoiceWizardProps {
     charges_gst: boolean
     charges_qst: boolean
   }
+  otBillingConfig?: OtBillingConfig | null
+  otStandardMultiplier?: number
   initialValues: {
     client_id?: string
     project_id?: string
     period_start?: string
     period_end?: string
     selectedEntryIds: string[]
+  }
+}
+
+/** Day-level OT flag shape */
+type OtDayFlag = {
+  type: 'standard_ot' | 'weekend' | 'conditions' | 'custom'
+  status: 'pending' | 'approved' | 'rejected'
+  multiplier?: number
+}
+
+/** Get the effective OT multiplier for an entry day */
+function getOtMultiplier(
+  dayFlag: OtDayFlag | undefined,
+  otConfig: OtBillingConfig | null | undefined,
+  standardMultiplier: number,
+): number | null {
+  if (!dayFlag || dayFlag.status !== 'approved') return null
+  if (!otConfig || otConfig.mode === 'off') return null
+  if (otConfig.mode === 'flat') return null // flat = same rate, no split
+
+  // Use day-level multiplier if present (custom per-day)
+  if (dayFlag.multiplier) return dayFlag.multiplier
+
+  // Otherwise use config-level multiplier
+  if (otConfig.mode === 'custom' && otConfig.ot_1_5x) return otConfig.ot_1_5x
+  return standardMultiplier // default 1.5x
+}
+
+/** Split an entry's hours into regular and OT portions */
+function splitEntryHours(
+  entry: UninvoicedEntry,
+  otConfig: OtBillingConfig | null | undefined,
+  standardMultiplier: number,
+): { regularHours: number; otHours: number; otMultiplier: number } {
+  const hours = entry.hours ?? []
+  const otFlags = entry.ot_flags
+
+  if (!otFlags?.days || !otConfig || otConfig.mode === 'off' || otConfig.mode === 'flat') {
+    // No OT split needed
+    const total = hours.reduce((sum, h) => sum + (h ?? 0), 0)
+    return { regularHours: total, otHours: 0, otMultiplier: 1 }
+  }
+
+  let regularHours = 0
+  let otHours = 0
+  let effectiveMultiplier = standardMultiplier
+
+  hours.forEach((h, dayIndex) => {
+    const dayKey = String(dayIndex)
+    const dayFlag = otFlags.days?.[dayKey]
+    const mult = getOtMultiplier(dayFlag, otConfig, standardMultiplier)
+
+    if (mult !== null && (h ?? 0) > 0) {
+      otHours += h ?? 0
+      effectiveMultiplier = mult // use last seen multiplier for the group
+    } else {
+      regularHours += h ?? 0
+    }
+  })
+
+  return {
+    regularHours,
+    otHours,
+    otMultiplier: effectiveMultiplier,
   }
 }
 
@@ -41,6 +108,8 @@ export function InvoiceWizard({
   entries,
   nextInvoiceNumber,
   clientTaxSettings,
+  otBillingConfig,
+  otStandardMultiplier = 1.5,
   initialValues,
 }: InvoiceWizardProps) {
   const router = useRouter()
@@ -135,51 +204,102 @@ export function InvoiceWizard({
     setProjectId(newProjectId)
   }
 
-  // Build line items from selected entries
+  // Build line items from selected entries (grouped, with OT split)
   const buildLineItems = (): InvoiceLineFormData[] => {
     const selectedEntries = entries.filter((e) => selectedEntryIds.includes(e.id))
 
-    // Group by billing role + user for cleaner invoices
-    const grouped = new Map<string, { entries: UninvoicedEntry[]; totalHours: number }>()
+    // Group by billing_role + user + is_ot for cleaner invoices
+    type GroupData = {
+      entries: UninvoicedEntry[]
+      regularHours: number
+      otHours: number
+      otMultiplier: number
+      rate: number
+      rateSource: UninvoicedEntry['rate_source']
+      rateTierCode: UninvoicedEntry['rate_tier_code']
+      rateClassificationLevel: UninvoicedEntry['rate_classification_level']
+    }
+    const grouped = new Map<string, GroupData>()
 
     selectedEntries.forEach((entry) => {
       const roleId = entry.billing_role?.id ?? 'no-role'
       const userId = entry.timesheet?.user?.id ?? 'no-user'
-      const key = `${roleId}-${userId}`
+      const rate = entry.resolved_rate ?? entry.billing_role?.rate ?? 0
+      const { regularHours, otHours, otMultiplier } = splitEntryHours(entry, otBillingConfig, otStandardMultiplier)
 
-      if (!grouped.has(key)) {
-        grouped.set(key, { entries: [], totalHours: 0 })
+      // Regular hours group
+      if (regularHours > 0) {
+        const regKey = `${roleId}-${userId}-reg`
+        if (!grouped.has(regKey)) {
+          grouped.set(regKey, {
+            entries: [],
+            regularHours: 0,
+            otHours: 0,
+            otMultiplier: 1,
+            rate,
+            rateSource: entry.rate_source,
+            rateTierCode: entry.rate_tier_code,
+            rateClassificationLevel: entry.rate_classification_level,
+          })
+        }
+        const group = grouped.get(regKey)!
+        group.entries.push(entry)
+        group.regularHours += regularHours
       }
 
-      const group = grouped.get(key)!
-      group.entries.push(entry)
-      const entryHours = entry.hours?.reduce((sum, h) => sum + (h ?? 0), 0) ?? 0
-      group.totalHours += entryHours
+      // OT hours group (separate line item)
+      if (otHours > 0) {
+        const otKey = `${roleId}-${userId}-ot`
+        if (!grouped.has(otKey)) {
+          grouped.set(otKey, {
+            entries: [],
+            regularHours: 0,
+            otHours: 0,
+            otMultiplier,
+            rate,
+            rateSource: entry.rate_source,
+            rateTierCode: entry.rate_tier_code,
+            rateClassificationLevel: entry.rate_classification_level,
+          })
+        }
+        const group = grouped.get(otKey)!
+        group.entries.push(entry)
+        group.otHours += otHours
+      }
     })
 
     // Convert to line items
     const lines: InvoiceLineFormData[] = []
     let sortOrder = 1
 
-    grouped.forEach((group) => {
+    grouped.forEach((group, key) => {
       const firstEntry = group.entries[0]
       const userName = firstEntry.timesheet?.user
         ? `${firstEntry.timesheet.user.first_name} ${firstEntry.timesheet.user.last_name}`
         : 'Unknown'
       const roleName = firstEntry.billing_role?.name ?? 'General'
-      const rate = firstEntry.billing_role?.rate ?? 0
+      const isOt = key.endsWith('-ot')
 
-      const description = `${roleName} - ${userName}`
-      const quantity = group.totalHours
-      const amount = calculateLineAmount(quantity, rate)
+      const quantity = isOt ? group.otHours : group.regularHours
+      const effectiveRate = isOt ? group.rate * group.otMultiplier : group.rate
+      const amount = calculateLineAmount(quantity, effectiveRate)
+
+      const description = isOt
+        ? `${roleName} - ${userName} ${t('ot.line_suffix', { multiplier: group.otMultiplier })}`
+        : `${roleName} - ${userName}`
 
       lines.push({
         description,
         quantity,
-        unit_price: rate,
+        unit_price: effectiveRate,
         amount,
-        timesheet_entry_id: firstEntry.id, // Link to first entry (others linked during save)
+        timesheet_entry_id: firstEntry.id,
         sort_order: sortOrder++,
+        rate_source: group.rateSource,
+        rate_tier_code: group.rateTierCode,
+        rate_classification_level: group.rateClassificationLevel,
+        is_ot: isOt,
+        ot_multiplier: isOt ? group.otMultiplier : null,
       })
     })
 
@@ -201,32 +321,71 @@ export function InvoiceWizard({
   const handleSaveDraft = async () => {
     setIsSubmitting(true)
     try {
-      const lines = buildLineItems()
-
-      // For each selected entry, we need to create a line item
-      // But our grouping means we need to track all entry IDs
-      const allEntryIds = selectedEntryIds
-
-      // Create lines with all timesheet entry IDs
+      // Create per-entry lines (one line per entry, split by OT)
       const linesWithEntries: InvoiceLineFormData[] = []
-      const selectedEntries = entries.filter((e) => allEntryIds.includes(e.id))
+      const selectedEntries = entries.filter((e) => selectedEntryIds.includes(e.id))
 
-      selectedEntries.forEach((entry, index) => {
+      let sortIndex = 1
+      selectedEntries.forEach((entry) => {
         const userName = entry.timesheet?.user
           ? `${entry.timesheet.user.first_name} ${entry.timesheet.user.last_name}`
           : 'Unknown'
         const roleName = entry.billing_role?.name ?? 'General'
-        const rate = entry.billing_role?.rate ?? 0
-        const hours = entry.hours?.reduce((sum, h) => sum + (h ?? 0), 0) ?? 0
+        const rate = entry.resolved_rate ?? entry.billing_role?.rate ?? 0
+        const weekLabel = entry.timesheet?.week_start ?? 'N/A'
 
-        linesWithEntries.push({
-          description: `${roleName} - ${userName} (Week of ${entry.timesheet?.week_start ?? 'N/A'})`,
-          quantity: hours,
-          unit_price: rate,
-          amount: calculateLineAmount(hours, rate),
-          timesheet_entry_id: entry.id,
-          sort_order: index + 1,
-        })
+        const { regularHours, otHours, otMultiplier } = splitEntryHours(entry, otBillingConfig, otStandardMultiplier)
+
+        // Regular line
+        if (regularHours > 0) {
+          linesWithEntries.push({
+            description: `${roleName} - ${userName} (Week of ${weekLabel})`,
+            quantity: regularHours,
+            unit_price: rate,
+            amount: calculateLineAmount(regularHours, rate),
+            timesheet_entry_id: entry.id,
+            sort_order: sortIndex++,
+            rate_source: entry.rate_source,
+            rate_tier_code: entry.rate_tier_code,
+            rate_classification_level: entry.rate_classification_level,
+            is_ot: false,
+            ot_multiplier: null,
+          })
+        }
+
+        // OT line (separate)
+        if (otHours > 0) {
+          const otRate = rate * otMultiplier
+          linesWithEntries.push({
+            description: `${roleName} - ${userName} (Week of ${weekLabel}) ${t('ot.line_suffix', { multiplier: otMultiplier })}`,
+            quantity: otHours,
+            unit_price: otRate,
+            amount: calculateLineAmount(otHours, otRate),
+            timesheet_entry_id: entry.id,
+            sort_order: sortIndex++,
+            rate_source: entry.rate_source,
+            rate_tier_code: entry.rate_tier_code,
+            rate_classification_level: entry.rate_classification_level,
+            is_ot: true,
+            ot_multiplier: otMultiplier,
+          })
+        }
+
+        // If no hours at all (edge case), still create one line
+        if (regularHours === 0 && otHours === 0) {
+          const totalHours = entry.hours?.reduce((sum, h) => sum + (h ?? 0), 0) ?? 0
+          linesWithEntries.push({
+            description: `${roleName} - ${userName} (Week of ${weekLabel})`,
+            quantity: totalHours,
+            unit_price: rate,
+            amount: calculateLineAmount(totalHours, rate),
+            timesheet_entry_id: entry.id,
+            sort_order: sortIndex++,
+            rate_source: entry.rate_source,
+            rate_tier_code: entry.rate_tier_code,
+            rate_classification_level: entry.rate_classification_level,
+          })
+        }
       })
 
       const result = await createInvoice({

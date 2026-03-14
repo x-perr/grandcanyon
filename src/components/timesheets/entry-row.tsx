@@ -24,6 +24,10 @@ import { sumHours } from '@/lib/date'
 import { uploadTimesheetReceipt, deleteTimesheetReceipt, updateTimesheetReceiptNote } from '@/app/(protected)/timesheets/actions'
 import { toast } from 'sonner'
 import type { ProjectForTimesheet, TimesheetEntryWithRelations } from '@/app/(protected)/timesheets/actions'
+import type { OtFlags } from '@/types/billing'
+
+const OT_TYPES = ['standard_ot', 'weekend', 'conditions', 'custom'] as const
+type OtType = (typeof OT_TYPES)[number]
 
 interface EntryRowProps {
   entry: TimesheetEntryWithRelations
@@ -39,6 +43,7 @@ interface EntryUpdate {
   billing_role_id: string | null
   hours: number[]
   is_billable: boolean
+  ot_flags: OtFlags | null
 }
 
 export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: EntryRowProps) {
@@ -58,6 +63,13 @@ export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: En
   const [receiptUrl, setReceiptUrl] = useState<string | null>(entryAny.receipt_url as string ?? null)
   const [receiptNote, setReceiptNote] = useState(entryAny.receipt_note as string ?? '')
   const [receiptOpen, setReceiptOpen] = useState(false)
+
+  // OT flag state
+  const initialOtFlags = (entryAny.ot_flags as OtFlags | null) ?? null
+  const [otFlags, setOtFlags] = useState<OtFlags | null>(initialOtFlags)
+
+  // Check if any day has an OT flag
+  const hasAnyOtFlag = otFlags?.days && Object.keys(otFlags.days).length > 0
 
   // Get available tasks and billing roles based on selected project
   const selectedProject = projects.find((p) => p.id === projectId)
@@ -112,6 +124,57 @@ export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: En
   const handleBillableChange = (checked: boolean) => {
     setIsBillable(checked)
     onUpdate(entry.id, { is_billable: checked })
+  }
+
+  // Toggle OT flag for a specific day
+  const handleOtToggle = (dayIndex: number) => {
+    if (!isEditable) return
+
+    const dayKey = String(dayIndex)
+    const currentDays = otFlags?.days ?? {}
+    let newFlags: OtFlags | null
+
+    if (currentDays[dayKey]) {
+      // Remove the OT flag for this day
+      const { [dayKey]: _, ...remainingDays } = currentDays
+      if (Object.keys(remainingDays).length === 0) {
+        newFlags = null
+      } else {
+        newFlags = { ...otFlags, days: remainingDays }
+      }
+    } else {
+      // Add OT flag with default type
+      newFlags = {
+        ...otFlags,
+        days: {
+          ...currentDays,
+          [dayKey]: { type: 'standard_ot', status: 'pending' },
+        },
+      }
+    }
+
+    setOtFlags(newFlags)
+    onUpdate(entry.id, { ot_flags: newFlags })
+  }
+
+  // Change OT type for a specific day
+  const handleOtTypeChange = (dayIndex: number, type: OtType) => {
+    if (!isEditable || !otFlags?.days) return
+
+    const dayKey = String(dayIndex)
+    const dayFlag = otFlags.days[dayKey]
+    if (!dayFlag) return
+
+    const newFlags: OtFlags = {
+      ...otFlags,
+      days: {
+        ...otFlags.days,
+        [dayKey]: { ...dayFlag, type },
+      },
+    }
+
+    setOtFlags(newFlags)
+    onUpdate(entry.id, { ot_flags: newFlags })
   }
 
   // Handle receipt upload
@@ -255,17 +318,72 @@ export function EntryRow({ entry, projects, isEditable, onUpdate, onDelete }: En
       </div>
 
       {/* Hours Inputs (Mon-Sun) */}
-      <div className="flex flex-1 items-center gap-1">
-        {hours.map((h, index) => (
-          <div key={index} className="w-[60px]">
-            <HourInput
-              value={h}
-              onChange={(value) => handleHourChange(index, value)}
-              disabled={!isEditable}
-            />
-          </div>
-        ))}
+      <div className="flex flex-1 items-start gap-1">
+        {hours.map((h, index) => {
+          const dayOt = otFlags?.days?.[String(index)]
+          return (
+            <div key={index} className="w-[60px]">
+              <HourInput
+                value={h}
+                onChange={(value) => handleHourChange(index, value)}
+                disabled={!isEditable}
+              />
+              {/* OT flag toggle */}
+              {h > 0 || dayOt ? (
+                <button
+                  type="button"
+                  onClick={() => handleOtToggle(index)}
+                  disabled={!isEditable}
+                  className={`mt-0.5 flex h-5 w-full items-center justify-center rounded text-[10px] font-semibold transition-colors ${
+                    dayOt
+                      ? dayOt.status === 'approved'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                        : dayOt.status === 'rejected'
+                          ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                          : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                      : 'text-muted-foreground/40 hover:bg-muted hover:text-muted-foreground'
+                  } disabled:cursor-not-allowed disabled:opacity-50`}
+                  title={dayOt ? t('ot.remove_flag') : t('ot.add_flag')}
+                >
+                  {dayOt ? 'OT' : isEditable ? '+OT' : ''}
+                </button>
+              ) : (
+                <div className="mt-0.5 h-5" />
+              )}
+            </div>
+          )
+        })}
       </div>
+
+      {/* OT Type Selector (shows when any day has OT flag) */}
+      {hasAnyOtFlag && (
+        <div className="flex w-[100px] flex-shrink-0 flex-col gap-1">
+          <span className="text-[10px] font-medium text-orange-600">{t('ot.type_label')}</span>
+          {Object.entries(otFlags?.days ?? {}).map(([dayKey, dayFlag]) => (
+            <div key={dayKey} className="flex items-center gap-1">
+              <span className="text-[10px] text-muted-foreground w-[20px]">
+                {t(`ot.day_short.${dayKey}`)}
+              </span>
+              <Select
+                value={dayFlag.type}
+                onValueChange={(val) => handleOtTypeChange(Number(dayKey), val as OtType)}
+                disabled={!isEditable || dayFlag.status !== 'pending'}
+              >
+                <SelectTrigger className="h-5 text-[10px] px-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {OT_TYPES.map((type) => (
+                    <SelectItem key={type} value={type} className="text-xs">
+                      {t(`ot.types.${type}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Row Total */}
       <div className="flex w-[60px] flex-shrink-0 items-center justify-center">

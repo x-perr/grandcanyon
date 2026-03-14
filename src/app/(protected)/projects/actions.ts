@@ -248,6 +248,16 @@ export async function createProjectAction(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Build OT billing config
+  const otBillingConfig = {
+    mode: data.ot_mode ?? 'flat',
+    ...(data.ot_mode === 'custom' ? {
+      ot_1_5x: data.ot_1_5x ?? 1.5,
+      ot_2x: data.ot_2x ?? 2.0,
+    } : {}),
+    client_approval: data.ot_client_approval ?? 'per_instance',
+  }
+
   // Insert project
   const { data: project, error } = await supabase
     .from('projects')
@@ -269,6 +279,7 @@ export async function createProjectAction(formData: FormData) {
       po_number: data.po_number || null,
       work_type: data.work_type || null,
       created_by: user?.id,
+      ot_billing_config: otBillingConfig,
     })
     .select('id')
     .single()
@@ -328,6 +339,16 @@ export async function updateProjectAction(id: string, formData: FormData) {
   // Get current project to check if client changed (shouldn't happen but just in case)
   const { data: currentProject } = await supabase.from('projects').select('client_id').eq('id', id).single()
 
+  // Build OT billing config
+  const otBillingConfig = {
+    mode: data.ot_mode ?? 'flat',
+    ...(data.ot_mode === 'custom' ? {
+      ot_1_5x: data.ot_1_5x ?? 1.5,
+      ot_2x: data.ot_2x ?? 2.0,
+    } : {}),
+    client_approval: data.ot_client_approval ?? 'per_instance',
+  }
+
   // Update project (don't update code - it's auto-generated)
   const { error } = await supabase
     .from('projects')
@@ -346,6 +367,7 @@ export async function updateProjectAction(id: string, formData: FormData) {
       address: data.address || null,
       po_number: data.po_number || null,
       work_type: data.work_type || null,
+      ot_billing_config: otBillingConfig,
     })
     .eq('id', id)
 

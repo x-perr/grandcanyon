@@ -1593,6 +1593,179 @@ export async function sendTimesheetReminders(
 }
 
 // ============================================
+// OT APPROVAL
+// ============================================
+
+export type OtApprovalEntry = {
+  entryId: string
+  timesheetId: string
+  weekStart: string
+  dayIndex: number
+  hours: number
+  otType: 'standard_ot' | 'weekend' | 'conditions' | 'custom'
+  otStatus: 'pending' | 'approved' | 'rejected'
+  multiplier?: number
+  employeeName: string
+  employeeId: string
+  projectCode: string
+  projectName: string
+}
+
+/**
+ * Get all pending OT approval entries (for managers/admins)
+ */
+export async function getPendingOtApprovals(): Promise<OtApprovalEntry[]> {
+  const supabase = await createClient()
+  const permissions = await getUserPermissions()
+
+  if (!hasPermission(permissions, 'timesheets.approve') && !hasPermission(permissions, 'admin.manage')) {
+    return []
+  }
+
+  // Fetch all timesheet entries that have ot_flags set
+  const { data: entries, error } = await supabase
+    .from('timesheet_entries')
+    .select(`
+      id,
+      hours,
+      ot_flags,
+      timesheet:timesheets!timesheet_entries_timesheet_id_fkey(
+        id,
+        week_start,
+        user_id,
+        user:profiles!timesheets_user_id_fkey(id, first_name, last_name)
+      ),
+      project:projects!timesheet_entries_project_id_fkey(id, code, name)
+    `)
+    .not('ot_flags', 'is', null)
+
+  if (error) {
+    console.error('Error fetching OT approvals:', error)
+    return []
+  }
+
+  const results: OtApprovalEntry[] = []
+
+  for (const entry of entries ?? []) {
+    const otFlags = entry.ot_flags as OtFlags | null
+    if (!otFlags?.days) continue
+
+    const timesheet = Array.isArray(entry.timesheet) ? entry.timesheet[0] : entry.timesheet
+    const user = timesheet ? (Array.isArray(timesheet.user) ? timesheet.user[0] : timesheet.user) : null
+    const project = Array.isArray(entry.project) ? entry.project[0] : entry.project
+    const hours = safeHours(entry.hours)
+
+    for (const [dayKey, dayFlag] of Object.entries(otFlags.days)) {
+      if (dayFlag.status !== 'pending') continue
+
+      const dayIndex = parseInt(dayKey, 10)
+      results.push({
+        entryId: entry.id,
+        timesheetId: timesheet?.id ?? '',
+        weekStart: timesheet?.week_start ?? '',
+        dayIndex,
+        hours: hours[dayIndex] ?? 0,
+        otType: dayFlag.type,
+        otStatus: dayFlag.status,
+        multiplier: dayFlag.multiplier,
+        employeeName: user ? `${user.first_name} ${user.last_name}` : 'Unknown',
+        employeeId: user?.id ?? '',
+        projectCode: project?.code ?? '',
+        projectName: project?.name ?? '',
+      })
+    }
+  }
+
+  // Sort by week descending, then employee name
+  results.sort((a, b) => {
+    const weekCmp = b.weekStart.localeCompare(a.weekStart)
+    if (weekCmp !== 0) return weekCmp
+    return a.employeeName.localeCompare(b.employeeName)
+  })
+
+  return results
+}
+
+/**
+ * Approve or reject a single OT entry (specific day on a specific timesheet entry)
+ */
+export async function approveOtEntry(params: {
+  timesheetEntryId: string
+  dayIndex: number
+  approved: boolean
+}): Promise<{ success?: boolean; error?: string }> {
+  const supabase = await createClient()
+  const profile = await getProfile()
+
+  if (!profile) {
+    return { error: 'Not authenticated' }
+  }
+
+  const permissions = await getUserPermissions()
+  if (!hasPermission(permissions, 'timesheets.approve') && !hasPermission(permissions, 'admin.manage')) {
+    return { error: 'Not authorized to approve OT entries' }
+  }
+
+  // Get the entry with its current ot_flags
+  const { data: entry, error: fetchError } = await supabase
+    .from('timesheet_entries')
+    .select('id, ot_flags')
+    .eq('id', params.timesheetEntryId)
+    .single()
+
+  if (fetchError || !entry) {
+    return { error: 'Entry not found' }
+  }
+
+  const otFlags = entry.ot_flags as OtFlags | null
+  if (!otFlags?.days) {
+    return { error: 'No OT flags on this entry' }
+  }
+
+  const dayKey = String(params.dayIndex)
+  const dayFlag = otFlags.days[dayKey]
+  if (!dayFlag) {
+    return { error: 'No OT flag for this day' }
+  }
+
+  // Update the status
+  const newFlags: OtFlags = {
+    ...otFlags,
+    days: {
+      ...otFlags.days,
+      [dayKey]: {
+        ...dayFlag,
+        status: params.approved ? 'approved' : 'rejected',
+      },
+    },
+    approved_by: profile.id,
+    approved_at: new Date().toISOString(),
+  }
+
+  const { error: updateError } = await supabase
+    .from('timesheet_entries')
+    .update({ ot_flags: newFlags })
+    .eq('id', params.timesheetEntryId)
+
+  if (updateError) {
+    console.error('Error updating OT flags:', updateError)
+    return { error: 'Failed to update OT entry' }
+  }
+
+  // Audit log
+  await logAudit({
+    action: params.approved ? 'approve' : 'reject',
+    entityType: 'timesheet',
+    entityId: params.timesheetEntryId,
+    oldValues: { ot_day: params.dayIndex, ot_status: dayFlag.status, context: 'ot_entry' },
+    newValues: { ot_day: params.dayIndex, ot_status: params.approved ? 'approved' : 'rejected', context: 'ot_entry' },
+  })
+
+  revalidatePath('/timesheets')
+  return { success: true }
+}
+
+// ============================================
 // RECEIPT MANAGEMENT (Parking receipts, etc.)
 // ============================================
 

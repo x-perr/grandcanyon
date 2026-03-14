@@ -1,11 +1,15 @@
+import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Settings, Users, Shield, Building2, ClipboardList, HardHat, Contact, Layers, DollarSign } from 'lucide-react'
+import { Settings, Users, Shield, Building2, ClipboardList, HardHat, Contact, Layers, DollarSign, GraduationCap } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { getCompanySettings, getUsers, getRoles, getEmployees, getContacts } from './actions'
+import { getAdvancementAlerts } from '@/lib/billing/progression'
 import { CompanySettingsForm } from '@/components/admin/company-settings-form'
+import { AdvancementAlerts } from '@/components/admin/advancement-alerts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default async function AdminPage() {
   const t = await getTranslations('admin')
@@ -175,6 +179,47 @@ export default async function AdminPage() {
 
       {/* Company Settings Form */}
       <CompanySettingsForm settings={settings} />
+
+      {/* Apprentice Advancement Section */}
+      <Suspense fallback={<AdvancementSkeleton />}>
+        <AdvancementSection />
+      </Suspense>
+    </div>
+  )
+}
+
+function AdvancementSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-6 w-64" />
+        <Skeleton className="h-4 w-96" />
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
+        </div>
+        <Skeleton className="h-32 w-full" />
+      </CardContent>
+    </Card>
+  )
+}
+
+async function AdvancementSection() {
+  const [alerts, t] = await Promise.all([
+    getAdvancementAlerts(),
+    getTranslations('admin'),
+  ])
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <GraduationCap className="h-6 w-6" />
+        <h2 className="text-xl font-semibold">{t('billing.advancement')}</h2>
+      </div>
+      <AdvancementAlerts alerts={alerts} />
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
@@ -32,24 +33,22 @@ const nextConfig: NextConfig = {
   },
 };
 
-// Only wrap with Sentry when configured — avoids webpack plugin overhead in builds without Sentry
-const sentryEnabled = !!(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_ORG && process.env.SENTRY_PROJECT);
+// Only apply Sentry build plugin when all required env vars are set
+const hasSentryConfig = !!(
+  process.env.SENTRY_AUTH_TOKEN &&
+  process.env.SENTRY_ORG &&
+  process.env.SENTRY_PROJECT
+);
 
-let finalConfig: NextConfig = withNextIntl(nextConfig);
+const finalConfig = withNextIntl(nextConfig);
 
-if (sentryEnabled) {
-  const { withSentryConfig } = require("@sentry/nextjs");
-  finalConfig = withSentryConfig(finalConfig, {
-    silent: true,
-    org: process.env.SENTRY_ORG,
-    project: process.env.SENTRY_PROJECT,
-    authToken: process.env.SENTRY_AUTH_TOKEN,
-    bundleSizeOptimizations: {
-      excludeDebugStatements: true,
-      excludeReplayIframe: true,
-      excludeReplayShadowDom: true,
-    },
-  });
-}
-
-export default finalConfig;
+export default hasSentryConfig
+  ? withSentryConfig(finalConfig, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      silent: !process.env.CI,
+      widenClientFileUpload: true,
+      disableLogger: true,
+      automaticVercelMonitors: false,
+    })
+  : finalConfig;

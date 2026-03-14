@@ -9,7 +9,8 @@ import { WeekPicker } from '@/components/timesheets/week-picker'
 import { TimesheetGrid } from '@/components/timesheets/timesheet-grid'
 import { TimesheetActions } from '@/components/timesheets/timesheet-actions'
 import { parseDateISO, formatWeekRange, getMonday, formatDateISO } from '@/lib/date'
-import { getProfile } from '@/lib/auth'
+import { getProfile, getUserPermissions } from '@/lib/auth'
+import { isWeekEditable } from '@/lib/validations/timesheet'
 
 interface TimesheetEntryPageProps {
   params: Promise<{ week: string }>
@@ -64,19 +65,30 @@ export default async function TimesheetEntryPage({ params, searchParams }: Times
   const timesheet = result.timesheet
 
   // Fetch timesheet with entries and user's projects in parallel
-  const [fullTimesheet, projects, profile] = await Promise.all([
+  const [fullTimesheet, projects, profile, permissions] = await Promise.all([
     getTimesheetById(timesheet.id),
     getUserProjects(impersonateUserId),
     getProfile(),
+    getUserPermissions(),
   ])
 
   if (!fullTimesheet) {
     notFound()
   }
 
-  const isEditable = fullTimesheet.status === 'draft'
+  // Check date-based editability
+  const editCheck = isWeekEditable(weekStart, permissions)
+  const isEditable = fullTimesheet.status === 'draft' && editCheck.allowed
   const isImpersonating = impersonateUserId && impersonateUserId !== profile?.id
   const weekRange = formatWeekRange(monday)
+
+  // Compute lock state for WeekPicker display
+  const weekIsLocked = !editCheck.allowed
+  const weekLockReason = editCheck.reason === 'future_week'
+    ? t('errors.future_week')
+    : editCheck.reason === 'past_limit'
+      ? t('errors.past_limit')
+      : undefined
 
   // Get user info for display
   const timesheetUser = Array.isArray(fullTimesheet.user) ? fullTimesheet.user[0] : fullTimesheet.user
@@ -130,7 +142,11 @@ export default async function TimesheetEntryPage({ params, searchParams }: Times
       )}
 
       {/* Week Navigation */}
-      <WeekPicker weekStart={weekStart} />
+      <WeekPicker
+        weekStart={weekStart}
+        isLocked={weekIsLocked}
+        lockReason={weekLockReason}
+      />
 
       {/* Actions Bar */}
       <TimesheetActions

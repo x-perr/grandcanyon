@@ -127,6 +127,7 @@ export interface OtBillingConfig {
   ot_1_5x?: number
   ot_2x?: number
   premiums?: OtPremium[]
+  client_approval?: 'pre_approved' | 'per_instance' | 'never'
 }
 
 export interface OtPremium {

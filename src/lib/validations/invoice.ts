@@ -36,6 +36,13 @@ export const invoiceLineSchema = z.object({
   timesheet_entry_id: z.string().uuid().optional().nullable(),
   expense_entry_id: z.string().uuid().optional().nullable(),
   sort_order: z.number().optional(),
+  // Rate source metadata (for audit trail)
+  rate_source: z.enum(['project_override', 'employee_override', 'client_tier', 'default_tier', 'legacy_role']).optional().nullable(),
+  rate_tier_code: z.string().optional().nullable(),
+  rate_classification_level: z.string().optional().nullable(),
+  // OT metadata
+  is_ot: z.boolean().optional(),
+  ot_multiplier: z.number().optional().nullable(),
 })
 
 export type InvoiceLineFormData = z.infer<typeof invoiceLineSchema>

@@ -607,7 +607,20 @@
       "status_updated": "Project status updated",
       "error_delete": "Error deleting project",
       "error_toggle": "Error updating project status"
-    }
+    },
+    "ot_billing": "Overtime Billing",
+    "ot_billing_desc": "Configure overtime billing for this project",
+    "ot_mode": "OT Billing Mode",
+    "ot_mode_flat": "Flat (same rate)",
+    "ot_mode_standard": "Standard (1.5x / 2x)",
+    "ot_mode_custom": "Custom multipliers",
+    "ot_mode_off": "No OT billing",
+    "ot_multiplier_1_5x": "Time and a half multiplier",
+    "ot_multiplier_2x": "Double time multiplier",
+    "ot_client_approval": "Client OT Pre-Approval",
+    "ot_pre_approved": "Pre-approved",
+    "ot_per_instance": "Per instance",
+    "ot_never": "Never"
   },
   "timesheets": {
     "title": "Timesheets",
@@ -726,7 +739,64 @@
       "submit_failed": "Failed to submit timesheet",
       "copy_failed": "Failed to copy entries",
       "approve_failed": "Failed to approve timesheet",
-      "reject_failed": "Failed to reject timesheet"
+      "reject_failed": "Failed to reject timesheet",
+      "ot_approved": "OT entry approved",
+      "ot_rejected": "OT entry rejected",
+      "ot_approve_failed": "Failed to approve OT entry",
+      "ot_reject_failed": "Failed to reject OT entry",
+      "ot_bulk_approved": "Approved {count} OT entries",
+      "ot_bulk_rejected": "Rejected {count} OT entries"
+    },
+    "ot": {
+      "add_flag": "Flag as overtime",
+      "remove_flag": "Remove overtime flag",
+      "type_label": "OT Type",
+      "types": {
+        "standard_ot": "Standard OT",
+        "weekend": "Weekend",
+        "conditions": "Conditions",
+        "custom": "Custom"
+      },
+      "day_short": {
+        "0": "Mon",
+        "1": "Tue",
+        "2": "Wed",
+        "3": "Thu",
+        "4": "Fri",
+        "5": "Sat",
+        "6": "Sun"
+      },
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "approvals": {
+        "title": "OT Approvals",
+        "subtitle": "Review and approve overtime entries",
+        "no_pending": "No pending OT approvals",
+        "no_pending_message": "Overtime entries from employees will appear here when flagged.",
+        "employee": "Employee",
+        "week": "Week",
+        "day": "Day",
+        "hours": "Hours",
+        "ot_type": "OT Type",
+        "status": "Status",
+        "actions": "Actions",
+        "approve": "Approve",
+        "reject": "Reject",
+        "approve_all": "Approve All",
+        "reject_all": "Reject All",
+        "day_names": {
+          "0": "Monday",
+          "1": "Tuesday",
+          "2": "Wednesday",
+          "3": "Thursday",
+          "4": "Friday",
+          "5": "Saturday",
+          "6": "Sunday"
+        }
+      }
     },
     "receipt": {
       "title": "Receipt Attachment",
@@ -1128,7 +1198,21 @@
       "week": "Week",
       "employee": "Employee",
       "task": "Task",
-      "role": "Role"
+      "role": "Role",
+      "resolved_rate": "Rate"
+    },
+    "rate_source": {
+      "client_tier": "Tier {code}",
+      "default_tier": "Default",
+      "project_override": "Project",
+      "employee_override": "Override",
+      "legacy_role": "Legacy",
+      "mixed": "Mixed"
+    },
+    "ot": {
+      "line_suffix": "(OT {multiplier}x)",
+      "badge": "OT",
+      "regular": "Regular"
     },
     "detail": {
       "back_to_invoices": "Back to Invoices",
@@ -1677,6 +1761,14 @@
       "advancement": "Advancement Alerts",
       "advancementDescription": "Apprentices approaching classification advancement thresholds",
       "noAlerts": "No advancement alerts at this time",
+      "allOnTrack": "All apprentices are on track",
+      "totalApprentices": "Active Apprentices",
+      "nearAdvancement": "Near Advancement",
+      "readyForAdvancement": "Ready for Advancement",
+      "advanceAll": "Advance All Ready",
+      "advanceAllConfirmTitle": "Advance All Ready",
+      "advanceAllConfirmMessage": "Advance all {count} apprentices that have reached 100% of their required hours?",
+      "trade": "Trade",
       "addTier": "Add Tier",
       "createTier": "Create Rate Tier",
       "createTierDescription": "Add a new rate tier for client billing",

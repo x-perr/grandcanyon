@@ -6,7 +6,6 @@ import { redirect } from 'next/navigation'
 import { getUserPermissions, hasPermission } from '@/lib/auth'
 import { calculateTaxes } from '@/lib/tax'
 import { createInvoiceSchema, isValidInvoiceTransition, type CreateInvoiceData, type InvoiceLineFormData } from '@/lib/validations/invoice'
-import type { RateSource } from '@/types/billing'
 
 /**
  * Create a new invoice with line items
@@ -84,7 +83,7 @@ export async function createInvoice(data: CreateInvoiceData) {
     return { error: 'Failed to create invoice' }
   }
 
-  // Create line items, capturing rate source metadata for audit trail
+  // Create line items, capturing rate source and OT metadata for audit trail
   const lineItems = data.lines.map((line, index) => {
     const item: Record<string, unknown> = {
       invoice_id: invoice.id,
@@ -98,19 +97,24 @@ export async function createInvoice(data: CreateInvoiceData) {
     }
 
     // Capture billing rate source for audit trail (from rate resolution cascade)
-    const lineWithMeta = line as InvoiceLineFormData & {
-      rate_source?: RateSource
-      rate_tier_code?: string | null
-      rate_classification_level?: string | null
-    }
-    if (lineWithMeta.rate_source) {
-      item.rate_source = lineWithMeta.rate_source
+    if (line.rate_source) {
+      item.rate_source = line.rate_source
       // Store additional rate context in metadata if present
-      const rateMeta: Record<string, string> = {}
-      if (lineWithMeta.rate_tier_code) rateMeta.tier_code = lineWithMeta.rate_tier_code
-      if (lineWithMeta.rate_classification_level) rateMeta.classification_level = lineWithMeta.rate_classification_level
+      const rateMeta: Record<string, string | number | boolean> = {}
+      if (line.rate_tier_code) rateMeta.tier_code = line.rate_tier_code
+      if (line.rate_classification_level) rateMeta.classification_level = line.rate_classification_level
+      if (line.is_ot) {
+        rateMeta.is_ot = true
+        if (line.ot_multiplier) rateMeta.ot_multiplier = line.ot_multiplier
+      }
       if (Object.keys(rateMeta).length > 0) {
         item.rate_metadata = rateMeta
+      }
+    } else if (line.is_ot) {
+      // Store OT metadata even without rate_source
+      item.rate_metadata = {
+        is_ot: true,
+        ...(line.ot_multiplier ? { ot_multiplier: line.ot_multiplier } : {}),
       }
     }
 
@@ -184,7 +188,7 @@ export async function updateInvoice(
     // Delete existing lines
     await supabase.from('invoice_lines').delete().eq('invoice_id', invoiceId)
 
-    // Insert new lines, capturing rate source metadata for audit trail
+    // Insert new lines, capturing rate source and OT metadata for audit trail
     const lineItems = data.lines.map((line, index) => {
       const item: Record<string, unknown> = {
         invoice_id: invoiceId,
@@ -197,19 +201,23 @@ export async function updateInvoice(
         sort_order: index + 1,
       }
 
-      // Capture billing rate source for audit trail
-      const lineWithMeta = line as InvoiceLineFormData & {
-        rate_source?: RateSource
-        rate_tier_code?: string | null
-        rate_classification_level?: string | null
-      }
-      if (lineWithMeta.rate_source) {
-        item.rate_source = lineWithMeta.rate_source
-        const rateMeta: Record<string, string> = {}
-        if (lineWithMeta.rate_tier_code) rateMeta.tier_code = lineWithMeta.rate_tier_code
-        if (lineWithMeta.rate_classification_level) rateMeta.classification_level = lineWithMeta.rate_classification_level
+      // Capture billing rate source and OT metadata for audit trail
+      if (line.rate_source) {
+        item.rate_source = line.rate_source
+        const rateMeta: Record<string, string | number | boolean> = {}
+        if (line.rate_tier_code) rateMeta.tier_code = line.rate_tier_code
+        if (line.rate_classification_level) rateMeta.classification_level = line.rate_classification_level
+        if (line.is_ot) {
+          rateMeta.is_ot = true
+          if (line.ot_multiplier) rateMeta.ot_multiplier = line.ot_multiplier
+        }
         if (Object.keys(rateMeta).length > 0) {
           item.rate_metadata = rateMeta
+        }
+      } else if (line.is_ot) {
+        item.rate_metadata = {
+          is_ot: true,
+          ...(line.ot_multiplier ? { ot_multiplier: line.ot_multiplier } : {}),
         }
       }
 

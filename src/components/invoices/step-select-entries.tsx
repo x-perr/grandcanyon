@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -14,9 +15,16 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { formatCurrency, calculateLineAmount } from '@/lib/tax'
 import { Clock, Calendar } from 'lucide-react'
 import type { UninvoicedEntry } from '@/app/(protected)/invoices/actions'
+import type { RateSource } from '@/types/billing'
 import { useTranslations, useLocale } from 'next-intl'
 
 interface StepSelectEntriesProps {
@@ -27,6 +35,47 @@ interface StepSelectEntriesProps {
   periodEnd: string
   onPeriodStartChange: (date: string) => void
   onPeriodEndChange: (date: string) => void
+}
+
+/** Map rate source to badge styling */
+function getRateSourceBadgeProps(source: RateSource, tierCode?: string | null): {
+  className: string
+  labelKey: string
+  labelParams: Record<string, string> | undefined
+} {
+  switch (source) {
+    case 'client_tier':
+      return {
+        className: 'bg-blue-100 text-blue-700 border-blue-200',
+        labelKey: 'client_tier',
+        labelParams: { code: tierCode ?? '?' },
+      }
+    case 'default_tier':
+      return {
+        className: 'bg-gray-100 text-gray-600 border-gray-200',
+        labelKey: 'default_tier',
+        labelParams: undefined,
+      }
+    case 'project_override':
+      return {
+        className: 'bg-purple-100 text-purple-700 border-purple-200',
+        labelKey: 'project_override',
+        labelParams: undefined,
+      }
+    case 'employee_override':
+      return {
+        className: 'bg-orange-100 text-orange-700 border-orange-200',
+        labelKey: 'employee_override',
+        labelParams: undefined,
+      }
+    case 'legacy_role':
+    default:
+      return {
+        className: 'bg-gray-50 text-gray-400 border-gray-200',
+        labelKey: 'legacy_role',
+        labelParams: undefined,
+      }
+  }
 }
 
 export function StepSelectEntries({
@@ -56,7 +105,7 @@ export function StepSelectEntries({
   // Convert selectedEntryIds to Set for O(1) lookups
   const selectedIdSet = useMemo(() => new Set(selectedEntryIds), [selectedEntryIds])
 
-  // Calculate totals
+  // Calculate totals using resolved rate
   const selectedEntries = filteredEntries.filter((e) => selectedIdSet.has(e.id))
   const totalHours = selectedEntries.reduce(
     (sum, e) => sum + (e.hours?.reduce((s, h) => s + (h ?? 0), 0) ?? 0),
@@ -64,7 +113,7 @@ export function StepSelectEntries({
   )
   const totalAmount = selectedEntries.reduce((sum, e) => {
     const hours = e.hours?.reduce((s, h) => s + (h ?? 0), 0) ?? 0
-    const rate = e.billing_role?.rate ?? 0
+    const rate = e.resolved_rate ?? e.billing_role?.rate ?? 0
     return sum + calculateLineAmount(hours, rate)
   }, 0)
 
@@ -97,6 +146,12 @@ export function StepSelectEntries({
     if (!hours) return '0.0'
     const total = hours.reduce((sum, h) => sum + (h ?? 0), 0)
     return total.toFixed(1)
+  }
+
+  /** Check if entry has any approved OT days */
+  const hasApprovedOt = (entry: UninvoicedEntry): boolean => {
+    if (!entry.ot_flags?.days) return false
+    return Object.values(entry.ot_flags.days).some((d) => d.status === 'approved')
   }
 
   return (
@@ -165,71 +220,111 @@ export function StepSelectEntries({
           </div>
 
           {/* Table */}
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50px]"></TableHead>
-                  <TableHead>{t('wizard.week')}</TableHead>
-                  <TableHead className="hidden sm:table-cell">{t('wizard.employee')}</TableHead>
-                  <TableHead className="hidden md:table-cell">{t('wizard.task')}</TableHead>
-                  <TableHead className="hidden lg:table-cell">{t('wizard.role')}</TableHead>
-                  <TableHead className="text-right">{tc('labels.hours')}</TableHead>
-                  <TableHead className="text-right hidden sm:table-cell">{tc('labels.rate')}</TableHead>
-                  <TableHead className="text-right">{tc('labels.amount')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredEntries.map((entry) => {
-                  const hours = entry.hours?.reduce((s, h) => s + (h ?? 0), 0) ?? 0
-                  const rate = entry.billing_role?.rate ?? 0
-                  const amount = calculateLineAmount(hours, rate)
-                  const isSelected = selectedIdSet.has(entry.id)
+          <TooltipProvider>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[50px]"></TableHead>
+                    <TableHead>{t('wizard.week')}</TableHead>
+                    <TableHead className="hidden sm:table-cell">{t('wizard.employee')}</TableHead>
+                    <TableHead className="hidden md:table-cell">{t('wizard.task')}</TableHead>
+                    <TableHead className="hidden lg:table-cell">{t('wizard.role')}</TableHead>
+                    <TableHead className="text-right">{tc('labels.hours')}</TableHead>
+                    <TableHead className="text-right hidden sm:table-cell">{t('wizard.resolved_rate')}</TableHead>
+                    <TableHead className="text-right">{tc('labels.amount')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredEntries.map((entry) => {
+                    const hours = entry.hours?.reduce((s, h) => s + (h ?? 0), 0) ?? 0
+                    const resolvedRate = entry.resolved_rate ?? entry.billing_role?.rate ?? 0
+                    const legacyRate = entry.billing_role?.rate ?? 0
+                    const ratesDiffer = entry.resolved_rate != null && entry.resolved_rate !== legacyRate && legacyRate > 0
+                    const amount = calculateLineAmount(hours, resolvedRate)
+                    const isSelected = selectedIdSet.has(entry.id)
+                    const rateSource = entry.rate_source ?? 'legacy_role'
+                    const badgeProps = getRateSourceBadgeProps(rateSource, entry.rate_tier_code)
+                    const entryHasOt = hasApprovedOt(entry)
 
-                  return (
-                    <TableRow
-                      key={entry.id}
-                      className={`cursor-pointer ${isSelected ? 'bg-muted/50' : ''}`}
-                      onClick={() => handleToggleEntry(entry.id)}
-                    >
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => handleToggleEntry(entry.id)}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">
-                            {formatDate(entry.timesheet?.week_start)}
+                    return (
+                      <TableRow
+                        key={entry.id}
+                        className={`cursor-pointer ${isSelected ? 'bg-muted/50' : ''} ${entryHasOt ? 'border-l-2 border-l-amber-400' : ''}`}
+                        onClick={() => handleToggleEntry(entry.id)}
+                      >
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => handleToggleEntry(entry.id)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium flex items-center gap-1.5">
+                              {formatDate(entry.timesheet?.week_start)}
+                              {entryHasOt && (
+                                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] px-1 py-0">
+                                  {t('ot.badge')}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="text-sm text-muted-foreground sm:hidden">
+                              {entry.timesheet?.user?.first_name} {entry.timesheet?.user?.last_name}
+                            </div>
                           </div>
-                          <div className="text-sm text-muted-foreground sm:hidden">
-                            {entry.timesheet?.user?.first_name} {entry.timesheet?.user?.last_name}
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell">
+                          {entry.timesheet?.user?.first_name} {entry.timesheet?.user?.last_name}
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {entry.task?.name ?? '-'}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          {entry.billing_role?.name ?? '-'}
+                        </TableCell>
+                        <TableCell className="text-right font-mono">{formatHours(entry.hours)}</TableCell>
+                        <TableCell className="text-right hidden sm:table-cell">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <div className="font-mono">
+                              {formatCurrency(resolvedRate)}
+                              {ratesDiffer && (
+                                <span className="text-xs text-muted-foreground line-through ml-1">
+                                  {formatCurrency(legacyRate)}
+                                </span>
+                              )}
+                            </div>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge
+                                  variant="outline"
+                                  className={`text-[10px] px-1 py-0 cursor-default ${badgeProps.className}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {t(`rate_source.${badgeProps.labelKey}`, badgeProps.labelParams)}
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <div className="text-xs">
+                                  <div>{t(`rate_source.${badgeProps.labelKey}`, badgeProps.labelParams)}</div>
+                                  {entry.rate_classification_level && (
+                                    <div className="text-muted-foreground">{entry.rate_classification_level}</div>
+                                  )}
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        {entry.timesheet?.user?.first_name} {entry.timesheet?.user?.last_name}
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {entry.task?.name ?? '-'}
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell">
-                        {entry.billing_role?.name ?? '-'}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">{formatHours(entry.hours)}</TableCell>
-                      <TableCell className="text-right font-mono hidden sm:table-cell">
-                        {formatCurrency(rate)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono font-medium">
-                        {formatCurrency(amount)}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-mono font-medium">
+                          {formatCurrency(amount)}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </TooltipProvider>
 
           {/* Summary */}
           <Card className="bg-muted/50">
